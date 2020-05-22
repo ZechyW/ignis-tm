@@ -125,6 +125,6 @@ def print_topic(topic_id):
 
 
 for k in range(model.k):
-    print(f"[Topic {k}]")
+    print(f"[Topic {k+1}]")
     print_topic(k)
     print()
