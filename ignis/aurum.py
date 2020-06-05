@@ -20,8 +20,8 @@ class Aurum:
     ----------
     corpus_slice: ignis.corpus.CorpusSlice
         The CorpusSlice that was topic-modelled
-    model: ignis.models.BaseModel
-        The specific topic model that was trained
+    ignis_model: ignis.models.BaseModel
+        The specific Ignis topic model that was trained
     """
 
     def __init__(self, corpus_slice, ignis_model):
@@ -77,7 +77,28 @@ class Aurum:
 
         self.ignis_model.model = external_model
 
-    def init_labeller(self, labeller_type, labeller_options):
+    def get_num_topics(self):
+        """
+        Returns
+        -------
+        int
+            The number of topics in the trained model
+        """
+        return self.ignis_model.get_num_topics()
+
+    def get_topic_words(self, *args, **kwargs):
+        """
+        Returns
+        -------
+        iterable
+            The `top_n` words in the topic `topic_id`, as a list of (<word:str>,
+            <probability:float>)
+        """
+        return self.ignis_model.get_topic_words(*args, **kwargs)
+
+    # ---------------------------------------------------------------------------------
+    # Automated Labeller
+    def init_labeller(self, labeller_type, labeller_options=None):
         """
         Trains an automated labeller for this Aurum object
 
@@ -106,7 +127,9 @@ class Aurum:
             )
         return self.labeller.get_topic_labels(*args, **kwargs)
 
-    def init_vis(self, vis_type, vis_options):
+    # ---------------------------------------------------------------------------------
+    # Visualisation Data
+    def init_vis(self, vis_type, vis_options=None):
         """
         Prepares a visualisation for this Aurum object in the given format
 
@@ -136,9 +159,9 @@ class Aurum:
         return self.vis_data
 
 
-def load_model(filename):
+def load_results(filename):
     """
-    Loads an Aurum object from the given file.
+    Loads an Aurum results object from the given file.
 
     Parameters
     ----------

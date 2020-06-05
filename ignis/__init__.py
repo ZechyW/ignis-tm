@@ -11,4 +11,4 @@ LDAModel = ignis.models.lda.LDAModel
 
 train_model = ignis.probat.train_model
 
-load_model = ignis.aurum.load_model
+load_results = ignis.aurum.load_results

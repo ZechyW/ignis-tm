@@ -229,3 +229,9 @@ class LDAModel(ignis.models.base.BaseModel):
 
             # noinspection PyTypeChecker,PyCallByClass
             self.model = tp.LDAModel.load(tmp_model_file)
+
+    def get_num_topics(self):
+        return self.model.k
+
+    def get_topic_words(self, topic_id, top_n):
+        return self.model.get_topic_words(topic_id, top_n)
