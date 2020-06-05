@@ -33,6 +33,36 @@ class Corpus:
         this_doc = Document(metadata, tokens)
         self.documents[this_doc.id] = this_doc
 
+    def slice_full(self):
+        """
+        Get a CorpusSlice containing all the documents in this Corpus.
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        return CorpusSlice(self, list(self.documents))
+
+
+class CorpusSlice:
+    """
+    Contains some subset of the Documents in a Corpus, and keeps a reference to the
+    root Corpus for bookkeeping and iteration.
+
+    Parameters
+    ----------
+    root: Corpus
+        The root Corpus instance for this slice.
+    slice_ids: iterable of str
+        The IDs for the documents in this slice.
+    """
+
+    def __init__(self, root, slice_ids):
+        self.root = root
+        self.documents = {}
+        for slice_id in slice_ids:
+            self.documents[slice_id] = root.documents[slice_id]
+
 
 class Document:
     """
