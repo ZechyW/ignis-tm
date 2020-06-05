@@ -11,8 +11,10 @@ def train_model(
     corpus_slice,
     model_type="lda",
     model_options=None,
-    prepare_labeller=False,
-    prepare_vis=False,
+    labeller_type=None,
+    labeller_options=None,
+    vis_type=None,
+    vis_options=None,
 ):
     """
     Top-level helper for training topic models using various algorithms
@@ -25,12 +27,18 @@ def train_model(
     model_type: {"lda", "hdp"}
         Type of model to train
     model_options: dict, optional
-        Dictionary of keyword arguments that will be passed to the relevant
-        `ignis.models` model constructor
-    prepare_labeller: bool, optional
-        Whether or not to train the automated labeller, if available
-    prepare_vis: bool, optional
-        Whether or not to prepare the visualisation data, if available
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor
+    labeller_type: {"tomotopy"}, optional
+        The type of automated labeller to use, if available
+    labeller_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.labeller`
+        object constructor
+    vis_type: {"pyldavis"}, optional
+        The type of visualisation data to extract, if available
+    vis_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.vis`
+        object constructor
 
     Returns
     -------
@@ -48,8 +56,16 @@ def train_model(
     if model_type == "lda":
         model = ignis.LDAModel(corpus_slice, model_options)
         model.train()
-        return ignis.aurum.Aurum(corpus_slice, model)
+        aurum = ignis.aurum.Aurum(corpus_slice, model)
     elif model_type == "hdp":
-        pass
+        aurum = None
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")
+
+    if labeller_type is not None:
+        aurum.init_labeller(labeller_type, labeller_options)
+
+    if vis_type is not None:
+        aurum.init_vis(vis_type, vis_options)
+
+    return aurum

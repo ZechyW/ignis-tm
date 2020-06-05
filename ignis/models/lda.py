@@ -8,8 +8,8 @@ import ignis.corpus
 import ignis.models.base
 
 default_options = {
-    "term_weighting": "idf",
-    "k": 20,
+    "term_weighting": "one",
+    "k": 10,
     "seed": 11399,
     "workers": 8,
     "parallel_scheme": "default",

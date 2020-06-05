@@ -1,3 +1,6 @@
+import bz2
+import pathlib
+import pickle
 import uuid
 
 
@@ -33,6 +36,20 @@ class Corpus:
         this_doc = Document(metadata, tokens)
         self.documents[this_doc.id] = this_doc
 
+    def save(self, filename):
+        """
+        Saves the Corpus object to the given file.
+        Essentially uses a bz2-compressed Pickle format.
+
+        Parameters
+        ----------
+        filename: str or pathlib.Path
+            File to save the Corpus to
+        """
+        filename = pathlib.Path(filename)
+        with bz2.open(filename, "wb") as fp:
+            pickle.dump(self, fp)
+
     def slice_full(self):
         """
         Get a CorpusSlice containing all the documents in this Corpus.
@@ -42,6 +59,28 @@ class Corpus:
         CorpusSlice
         """
         return CorpusSlice(self, list(self.documents))
+
+
+def load_corpus(filename):
+    """
+    Loads a Corpus object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the Corpus object from.
+
+    Returns
+    -------
+    ignis.corpus.Corpus
+    """
+    with bz2.open(filename, "rb") as fp:
+        loaded = pickle.load(fp)
+
+    if not isinstance(loaded, Corpus):
+        raise ValueError(f"File does not contain a Corpus object: '{filename}'")
+
+    return loaded
 
 
 class CorpusSlice:
