@@ -16,16 +16,24 @@ class Aurum:
     They provide methods for easily exploring the results and iterating over the topic
     modelling process.
 
+    Aurum objects basically bring together the public APIs for Ignis models,
+    automated labellers, and visualisation data providers, while also providing general
+    save/load functionality.
+
+    NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
+    0-indexed. So a model with 5 topics has topic IDs [1, 2, 3, 4, 5] and not
+    [0, 1, 2, 3, 4].
+
+    This is for easier matching against pyLDAvis visualisations, and for easier usage
+    by non-technical users.
+
     Parameters
     ----------
-    corpus_slice: ignis.corpus.CorpusSlice
-        The CorpusSlice that was topic-modelled
     ignis_model: ignis.models.BaseModel
         The specific Ignis topic model that was trained
     """
 
-    def __init__(self, corpus_slice, ignis_model):
-        self.corpus_slice = corpus_slice
+    def __init__(self, ignis_model):
         self.ignis_model = ignis_model
 
         # Aurum objects also optionally have cached labeller and visualisation data
@@ -63,7 +71,6 @@ class Aurum:
                 external_model_bytes = fp.read()
 
         save_object = {
-            "corpus_slice": self.corpus_slice,
             "save_model": save_model,
             "model_type": save_model.model_type,
             "external_model_bytes": external_model_bytes,
@@ -77,28 +84,45 @@ class Aurum:
 
         self.ignis_model.model = external_model
 
+    # =================================================================================
+    # Topic Model
     def get_num_topics(self):
         """
-        Returns
-        -------
-        int
-            The number of topics in the trained model
+        See `ignis.models.base.BaseModel.get_num_topics()`
         """
         return self.ignis_model.get_num_topics()
 
     def get_topic_words(self, *args, **kwargs):
         """
-        Returns
-        -------
-        iterable
-            The `top_n` words in the topic `topic_id`, as a list of (<word:str>,
-            <probability:float>)
+        See `ignis.models.base.BaseModel.get_topic_words()`
         """
         return self.ignis_model.get_topic_words(*args, **kwargs)
 
+    def get_topic_documents(self, topic_id, within_top_n):
+        """
+        See `ignis.models.base.BaseModel.get_topic_documents()`
+        """
+        return self.ignis_model.get_topic_documents(topic_id, within_top_n)
+
+    def get_document_topics(self, doc_id, top_n):
+        """
+        See `ignis.models.base.BaseModel.get_document_topics()`
+        """
+        return self.ignis_model.get_document_topics(doc_id, top_n)
+
     # ---------------------------------------------------------------------------------
+    # Corpus Slice
+    # Ignis models keep track of the corpus slice they are operating over; in turn,
+    # corpus slices keep track of the full corpus.
+    def get_document_by_id(self, doc_id):
+        """
+        See `ignis.models.base.BaseModel.get_document_by_id()`
+        """
+        return self.ignis_model.get_document_by_id(doc_id)
+
+    # =================================================================================
     # Automated Labeller
-    def init_labeller(self, labeller_type, labeller_options=None):
+    def init_labeller(self, labeller_type, **labeller_options):
         """
         Trains an automated labeller for this Aurum object
 
@@ -106,12 +130,13 @@ class Aurum:
         ----------
         labeller_type: {"tomotopy"}
             String denoting the labeller type.
-        labeller_options: dict, optional
-            Dictionary of options for the given labeller type.
+        **labeller_options
+            Keyword arguments that are passed to the constructor for the given
+            labeller type.
         """
         if labeller_type == "tomotopy":
             self.labeller = ignis.labeller.tomotopy.TomotopyLabeller(
-                self.ignis_model.model, labeller_options
+                self.ignis_model.model, **labeller_options
             )
         else:
             raise ValueError(f"Unknown labeller type: '{labeller_type}'")
@@ -127,9 +152,9 @@ class Aurum:
             )
         return self.labeller.get_topic_labels(*args, **kwargs)
 
-    # ---------------------------------------------------------------------------------
+    # =================================================================================
     # Visualisation Data
-    def init_vis(self, vis_type, vis_options=None):
+    def init_vis(self, vis_type, force=False, **vis_options):
         """
         Prepares a visualisation for this Aurum object in the given format
 
@@ -137,12 +162,22 @@ class Aurum:
         ----------
         vis_type: {"pyldavis"}
             String denoting the visualisation type.
-        vis_options: dict, optional
-            Dictionary of options for the given visualisation type.
+        force: bool, optional
+            If `self.vis_data` is already set, it will not be recalculated unless
+            `force` is set.
+        **vis_options
+            Keyword arguments that are passed to the constructor for the given
+            visualisation type.
         """
         if vis_type == "pyldavis":
+            if self.vis_data is not None and not force:
+                raise RuntimeError(
+                    "Visualisation data already exists for this Aurum object. "
+                    "Pass `force=True` to force recalculation."
+                )
+
             self.vis_data = ignis.vis.pyldavis.prepare_data(
-                self.ignis_model.model, vis_options
+                self.ignis_model.model, **vis_options
             )
         else:
             raise ValueError(f"Unknown visualisation type: '{vis_type}'")
@@ -175,7 +210,6 @@ def load_results(filename):
     with bz2.open(filename, "rb") as fp:
         save_object = pickle.load(fp)
 
-    corpus_slice = save_object["corpus_slice"]
     model_type = save_object["model_type"]
     save_model = save_object["save_model"]
     external_model_bytes = save_object["external_model_bytes"]
@@ -190,7 +224,7 @@ def load_results(filename):
 
     save_model.model = external_model
 
-    aurum = Aurum(corpus_slice, save_model)
+    aurum = Aurum(save_model)
     aurum.vis_data = vis_data
 
     return aurum

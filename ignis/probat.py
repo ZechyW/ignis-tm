@@ -56,16 +56,16 @@ def train_model(
     if model_type == "lda":
         model = ignis.LDAModel(corpus_slice, model_options)
         model.train()
-        aurum = ignis.aurum.Aurum(corpus_slice, model)
+        aurum = ignis.aurum.Aurum(model)
     elif model_type == "hdp":
         aurum = None
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")
 
     if labeller_type is not None:
-        aurum.init_labeller(labeller_type, labeller_options)
+        aurum.init_labeller(labeller_type, **labeller_options)
 
     if vis_type is not None:
-        aurum.init_vis(vis_type, vis_options)
+        aurum.init_vis(vis_type, **vis_options)
 
     return aurum

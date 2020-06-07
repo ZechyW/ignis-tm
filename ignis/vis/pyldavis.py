@@ -3,15 +3,8 @@ import time
 
 import pyLDAvis
 
-default_options = {
-    "mds": "pcoa",
-    "lambda_step": 0.1,
-    "sort_topics": False,
-    "verbose": False,
-}
 
-
-def prepare_data(model, options=None):
+def prepare_data(model, mds="pcoa", lambda_step=0.1, sort_topics=False, verbose=False):
     """
     Provides a simple interface for preparing the data for visualisation with pyLDAvis
 
@@ -19,16 +12,15 @@ def prepare_data(model, options=None):
     ----------
     model: tp.LDAModel
         A trained Tomotopy model
-    options: dict, optional
-        Vis-specific options (See pyLDAvis docs for details)
+    verbose: bool, optional
+        Whether or not to print verbose progress messages
+
+    mds
+    lambda_step
+    sort_topics
+        These other keyword arguments are pyLDAvis-specific options
+        (See pyLDAvis docs for details)
     """
-    if options is None:
-        options = {}
-    options = dict(default_options, **options)
-
-    verbose = options["verbose"]
-
-    # Prepare the visualisation data
     model_data = {
         "topic_term_dists": [model.get_topic_word_dist(k) for k in range(model.k)],
         "doc_topic_dists": [
@@ -38,6 +30,11 @@ def prepare_data(model, options=None):
         "vocab": model.vocabs,
         "term_frequency": model.vocab_freq,
     }
+
+    # Since we are doing the actual calculations in a separate thread, we collect the
+    # options here to pass them through more neatly
+    # (Is there a better way to handle this?)
+    options = {"mds": mds, "lambda_step": lambda_step, "sort_topics": sort_topics}
 
     if verbose:
         print("Preparing LDA visualisation", flush=True, end="")
@@ -78,11 +75,5 @@ def _prepare_vis(model_data, options, results):
         Single element list to be passed in by reference -- The prepared data will be
         stored here.
     """
-    mds = options["mds"]
-    lambda_step = options["lambda_step"]
-    sort_topics = options["sort_topics"]
-
-    vis_data = pyLDAvis.prepare(
-        **model_data, mds=mds, lambda_step=lambda_step, sort_topics=sort_topics
-    )
+    vis_data = pyLDAvis.prepare(**model_data, **options)
     results[0] = vis_data

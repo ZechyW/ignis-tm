@@ -61,18 +61,10 @@ class LDAModel(ignis.models.base.BaseModel):
     """
 
     def __init__(self, corpus_slice, options=None):
-        super().__init__(options)
+        super().__init__(corpus_slice, options)
 
         # For saving/loading
         self.model_type = "tp_lda"
-
-        if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
-            raise ValueError(
-                "Ignis models must be instantiated with Corpus or "
-                "CorpusSlice instances."
-            )
-
-        self.corpus_slice = corpus_slice
 
         # `options` is a dict holding any user-defined model options.
         # Since it comes from an external source, we keep it as a separate dict rather
@@ -234,4 +226,34 @@ class LDAModel(ignis.models.base.BaseModel):
         return self.model.k
 
     def get_topic_words(self, topic_id, top_n):
-        return self.model.get_topic_words(topic_id, top_n)
+        # Tomotopy topics are 0-indexed
+        tp_topic_id = topic_id - 1
+        return self.model.get_topic_words(tp_topic_id, top_n)
+
+    def get_topic_documents(self, topic_id, within_top_n):
+        # Tomotopy topics are 0-indexed
+        tp_topic_id = topic_id - 1
+
+        topic_documents = []
+        for doc_id in self.corpus_slice.documents:
+            model_index = self.doc_id_to_model_index[doc_id]
+            model_doc = self.model.docs[model_index]
+            doc_topics = model_doc.get_topics(top_n=within_top_n)
+
+            # Each item in doc_topics is a tuple of (<tp_topic_id>, <probability>)
+            for topic, prob in doc_topics:
+                if topic == tp_topic_id:
+                    topic_documents.append((doc_id, prob))
+
+        return topic_documents
+
+    def get_document_topics(self, doc_id, top_n):
+        model_index = self.doc_id_to_model_index[doc_id]
+        model_doc = self.model.docs[model_index]
+        doc_topics = model_doc.get_topics(top_n=top_n)
+
+        # Each item in doc_topics is a tuple of (<topic_id>, <probability>),
+        # but the `topic_id` returned by Tomotopy is 0-indexed, so we need to add 1
+        doc_topics = [(tp_topic_id + 1, prob) for tp_topic_id, prob in doc_topics]
+
+        return doc_topics

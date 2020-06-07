@@ -1,17 +1,5 @@
 import tomotopy as tp
 
-default_options = {
-    # Candidates
-    "min_cf": 10,
-    "min_df": 5,
-    "max_len": 5,
-    "max_cand": 10000,
-    # First-order Relevance
-    "smoothing": 0.01,
-    "mu": 0.25,
-    "workers": 8,
-}
-
 
 class TomotopyLabeller:
     """
@@ -21,30 +9,54 @@ class TomotopyLabeller:
     ----------
     model: tp.LDAModel
         A trained Tomotopy model
-    options: dict, optional
-        Labeller-specific options (See Tomotopy docs for details)
+    verbose: bool, optional
+        Whether or not to print verbose progress messages
+    workers: int, optional
+        Number of worker processes to use for the labeller -- Note that this *might*
+        affect other random processes (e.g., the topic modelling proper) because it
+        affects the parallelisation operations
+
+    Other Parameters
+    ----------------
+    The other keyword arguments are labeller-specific options (See Tomotopy docs for
+    details)
     """
 
-    def __init__(self, model, options=None):
-        if options is None:
-            options = {}
-        self.options = dict(default_options, **options)
+    def __init__(
+        self,
+        model,
+        min_cf=10,
+        min_df=5,
+        max_len=5,
+        max_cand=10000,
+        smoothing=0.01,
+        mu=0.25,
+        workers=8,
+        verbose=False,
+    ):
         self.model = model
 
-        # Initialise the labeller
-        min_cf = self.options["min_cf"]
-        min_df = self.options["min_df"]
-        max_len = self.options["max_len"]
-        max_cand = self.options["max_cand"]
-        smoothing = self.options["smoothing"]
-        mu = self.options["mu"]
-        workers = self.options["workers"]
+        # Bookkeeping: Save a record of the options used
+        self.options = {
+            "min_cf": min_cf,
+            "min_df": min_df,
+            "max_len": max_len,
+            "max_cand": max_cand,
+            "smoothing": smoothing,
+            "mu": mu,
+            "workers": workers,
+            "verbose": verbose,
+        }
 
+        if verbose:
+            print("Extracting label candidates from model...")
         extractor = tp.label.PMIExtractor(
             min_cf=min_cf, min_df=min_df, max_len=max_len, max_cand=max_cand
         )
         candidates = extractor.extract(self.model)
 
+        if verbose:
+            print("Preparing First-order relevance labeller...")
         self.labeller = tp.label.FoRelevance(
             self.model,
             candidates,
@@ -53,6 +65,9 @@ class TomotopyLabeller:
             mu=mu,
             workers=workers,
         )
+
+        if verbose:
+            print("Done.")
 
     def get_topic_labels(self, k, top_n=10):
         """
