@@ -5,8 +5,6 @@ class BaseModel:
     """
     The base class for all Ignis models.
 
-    Also handles general CorpusSlice manipulation.
-
     NOTE: All Ignis models should have topic IDs that start from 1 and not 0;
     i.e., they should be in range(1, num_topics + 1)
 
@@ -19,13 +17,19 @@ class BaseModel:
     """
 
     def __init__(self, corpus_slice, options=None):
-        if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
-            raise ValueError(
-                "Ignis models must be instantiated with Corpus or "
-                "CorpusSlice instances."
-            )
-
+        # Save a reference to the CorpusSlice we are modelling over
         self.corpus_slice = corpus_slice
+
+        # Unique model type identifier for saving/loading results
+        self.model_type = "<set_me>"
+
+        # Model-specific options
+        if options is None:
+            options = {}
+        self.options = options
+
+        # The actual model, as created by the external topic modelling library
+        self.model = None
 
     def get_num_topics(self):
         """
@@ -100,19 +104,3 @@ class BaseModel:
             A list of tuples (<topic ID>, <probability>)
         """
         pass
-
-    # ---------------------------------------------------------------------------------
-    # Methods that operate on the CorpusSlice
-    def get_document_by_id(self, doc_id):
-        """
-        Return the document from the model's CorpusSlice with the given ID.
-
-        Parameters
-        ----------
-        doc_id
-
-        Returns
-        -------
-        ignis.corpus.Document
-        """
-        return self.corpus_slice.documents[doc_id]

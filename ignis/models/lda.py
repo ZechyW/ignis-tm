@@ -63,7 +63,7 @@ class LDAModel(ignis.models.base.BaseModel):
     def __init__(self, corpus_slice, options=None):
         super().__init__(corpus_slice, options)
 
-        # For saving/loading
+        self.corpus_slice = corpus_slice
         self.model_type = "tp_lda"
 
         # `options` is a dict holding any user-defined model options.

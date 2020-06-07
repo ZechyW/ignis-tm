@@ -58,7 +58,7 @@ class Corpus:
         -------
         CorpusSlice
         """
-        return CorpusSlice(self, list(self.documents))
+        return CorpusSlice(root=self, slice_ids=list(self.documents))
 
 
 def load_corpus(filename):
@@ -94,6 +94,11 @@ class CorpusSlice:
         The root Corpus instance for this slice.
     slice_ids: iterable of str
         The IDs for the documents in this slice.
+
+    Attributes
+    ----------
+    documents: dict
+        Mapping of IDs to Documents.
     """
 
     def __init__(self, root, slice_ids):
@@ -101,6 +106,70 @@ class CorpusSlice:
         self.documents = {}
         for slice_id in slice_ids:
             self.documents[slice_id] = root.documents[slice_id]
+
+    def get_document(self, doc_id):
+        """
+        Return the Document from this CorpusSlice with the given ID.
+
+        Parameters
+        ----------
+        doc_id
+
+        Returns
+        -------
+        Document
+        """
+        return self.documents[doc_id]
+
+    def slice_by_ids(self, doc_ids):
+        """
+        Create a new CorpusSlice with the given Document IDs.
+        The IDs do not have to be part of this CorpusSlice, as long as they are a
+        part of the root Corpus.
+
+        Parameters
+        ----------
+        doc_ids: iterable of str
+            List of Document IDs
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        return CorpusSlice(self.root, doc_ids)
+
+    def slice_by_tokens(self, tokens, include_root=False):
+        """
+        Create a new CorpusSlice with Documents that contain at least one of the
+        given tokens.
+        If `include_root` is True, will also search the root Corpus for Documents
+        instead of limiting the search to the current CorpusSlice.
+
+        Parameters
+        ----------
+        tokens: iterable of str
+            A list of the tokens to search Documents for
+        include_root: bool, optional
+            Whether or not to search the root Corpus as well
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        if include_root:
+            search_docs = self.root.documents
+        else:
+            search_docs = self.documents
+
+        search_tokens = set(tokens)
+
+        found_doc_ids = []
+        for doc_id, doc in search_docs.items():
+            doc_tokens = set(doc.tokens)
+            if len(search_tokens & doc_tokens) > 0:
+                found_doc_ids.append(doc_id)
+
+        return self.slice_by_ids(found_doc_ids)
 
 
 class Document:

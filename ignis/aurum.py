@@ -36,6 +36,10 @@ class Aurum:
     def __init__(self, ignis_model):
         self.ignis_model = ignis_model
 
+        # Grab a reference to the CorpusSlice object so that we can use its methods
+        # directly
+        self.corpus_slice = ignis_model.corpus_slice
+
         # Aurum objects also optionally have cached labeller and visualisation data
         # objects
         self.labeller = None
@@ -56,15 +60,17 @@ class Aurum:
         """
         filename = pathlib.Path(filename)
 
-        # Copy the Ignis model, separate the actual Tomotopy part out, pickle
+        # Copy the Ignis model, separate the external library's model out, pickle
         # everything together
+        # (The model objects created by external libraries might not be pickle-able)
         external_model = self.ignis_model.model
         self.ignis_model.model = None
         save_model = copy.deepcopy(self.ignis_model)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_model_file = pathlib.Path(tmpdir) / "save_model.bin"
-            # model.save() expects the filename to be a string
+            # We assume that the external library's model object provides a `.save()`
+            # method that takes the filename as a string
             tmp_model_file = str(tmp_model_file)
             external_model.save(tmp_model_file)
             with open(tmp_model_file, "rb") as fp:
@@ -110,15 +116,25 @@ class Aurum:
         """
         return self.ignis_model.get_document_topics(doc_id, top_n)
 
-    # ---------------------------------------------------------------------------------
+    # =================================================================================
     # Corpus Slice
-    # Ignis models keep track of the corpus slice they are operating over; in turn,
-    # corpus slices keep track of the full corpus.
-    def get_document_by_id(self, doc_id):
+    def get_document(self, doc_id):
         """
-        See `ignis.models.base.BaseModel.get_document_by_id()`
+        See `ignis.corpus.CorpusSlice.get_document()`
         """
-        return self.ignis_model.get_document_by_id(doc_id)
+        return self.corpus_slice.get_document(doc_id)
+
+    def slice_by_ids(self, doc_ids):
+        """
+        See `ignis.corpus.CorpusSlice.slice_by_ids()`
+        """
+        return self.corpus_slice.slice_by_ids(doc_ids)
+
+    def slice_by_tokens(self, tokens, include_root):
+        """
+        See `ignis.corpus.CorpusSlice.slice_by_tokens()`
+        """
+        return self.corpus_slice.slice_by_tokens(tokens, include_root)
 
     # =================================================================================
     # Automated Labeller
