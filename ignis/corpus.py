@@ -20,7 +20,7 @@ class Corpus:
     def __init__(self):
         self.documents = {}
 
-    def add_doc(self, metadata, tokens):
+    def add_doc(self, metadata, tokens, human_readable=None):
         """
         Creates a new Document with the given parameters and starts tracking it.
 
@@ -32,8 +32,14 @@ class Corpus:
 
         tokens: iterable of str
             The individual content tokens in the given document.
+
+        human_readable: str, optional
+            A human-readable version of the Document text.
+            If None, will use the Document tokens joined with single spaces.
         """
-        this_doc = Document(metadata, tokens)
+        if human_readable is None:
+            human_readable = " ".join(tokens)
+        this_doc = Document(metadata, tokens, human_readable)
         self.documents[this_doc.id] = this_doc
 
     def save(self, filename):
@@ -107,6 +113,9 @@ class CorpusSlice:
         for slice_id in slice_ids:
             self.documents[slice_id] = root.documents[slice_id]
 
+    def __len__(self):
+        return len(self.documents)
+
     def get_document(self, doc_id):
         """
         Return the Document from this CorpusSlice with the given ID.
@@ -171,6 +180,29 @@ class CorpusSlice:
 
         return self.slice_by_ids(found_doc_ids)
 
+    def concat(self, *other_slices):
+        """
+        Returns a new CorpusSlice that has the Documents from this instance and all
+        the other specified CorpusSlices.
+
+        Will retain the root Corpus from this instance.
+
+        Parameters
+        ----------
+        other_slices: iterable of CorpusSlice
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        new_slice_ids = set(self.documents)
+
+        for other_slice in other_slices:
+            slice_ids = set(other_slice.documents)
+            new_slice_ids = new_slice_ids | slice_ids
+
+        return CorpusSlice(self.root, new_slice_ids)
+
 
 class Document:
     """
@@ -185,12 +217,18 @@ class Document:
 
     tokens: iterable of str
         The individual content tokens in the given document.
+
+    human_readable: str
+        A string representing the Document in human-readable form.
     """
 
-    def __init__(self, metadata, tokens):
+    def __init__(self, metadata, tokens, human_readable):
         self.id = str(uuid.uuid4())
         self.metadata = metadata
         self.tokens = tokens
+        self.human_readable = human_readable
 
     def __str__(self):
-        return f"ID: {self.id}\n\nMetadata: {self.metadata}\n\n{' '.join(self.tokens)}"
+        return (
+            f"ID: {self.id}\n\nMetadata: {self.metadata}\n\n" f"{self.human_readable}"
+        )

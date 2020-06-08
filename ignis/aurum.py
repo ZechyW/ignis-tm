@@ -2,6 +2,7 @@ import bz2
 import copy
 import pathlib
 import pickle
+import pprint
 import tempfile
 
 import tomotopy as tp
@@ -35,6 +36,8 @@ class Aurum:
 
     def __init__(self, ignis_model):
         self.ignis_model = ignis_model
+        self.model_type = ignis_model.model_type
+        self.model_options = ignis_model.options
 
         # Grab a reference to the CorpusSlice object so that we can use its methods
         # directly
@@ -45,6 +48,7 @@ class Aurum:
         self.labeller = None
 
         self.vis_type = None
+        self.vis_options = None
         self.vis_data = None
 
     def save(self, filename):
@@ -85,6 +89,7 @@ class Aurum:
             # We should also be able to save any cached visualisation data, but the
             # labeller is probably not pickle-able.
             "vis_type": self.vis_type,
+            "vis_options": self.vis_options,
             "vis_data": self.vis_data,
         }
 
@@ -121,6 +126,16 @@ class Aurum:
 
     # =================================================================================
     # Corpus Slice
+    def get_documents(self):
+        """
+        Get the IDs of all the documents that are covered by this Ignis model.
+
+        Returns
+        -------
+        iterable of str
+        """
+        return list(self.corpus_slice.documents.keys())
+
     def get_document(self, doc_id):
         """
         See `ignis.corpus.CorpusSlice.get_document()`
@@ -173,6 +188,7 @@ class Aurum:
 
     # =================================================================================
     # Visualisation Data
+    # TODO: Move `vis_data` into a full visualisation object, like the labeller/model?
     def init_vis(self, vis_type, force=False, **vis_options):
         """
         Prepares a visualisation for this Aurum object in the given format
@@ -197,6 +213,7 @@ class Aurum:
                 )
 
             self.vis_type = vis_type
+            self.vis_options = vis_options
             self.vis_data = ignis.vis.pyldavis.prepare_data(
                 self.ignis_model.model, **vis_options
             )
@@ -205,7 +222,7 @@ class Aurum:
 
     def get_vis_data(self):
         """
-        Returns the prepared visualisation data for this model, if any
+        Returns the prepared visualisation data for this model, if any.
         """
         if self.vis_data is None:
             raise RuntimeError(
@@ -213,6 +230,23 @@ class Aurum:
                 "Use `.init_vis()` to prepare it."
             )
         return self.vis_data
+
+    def show_visualisation(self):
+        """
+        Displays the prepared visualisation for this model.
+        (Presumes that the `ignis.vis` class returns a situation-appropriate format,
+        e.g., for display in a Jupyter notebook)
+
+        Returns
+        -------
+        The output of the `show_visualisation` method of the relevant `ingnis.vis` class
+        """
+        vis_data = self.get_vis_data()
+
+        if self.vis_type == "pyldavis":
+            return ignis.vis.pyldavis.show_visualisation(vis_data)
+        else:
+            raise RuntimeError(f"Unknown saved visualisation type: '{self.vis_type}'")
 
     def export_visualisation(self, folder):
         """
@@ -230,6 +264,192 @@ class Aurum:
             ignis.vis.pyldavis.export_visualisation(vis_data, folder)
         else:
             raise RuntimeError(f"Unknown saved visualisation type: '{self.vis_type}'")
+
+    # =================================================================================
+    # Jupyter widgets
+    def nb_show_topics(self, top_labels=None, top_words=None):
+        """
+        Convenience function to create an interactive Jupyter notebook widget for
+        exploring the topics in this model.
+
+        Parameters
+        ----------
+        top_labels: int, optional
+            Number of top suggested labels for this topic to show.
+            If None, will skip showing labels.
+        top_words: int, optional
+            Number of top words for this topics to show.
+            If None, will skip showing top words.
+
+        Returns
+        -------
+        ipywidgets.interact function
+        """
+        import ipywidgets
+
+        # Prepare the display function
+        def show_topic(topic_id=1):
+            print(f"[Topic {topic_id}]")
+
+            # Labels
+            if top_labels is not None:
+                labels = ", ".join(
+                    label
+                    for label, score in self.get_topic_labels(
+                        topic_id, top_n=top_labels
+                    )
+                )
+                print(f"\nSuggested labels:\n{labels}")
+
+            # Top words
+            if top_words is not None:
+                words_probs = self.get_topic_words(topic_id, top_n=top_words)
+                words = [x[0] for x in words_probs]
+
+                words = ", ".join(words)
+                print(f"\nTop words:\n{words}")
+
+        return ipywidgets.interact(show_topic, topic_id=(1, self.get_num_topics()))
+
+    def nb_show_topic_documents(self, topic_id, within_top_n):
+        """
+        Convenience function to create an interactive Jupyter notebook widget for
+        exploring the documents under a certain topic in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        parameters accepted.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_id
+        within_top_n
+
+        Returns
+        -------
+        ipywidgets.interact function
+        """
+        import ipywidgets
+
+        # Grab the documents that match the params passed
+        topic_docs = [
+            doc_id
+            for doc_id, prob in self.get_topic_documents(
+                topic_id=topic_id, within_top_n=within_top_n
+            )
+        ]
+
+        # Prepare the display function
+        def show_topic_doc(index=0):
+            doc_id = topic_docs[index]
+            doc = self.get_document(doc_id)
+            print(str(doc))
+            print()
+            print("Top document topics (in descending order of probability):")
+            pprint.pprint(self.get_document_topics(doc_id, 10))
+
+        return ipywidgets.interact(show_topic_doc, index=(0, len(topic_docs) - 1))
+
+    # =================================================================================
+    # Slicing and Iteration
+    # Convenience functions that help with the exploring the Model-Corpus interface
+    def slice_by_topic(self, topic_id, within_top_n):
+        """
+        Convenience function to create a new CorpusSlice with Documents that come
+        under a given topic in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        parameters accepted.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_id
+        within_top_n
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        """
+        topic_docs = [
+            doc_id
+            for doc_id, prob in self.get_topic_documents(
+                topic_id=topic_id, within_top_n=within_top_n
+            )
+        ]
+        return self.slice_by_ids(topic_docs)
+
+    def retrain_model(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        labeller_type=None,
+        labeller_options=None,
+        vis_type=None,
+        vis_options=None,
+    ):
+        """
+        (Re-)trains a topic model with any number of specified options changed; any
+        parameters that are None will be kept the same as the current model.
+
+        See `ignis.probat.train_model()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        labeller_type
+        labeller_options
+        vis_type
+        vis_options
+
+        Returns
+        -------
+        ignis.aurum.Aurum
+            The Aurum results object for the newly-trained model, which can be used
+            for further exploration and iteration
+        """
+        new_kwargs = {
+            "corpus_slice": corpus_slice or self.corpus_slice,
+            "model_type": model_type or self.model_type,
+            "vis_type": vis_type or self.vis_type,
+        }
+
+        # We can only look up current labeller settings if this object has a labeller
+        # initialised in the first place
+        if self.labeller is not None:
+            if labeller_type is None:
+                new_kwargs["labeller_type"] = self.labeller.labeller_type
+            if labeller_options is None:
+                new_kwargs["labeller_options"] = self.labeller.options
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs["model_options"] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs["model_options"] = self.model_options
+
+        if labeller_options is not None:
+            if self.labeller is not None:
+                new_kwargs["labeller_options"] = dict(
+                    self.labeller.options, **labeller_options
+                )
+            else:
+                new_kwargs["labeller_options"] = labeller_options
+
+        if vis_options is not None:
+            if self.vis_options is not None:
+                new_kwargs["vis_options"] = dict(self.vis_options, **vis_options)
+            else:
+                new_kwargs["vis_options"] = vis_options
+        else:
+            new_kwargs["vis_options"] = self.vis_options
+
+        return ignis.probat.train_model(**new_kwargs)
 
 
 def load_results(filename):
@@ -265,6 +485,7 @@ def load_results(filename):
     aurum = Aurum(save_model)
 
     aurum.vis_type = save_object["vis_type"]
+    aurum.vis_options = save_object["vis_options"]
     aurum.vis_data = save_object["vis_data"]
 
     return aurum

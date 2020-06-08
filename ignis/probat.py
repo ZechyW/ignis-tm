@@ -24,8 +24,9 @@ def train_model(
     corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
         The CorpusSlice to perform the topic modelling over.  If a Corpus is passed
         instead, a CorpusSlice containing all of its Documents will be created.
-    model_type: {"lda", "hdp"}
-        Type of model to train
+    model_type: {"tp_lda", "tp_hdp"}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class
     model_options: dict, optional
         Dictionary of options that will be passed to the relevant `ignis.models`
         model constructor
@@ -53,20 +54,26 @@ def train_model(
             "Ignis models must be instantiated with Corpus or CorpusSlice instances."
         )
 
-    if model_type == "lda":
+    if model_type == "tp_lda":
         model = ignis.LDAModel(corpus_slice, model_options)
         model.train()
         aurum = ignis.aurum.Aurum(model)
-    elif model_type == "hdp":
+    elif model_type == "tp_hdp":
         # Not implemented yet
         aurum = None
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")
 
     if labeller_type is not None:
+        if labeller_options is None:
+            labeller_options = {}
+
         aurum.init_labeller(labeller_type, **labeller_options)
 
     if vis_type is not None:
+        if vis_options is None:
+            vis_options = {}
+
         aurum.init_vis(vis_type, **vis_options)
 
     return aurum

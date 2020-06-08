@@ -34,6 +34,8 @@ class TomotopyLabeller:
         workers=8,
         verbose=False,
     ):
+        self.labeller_type = "tomotopy"
+
         self.model = model
 
         # Bookkeeping: Save a record of the options used
@@ -49,14 +51,14 @@ class TomotopyLabeller:
         }
 
         if verbose:
-            print("Extracting label candidates from model...")
+            print("Extracting label candidates from model...", flush=True)
         extractor = tp.label.PMIExtractor(
             min_cf=min_cf, min_df=min_df, max_len=max_len, max_cand=max_cand
         )
         candidates = extractor.extract(self.model)
 
         if verbose:
-            print("Preparing First-order relevance labeller...")
+            print("Preparing First-order relevance labeller...", flush=True)
         self.labeller = tp.label.FoRelevance(
             self.model,
             candidates,

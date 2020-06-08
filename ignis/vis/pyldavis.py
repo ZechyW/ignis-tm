@@ -2,10 +2,12 @@ import pathlib
 import shutil
 import threading
 import time
+import warnings
 
+import IPython.utils.shimmodule
 import pyLDAvis
-import pyLDAvis.utils
 import pyLDAvis.urls
+import pyLDAvis.utils
 
 
 def prepare_data(model, mds="pcoa", lambda_step=0.1, sort_topics=False, verbose=False):
@@ -25,6 +27,8 @@ def prepare_data(model, mds="pcoa", lambda_step=0.1, sort_topics=False, verbose=
         These other keyword arguments are pyLDAvis-specific options
         (See pyLDAvis docs for details)
     """
+    origin_time = time.perf_counter()
+
     model_data = {
         "topic_term_dists": [model.get_topic_word_dist(k) for k in range(model.k)],
         "doc_topic_dists": [
@@ -57,8 +61,10 @@ def prepare_data(model, mds="pcoa", lambda_step=0.1, sort_topics=False, verbose=
                 print(" .", flush=True, end="")
             progress_countdown = 1
 
+    elapsed = time.perf_counter() - origin_time
+
     if verbose:
-        print(" Done.")
+        print(f" Done. ({elapsed:.3f}s)")
 
     vis_data = results[0]
     return vis_data
@@ -81,6 +87,25 @@ def _prepare_vis(model_data, options, results):
     """
     vis_data = pyLDAvis.prepare(**model_data, **options)
     results[0] = vis_data
+
+
+def show_visualisation(vis_data):
+    """
+    Display the pyLDAvis visualisation for the given data; assumes a Jupyter notebook
+    environment.
+
+    Parameters
+    ----------
+    vis_data
+
+    Returns
+    -------
+    IPython.display.HTML
+    """
+    with warnings.catch_warnings():
+        # Let's pretend pyLDAvis isn't a few generations behind ¯\_(ツ)_/¯
+        warnings.simplefilter("ignore", category=IPython.utils.shimmodule.ShimWarning)
+        return pyLDAvis.display(vis_data, local=True)
 
 
 def export_visualisation(vis_data, folder):

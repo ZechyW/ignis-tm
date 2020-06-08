@@ -3,6 +3,7 @@ import tempfile
 import time
 
 import tomotopy as tp
+import tqdm
 
 import ignis.corpus
 import ignis.models.base
@@ -134,31 +135,35 @@ class LDAModel(ignis.models.base.BaseModel):
 
         origin_time = time.perf_counter()
 
+        progress_bar = None
         if verbose:
-            print(f"Training LDA model:\n" f"{self.options}")
-            print()
+            print(
+                f"Training LDA model on {len(self.corpus_slice)} documents:\n"
+                f"{self.options}\n",
+                flush=True,
+            )
+            progress_bar = tqdm.tqdm(total=iterations, miniters=1)
 
         try:
             for i in range(0, iterations, update_every):
-                start_time = time.perf_counter()
                 self.model.train(update_every, workers=workers, parallel=parallel)
-                elapsed = time.perf_counter() - start_time
                 if verbose:
-                    print(
-                        f"Iteration: {i + update_every}\t"
-                        f"Log-likelihood: {self.model.ll_per_word}\t"
-                        f"Time: {elapsed:.3f}s",
-                        flush=True,
+                    progress_bar.set_postfix(
+                        {"Log-likelihood": f"{self.model.ll_per_word:.5f}"}
                     )
+                    progress_bar.update(update_every)
         except KeyboardInterrupt:
             print("Stopping train sequence.")
+
+        if verbose:
+            progress_bar.close()
 
         if until_max_ll:
             self._train_until_max_ll()
 
         elapsed = time.perf_counter() - origin_time
         if verbose:
-            print(f"Model training complete. ({elapsed:.3f}s)")
+            print(f"Model training complete. ({elapsed:.3f}s)", flush=True)
 
     def _train_until_max_ll(self):
         """
@@ -180,10 +185,13 @@ class LDAModel(ignis.models.base.BaseModel):
             self.model.save(tmp_model_file)
 
             if verbose:
-                print()
-                print("Continuing to train until maximum log-likelihood.")
-                print("(N.B.: This may not correlate with increased interpretability)")
-                print()
+                print(
+                    "\n"
+                    "Continuing to train until maximum log-likelihood.\n"
+                    "(N.B.: This may not correlate with increased interpretability)\n",
+                    flush=True,
+                )
+                progress_bar = tqdm.tqdm(miniters=1)
 
             last_ll = self.model.ll_per_word
             i = 0
@@ -191,19 +199,15 @@ class LDAModel(ignis.models.base.BaseModel):
 
             while True:
                 try:
-                    start_time = time.perf_counter()
                     self.model.train(update_every, workers=workers, parallel=parallel)
                     i += update_every
-                    elapsed = time.perf_counter() - start_time
 
                     current_ll = self.model.ll_per_word
                     if verbose:
-                        print(
-                            f"Iteration: {i}\t"
-                            f"Log-likelihood: {current_ll}\t"
-                            f"Time: {elapsed:.3f}s",
-                            flush=True,
+                        progress_bar.set_postfix(
+                            {"Log-likelihood": f"{current_ll:.5f}"}
                         )
+                        progress_bar.update(update_every)
 
                     if current_ll < last_ll:
                         consecutive_losses += 1
@@ -218,6 +222,9 @@ class LDAModel(ignis.models.base.BaseModel):
                 except KeyboardInterrupt:
                     print("Stopping extended train sequence.")
                     break
+
+            if verbose:
+                progress_bar.close()
 
             # noinspection PyTypeChecker,PyCallByClass
             self.model = tp.LDAModel.load(tmp_model_file)
