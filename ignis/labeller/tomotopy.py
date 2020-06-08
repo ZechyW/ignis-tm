@@ -69,15 +69,18 @@ class TomotopyLabeller:
         if verbose:
             print("Done.")
 
-    def get_topic_labels(self, k, top_n=10):
+    def get_topic_labels(self, topic_id, top_n=10):
         """
-        Ensures the labeller is initialised, then passes the request through to the
-        Tomotopy FoRelevance object
+        Gets the `top_n` labels from the saved Tomotopy FoRelevance labeller for the
+        given `topic_id`.
+
+        NOTE: `topic_id` should start from 1 and not 0;
+        i.e., it should be in `range(1, len(topics) + 1)`
 
         Parameters
         ----------
-        k: int
-            Topic number to label
+        topic_id: int
+            Topic ID to label
         top_n: int
             Number of labels to generate
 
@@ -86,4 +89,7 @@ class TomotopyLabeller:
         tuple of [str, float]
             Returns (<label>, <score>) for each of the `top_n` labels for the topic.
         """
-        return self.labeller.get_topic_labels(k=k, top_n=top_n)
+        # Tomotopy topics are 0-indexed
+        tp_topic_id = topic_id - 1
+
+        return self.labeller.get_topic_labels(k=tp_topic_id, top_n=top_n)

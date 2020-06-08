@@ -43,6 +43,8 @@ class Aurum:
         # Aurum objects also optionally have cached labeller and visualisation data
         # objects
         self.labeller = None
+
+        self.vis_type = None
         self.vis_data = None
 
     def save(self, filename):
@@ -82,6 +84,7 @@ class Aurum:
             "external_model_bytes": external_model_bytes,
             # We should also be able to save any cached visualisation data, but the
             # labeller is probably not pickle-able.
+            "vis_type": self.vis_type,
             "vis_data": self.vis_data,
         }
 
@@ -157,16 +160,16 @@ class Aurum:
         else:
             raise ValueError(f"Unknown labeller type: '{labeller_type}'")
 
-    def get_topic_labels(self, *args, **kwargs):
+    def get_topic_labels(self, topic_id, top_n):
         """
-        Passes arguments directly through to the labeller.
+        See `ignis.labeller.tomotopy.get_topic_labels()`
         """
         if self.labeller is None:
             raise RuntimeError(
                 "There is no labeller instantiated for this Aurum object. "
                 "Use `.init_labeller()` to prepare one."
             )
-        return self.labeller.get_topic_labels(*args, **kwargs)
+        return self.labeller.get_topic_labels(topic_id, top_n)
 
     # =================================================================================
     # Visualisation Data
@@ -188,10 +191,12 @@ class Aurum:
         if vis_type == "pyldavis":
             if self.vis_data is not None and not force:
                 raise RuntimeError(
-                    "Visualisation data already exists for this Aurum object. "
-                    "Pass `force=True` to force recalculation."
+                    f"Visualisation data already exists for this Aurum object "
+                    f"(type: '{self.vis_type}'). "
+                    f"Pass `force=True` to force recalculation."
                 )
 
+            self.vis_type = vis_type
             self.vis_data = ignis.vis.pyldavis.prepare_data(
                 self.ignis_model.model, **vis_options
             )
@@ -208,6 +213,23 @@ class Aurum:
                 "Use `.init_vis()` to prepare it."
             )
         return self.vis_data
+
+    def export_visualisation(self, folder):
+        """
+        Exports the visualisation prepared for this Aurum object to the given folder.
+
+        Parameters
+        ----------
+        folder
+        """
+        vis_data = self.get_vis_data()
+
+        # Assuming the `vis_data` get is successful, we should have a valid record of
+        # the `vis_type` as well.
+        if self.vis_type == "pyldavis":
+            ignis.vis.pyldavis.export_visualisation(vis_data, folder)
+        else:
+            raise RuntimeError(f"Unknown saved visualisation type: '{self.vis_type}'")
 
 
 def load_results(filename):
@@ -226,11 +248,10 @@ def load_results(filename):
     with bz2.open(filename, "rb") as fp:
         save_object = pickle.load(fp)
 
+    # Rehydrate the Ignis/external models
     model_type = save_object["model_type"]
     save_model = save_object["save_model"]
     external_model_bytes = save_object["external_model_bytes"]
-
-    vis_data = save_object["vis_data"]
 
     if model_type[:3] == "tp_":
         # Tomotopy model
@@ -240,8 +261,11 @@ def load_results(filename):
 
     save_model.model = external_model
 
+    # Rehydrate the Aurum object
     aurum = Aurum(save_model)
-    aurum.vis_data = vis_data
+
+    aurum.vis_type = save_object["vis_type"]
+    aurum.vis_data = save_object["vis_data"]
 
     return aurum
 
