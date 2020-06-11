@@ -5,8 +5,7 @@ import time
 import tomotopy as tp
 import tqdm
 
-import ignis.corpus
-import ignis.models.base
+from .base import BaseModel
 
 default_options = {
     "term_weighting": "one",
@@ -22,7 +21,7 @@ default_options = {
 }
 
 
-class LDAModel(ignis.models.base.BaseModel):
+class LDAModel(BaseModel):
     """
     An Ignis model that performs LDA using Tomotopy.
 
@@ -116,9 +115,10 @@ class LDAModel(ignis.models.base.BaseModel):
         # of which Document (by ID) goes to which index within that list.
         self.doc_id_to_model_index = {}
         index = 0
-        for doc_id, doc in self.corpus_slice.documents.items():
-            tokens = doc.tokens
-            self.model.add_doc(tokens)
+
+        for doc_id in self.corpus_slice.document_ids():
+            doc = self.corpus_slice.get_document(doc_id)
+            self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
 
@@ -242,7 +242,7 @@ class LDAModel(ignis.models.base.BaseModel):
         tp_topic_id = topic_id - 1
 
         topic_documents = []
-        for doc_id in self.corpus_slice.documents:
+        for doc_id in self.corpus_slice.document_ids():
             model_index = self.doc_id_to_model_index[doc_id]
             model_doc = self.model.docs[model_index]
             doc_topics = model_doc.get_topics(top_n=within_top_n)

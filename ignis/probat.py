@@ -5,11 +5,12 @@ Aurum results.
 import ignis
 import ignis.aurum
 import ignis.corpus
+import ignis.models
 
 
 def train_model(
     corpus_slice,
-    model_type="lda",
+    model_type="tp_lda",
     model_options=None,
     labeller_type=None,
     labeller_options=None,
@@ -55,7 +56,7 @@ def train_model(
         )
 
     if model_type == "tp_lda":
-        model = ignis.LDAModel(corpus_slice, model_options)
+        model = ignis.models.LDAModel(corpus_slice, model_options)
         model.train()
         aurum = ignis.aurum.Aurum(model)
     elif model_type == "tp_hdp":

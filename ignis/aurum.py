@@ -148,7 +148,7 @@ class Aurum:
         """
         return self.corpus_slice.slice_by_ids(doc_ids)
 
-    def slice_by_tokens(self, tokens, include_root):
+    def slice_by_tokens(self, tokens, include_root=False):
         """
         See `ignis.corpus.CorpusSlice.slice_by_tokens()`
         """
@@ -195,8 +195,9 @@ class Aurum:
 
         Parameters
         ----------
-        vis_type: {"pyldavis"}
-            String denoting the visualisation type.
+        vis_type: {"pyldavis", "clear"}
+            String denoting the visualisation type.  Setting to "clear" will remove
+            any existing visualisation data.
         force: bool, optional
             If `self.vis_data` is already set, it will not be recalculated unless
             `force` is set.
@@ -204,7 +205,11 @@ class Aurum:
             Keyword arguments that are passed to the constructor for the given
             visualisation type.
         """
-        if vis_type == "pyldavis":
+        if vis_type == "clear":
+            self.vis_type = None
+            self.vis_options = None
+            self.vis_data = None
+        elif vis_type == "pyldavis":
             if self.vis_data is not None and not force:
                 raise RuntimeError(
                     f"Visualisation data already exists for this Aurum object "

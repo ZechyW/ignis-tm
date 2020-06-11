@@ -2,6 +2,7 @@ import bz2
 import pathlib
 import pickle
 import uuid
+import collections
 
 
 class Corpus:
@@ -18,29 +19,35 @@ class Corpus:
     """
 
     def __init__(self):
-        self.documents = {}
+        self.documents = collections.OrderedDict()
 
-    def add_doc(self, metadata, tokens, human_readable=None):
+    def add_doc(self, tokens, metadata=None, human_readable=None):
         """
         Creates a new Document with the given parameters and starts tracking it.
 
         Parameters
         ----------
-        metadata: dict
-            A general-purpose dictionary containing any metadata the user wants to
-            track.
-
         tokens: iterable of str
             The individual content tokens in the given document.
-
+        metadata: dict, optional
+            A general-purpose dictionary containing any metadata the user wants to
+            track.
         human_readable: str, optional
             A human-readable version of the Document text.
             If None, will use the Document tokens joined with single spaces.
+
+        Returns
+        -------
+        str
+            The ID for the added Document
         """
+        if metadata is None:
+            metadata = collections.OrderedDict()
         if human_readable is None:
             human_readable = " ".join(tokens)
-        this_doc = Document(metadata, tokens, human_readable)
-        self.documents[this_doc.id] = this_doc
+        doc = Document(tokens, metadata, human_readable)
+        self.documents[doc.id] = doc
+        return doc.id
 
     def save(self, filename):
         """
@@ -67,28 +74,6 @@ class Corpus:
         return CorpusSlice(root=self, slice_ids=list(self.documents))
 
 
-def load_corpus(filename):
-    """
-    Loads a Corpus object from the given file.
-
-    Parameters
-    ----------
-    filename: str or pathlib.Path
-        The file to load the Corpus object from.
-
-    Returns
-    -------
-    ignis.corpus.Corpus
-    """
-    with bz2.open(filename, "rb") as fp:
-        loaded = pickle.load(fp)
-
-    if not isinstance(loaded, Corpus):
-        raise ValueError(f"File does not contain a Corpus object: '{filename}'")
-
-    return loaded
-
-
 class CorpusSlice:
     """
     Contains some subset of the Documents in a Corpus, and keeps a reference to the
@@ -103,18 +88,23 @@ class CorpusSlice:
 
     Attributes
     ----------
-    documents: dict
-        Mapping of IDs to Documents.
+    documents: collections.OrderedDict
+        Mapping of IDs to Documents.  Ordered by Document ID, but this shouldn't
+        substantively affect the topic-modelling results.
     """
 
     def __init__(self, root, slice_ids):
         self.root = root
-        self.documents = {}
+        self.documents = collections.OrderedDict()
+        slice_ids.sort()
         for slice_id in slice_ids:
             self.documents[slice_id] = root.documents[slice_id]
 
     def __len__(self):
         return len(self.documents)
+
+    def document_ids(self):
+        return list(self.documents.keys())
 
     def get_document(self, doc_id):
         """
@@ -129,6 +119,20 @@ class CorpusSlice:
         Document
         """
         return self.documents[doc_id]
+
+    def save(self, filename):
+        """
+        Saves the CorpusSlice object to the given file.
+        Essentially uses a bz2-compressed Pickle format.
+
+        Parameters
+        ----------
+        filename: str or pathlib.Path
+            File to save the Corpus to
+        """
+        filename = pathlib.Path(filename)
+        with bz2.open(filename, "wb") as fp:
+            pickle.dump(self, fp)
 
     def slice_by_ids(self, doc_ids):
         """
@@ -145,6 +149,13 @@ class CorpusSlice:
         -------
         CorpusSlice
         """
+        # Sanity check
+        if type(doc_ids) is str:
+            raise RuntimeWarning(
+                "Received a single string instead of an iterable of Document ID "
+                "strings -- You probably did not intend to do this."
+            )
+
         return CorpusSlice(self.root, doc_ids)
 
     def slice_by_tokens(self, tokens, include_root=False):
@@ -165,6 +176,13 @@ class CorpusSlice:
         -------
         CorpusSlice
         """
+        # Sanity check
+        if type(tokens) is str:
+            raise RuntimeWarning(
+                "Received a single string instead of an iterable of token "
+                "strings -- You probably did not intend to do this."
+            )
+
         if include_root:
             search_docs = self.root.documents
         else:
@@ -195,11 +213,19 @@ class CorpusSlice:
         -------
         CorpusSlice
         """
-        new_slice_ids = set(self.documents)
+        new_slice_ids = set(self.documents.keys())
 
         for other_slice in other_slices:
+            if other_slice.root != self.root:
+                raise RuntimeError(
+                    "CorpusSlices can only be concatenated if they have the same root "
+                    "Corpus."
+                )
+
             slice_ids = set(other_slice.documents)
             new_slice_ids = new_slice_ids | slice_ids
+
+        new_slice_ids = list(new_slice_ids)
 
         return CorpusSlice(self.root, new_slice_ids)
 
@@ -211,24 +237,75 @@ class Document:
 
     Parameters
     ----------
+    tokens: iterable of str
+        The individual content tokens in the given document.
     metadata: dict
         A general-purpose dictionary containing any metadata the user wants to
         track.
-
-    tokens: iterable of str
-        The individual content tokens in the given document.
-
     human_readable: str
         A string representing the Document in human-readable form.
     """
 
-    def __init__(self, metadata, tokens, human_readable):
+    def __init__(self, tokens, metadata, human_readable):
         self.id = str(uuid.uuid4())
-        self.metadata = metadata
         self.tokens = tokens
+        self.metadata = metadata
         self.human_readable = human_readable
 
     def __str__(self):
         return (
             f"ID: {self.id}\n\nMetadata: {self.metadata}\n\n" f"{self.human_readable}"
         )
+
+
+def load_corpus(filename):
+    """
+    Loads a Corpus object from the given file.
+
+    Conceptually, Corpus objects contain the full amount of data for a given dataset.
+
+    Some subset of the Corpus (up to the full Corpus itself) must be sliced into a
+    CorpusSlice to perform topic modelling over the data, and these CorpusSlices can
+    be iteratively expanded or contracted freely within the full set of Corpus data.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the Corpus object from.
+
+    Returns
+    -------
+    ignis.corpus.Corpus
+    """
+    with bz2.open(filename, "rb") as fp:
+        loaded = pickle.load(fp)
+
+    if not isinstance(loaded, Corpus):
+        raise ValueError(f"File does not contain a Corpus object: '{filename}'")
+
+    return loaded
+
+
+def load_slice(filename):
+    """
+    Loads a CorpusSlice object from the given file.
+
+    CorpusSlices contain a specific subset of some root Corpus, and can be passed
+    directly as input into topic models.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the CorpusSlice object from.
+
+    Returns
+    -------
+    ignis.corpus.CorpusSlice
+    """
+    with bz2.open(filename, "rb") as fp:
+        loaded = pickle.load(fp)
+
+    if not isinstance(loaded, CorpusSlice):
+        raise ValueError(f"File does not contain a CorpusSlice object: '{filename}'")
+
+    return loaded
