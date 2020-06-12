@@ -46,6 +46,13 @@ class Corpus:
         if human_readable is None:
             human_readable = " ".join(tokens)
         doc = Document(tokens, metadata, human_readable)
+        if doc.id in self.documents:
+            raise RuntimeError(
+                f"This Document's hash is already present in the Corpus; it may be a "
+                f"duplicate. Ignoring."
+                f"(If this is a genuine hash collision, create a new Document with "
+                f"different metadata values and try adding it again.)"
+            )
         self.documents[doc.id] = doc
         return doc.id
 
@@ -246,11 +253,18 @@ class Document:
         A string representing the Document in human-readable form.
     """
 
+    # Let's make Document IDs deterministic on their data, so that multiple runs of a
+    # Corpus creation script don't generate different IDs.
+    # We will create a UUID5 for each Document against this fixed namespace:
+    ignis_uuid_namespace = uuid.UUID("58ca78f2-0347-4b96-b2e7-63796bf87889")
+
     def __init__(self, tokens, metadata, human_readable):
-        self.id = str(uuid.uuid4())
         self.tokens = tokens
         self.metadata = metadata
         self.human_readable = human_readable
+
+        data = f"{tokens}{metadata}{human_readable}"
+        self.id = uuid.uuid3(Document.ignis_uuid_namespace, data)
 
     def __str__(self):
         return (
