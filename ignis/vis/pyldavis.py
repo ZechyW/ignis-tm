@@ -3,6 +3,7 @@ import shutil
 import threading
 import time
 import warnings
+import pandas as pd
 
 import IPython.utils.shimmodule
 import pyLDAvis
@@ -29,8 +30,24 @@ def prepare_data(model, mds="pcoa", lambda_step=0.1, sort_topics=False, verbose=
     """
     origin_time = time.perf_counter()
 
+    # Convert tomotopy model data to pyLDAvis format
+    # ----------------------------------------------
+
+    # Pandas appears to operate in a column-based fashion, but the tomotopy
+    # topic_term_dists is naturally arranged by row;
+    # We can save a bunch of runtime by preparing the DataFrame before sending it off
+    # to pyLDAvis, since there are way more columns than there are rows
+    # (There are as many columns as terms, but only as many rows as topics)
+
+    # By default Pandas thinks the DataFrame is a single column, but it's really a
+    # single row, so we Transpose
+    topic_term_dists_rows = [
+        pd.DataFrame(model.get_topic_word_dist(k)).T for k in range(model.k)
+    ]
+    topic_term_dists = pd.concat(topic_term_dists_rows, ignore_index=True)
+
     model_data = {
-        "topic_term_dists": [model.get_topic_word_dist(k) for k in range(model.k)],
+        "topic_term_dists": topic_term_dists,
         "doc_topic_dists": [
             model.docs[n].get_topic_dist() for n in range(len(model.docs))
         ],
