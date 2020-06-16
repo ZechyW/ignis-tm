@@ -5,7 +5,7 @@
 General:
 
 ```
-conda install tqdm
+conda install python=3.7.6 tqdm
 ```
 
 Tomotopy:
