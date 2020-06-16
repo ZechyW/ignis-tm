@@ -5,7 +5,6 @@ import time
 import warnings
 import pandas as pd
 
-import IPython.utils.shimmodule
 import pyLDAvis
 import pyLDAvis.urls
 import pyLDAvis.utils
@@ -120,8 +119,16 @@ def show_visualisation(vis_data):
     IPython.display.HTML
     """
     with warnings.catch_warnings():
-        # Let's pretend pyLDAvis isn't a few generations behind ¯\_(ツ)_/¯
-        warnings.simplefilter("ignore", category=IPython.utils.shimmodule.ShimWarning)
+        try:
+            import IPython.utils.shimmodule
+
+            # Let's pretend pyLDAvis isn't a few generations behind ¯\_(ツ)_/¯
+            warnings.simplefilter(
+                "ignore", category=IPython.utils.shimmodule.ShimWarning
+            )
+        except ModuleNotFoundError:
+            pass
+
         return pyLDAvis.display(vis_data, local=True)
 
 

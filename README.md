@@ -2,9 +2,23 @@
 
 ## Dependencies
 
+General:
+
 ```
-conda install py-cpuinfo tqdm
+conda install tqdm
+```
+
+Tomotopy:
+
+```
+conda install py-cpuinfo numpy
 pip install tomotopy
+```
+
+pyLDAvis:
+
+```
+conda install pandas=0.23.4 pyldavis
 ```
 
 For ease of use:
