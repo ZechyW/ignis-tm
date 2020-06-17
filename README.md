@@ -5,7 +5,7 @@
 General:
 
 ```
-conda install python=3.7.6 tqdm
+conda install python=3.7.6 tqdm jupyter
 ```
 
 Tomotopy:
@@ -28,6 +28,8 @@ conda install jupyter_contrib_nbextensions
 
 ## Tomotopy
 N.B.: As at version 0.8.1, Tomotopy sometimes seems to rely on `PYTHONHASHSEED` being set in order to consistently reproduce results (together with setting the actual model seed), although this behaviour is not always reproducible.  To be safe, `PYTHONHASHSEED` should be explicitly set where necessary.
+
+P.S.: This may have been an artifact of Windows Prefetching; needs further testing.
 
 If using a Conda environment, this can be done with:
 ```
