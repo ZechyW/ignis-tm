@@ -23,7 +23,7 @@ conda install pandas=0.23.4 pyldavis
 
 For ease of use:
 ```
-conda install jupyter_contrib_nbextensions
+conda install jupyter_contrib_nbextensions black
 ```
 
 ## Tomotopy

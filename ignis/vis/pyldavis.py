@@ -131,26 +131,27 @@ def prepare_data(
     if verbose:
         print("Preparing LDA visualisation...", flush=True, end="")
 
-    # With the pyLDAvis monkey patching we did above to optimise various
-    # calculations, we probably no longer need to run the preparation in a separate
-    # thread.
-
     results = [None]
-    _prepare_vis(model_data, options, use_optimised, results)
 
-    # t = threading.Thread(target=_prepare_vis, args=(model_data, options, results))
-    # t.start()
-    #
-    # progress_countdown = 1.0
-    #
-    # while t.is_alive():
-    #     time.sleep(0.1)
-    #     progress_countdown -= 0.1
-    #     if progress_countdown <= 0:
-    #         if verbose:
-    #             print(" .", flush=True, end="")
-    #         progress_countdown = 1
-    #
+    if use_optimised:
+        # We probably don't need to start up a separate thread if we are using our
+        # monkey-patched optimised prepare function
+        _prepare_vis(model_data, options, use_optimised, results)
+    else:
+        t = threading.Thread(
+            target=_prepare_vis, args=(model_data, options, use_optimised, results)
+        )
+        t.start()
+
+        progress_countdown = 1.0
+
+        while t.is_alive():
+            time.sleep(0.1)
+            progress_countdown -= 0.1
+            if progress_countdown <= 0:
+                if verbose:
+                    print(" .", flush=True, end="")
+                progress_countdown = 1
 
     vis_data = results[0]
     elapsed = time.perf_counter() - origin_time
