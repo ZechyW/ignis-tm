@@ -1,0 +1,5 @@
+pyldavis>=2.1.2
+tomotopy>=0.8.1
+numpy>=1.18.1
+pandas>=1.0.3
+tqdm>=4.46.0

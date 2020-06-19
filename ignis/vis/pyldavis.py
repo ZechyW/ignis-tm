@@ -34,6 +34,7 @@ def show_visualisation(vis_data):
             import IPython.utils.shimmodule
 
             # Let's pretend pyLDAvis isn't a few generations behind ¯\_(ツ)_/¯
+            # (Waiting for upstream 2.1.4)
             warnings.simplefilter(
                 "ignore", category=IPython.utils.shimmodule.ShimWarning
             )
