@@ -2,10 +2,12 @@ import pathlib
 import tempfile
 import time
 
-import tomotopy as tp
 import tqdm
 
+import ignis.util
 from .base import BaseModel
+
+tp = ignis.util.LazyLoader("tomotopy")
 
 default_options = {
     "term_weighting": "one",
@@ -122,6 +124,31 @@ class LDAModel(BaseModel):
             self.doc_id_to_model_index[doc_id] = index
             index += 1
 
+    @staticmethod
+    def load_from_bytes(model_bytes):
+        """
+        Loads a Tomotopy LDAModel from its binary representation
+
+        Parameters
+        ----------
+        model_bytes: bytes
+
+        Returns
+        -------
+        tp.LDAModel
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_model_file = pathlib.Path(tmpdir) / "load_model.bin"
+            # model.save() expects the filename to be a string
+            tmp_model_file = str(tmp_model_file)
+            with open(tmp_model_file, "wb") as fp:
+                fp.write(model_bytes)
+
+            # noinspection PyTypeChecker,PyCallByClass
+            tp_model = tp.LDAModel.load(tmp_model_file)
+
+        return tp_model
+
     def train(self):
         """
         Runs the modelling algorithm with the saved options and CorpusSlice.
@@ -163,6 +190,11 @@ class LDAModel(BaseModel):
 
         elapsed = time.perf_counter() - origin_time
         if verbose:
+            print(
+                f"Docs: {len(self.model.docs)}, "
+                f"Vocab size: {len(self.model.used_vocabs)}, "
+                f"Total Words: {self.model.num_words}"
+            )
             print(f"Model training complete. ({elapsed:.3f}s)", flush=True)
 
     def _train_until_max_ll(self):

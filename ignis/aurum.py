@@ -5,8 +5,6 @@ import pickle
 import pprint
 import tempfile
 
-import tomotopy as tp
-
 import ignis.labeller.tomotopy
 import ignis.vis.pyldavis
 
@@ -244,7 +242,7 @@ class Aurum:
 
         Returns
         -------
-        The output of the `show_visualisation` method of the relevant `ingnis.vis` class
+        The output of the `show_visualisation` method of the relevant `ignis.vis` class
         """
         vis_data = self.get_vis_data()
 
@@ -308,8 +306,12 @@ class Aurum:
 
             # Top words
             if top_words is not None:
-                words_probs = self.get_topic_words(topic_id, top_n=top_words)
-                words = [x[0] for x in words_probs]
+                words = [
+                    word
+                    for word, probability in self.get_topic_words(
+                        topic_id, top_n=top_words
+                    )
+                ]
 
                 words = ", ".join(words)
                 print(f"\nTop words:\n{words}")
@@ -514,18 +516,8 @@ def _load_tomotopy_model(model_type, model_bytes):
     tp.LDAModel
     """
     if model_type == "tp_lda":
-        tp_class = tp.LDAModel
+        import ignis.models
+
+        return ignis.models.LDAModel.load_from_bytes(model_bytes)
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_model_file = pathlib.Path(tmpdir) / "load_model.bin"
-        # model.save() expects the filename to be a string
-        tmp_model_file = str(tmp_model_file)
-        with open(tmp_model_file, "wb") as fp:
-            fp.write(model_bytes)
-
-        # noinspection PyTypeChecker,PyCallByClass
-        tp_model = tp_class.load(tmp_model_file)
-
-    return tp_model

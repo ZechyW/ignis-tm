@@ -4,15 +4,16 @@ import threading
 import time
 import warnings
 
-import numpy as np
-import pandas as pd
-import pyLDAvis
-import pyLDAvis.urls
-import pyLDAvis.utils
-
 # We monkey patch pyLDAvis to optimise various pandas calculations below
 from joblib import Parallel, delayed
 
+import ignis.util
+
+pyLDAvis = ignis.util.LazyLoader("pyLDAvis")
+np = ignis.util.LazyLoader("numpy")
+pd = ignis.util.LazyLoader("pandas")
+
+# noinspection PyProtectedMember
 _prepare = pyLDAvis._prepare
 
 

@@ -1,4 +1,6 @@
-import tomotopy as tp
+import ignis.util
+
+tp = ignis.util.LazyLoader("tomotopy")
 
 
 class TomotopyLabeller:
