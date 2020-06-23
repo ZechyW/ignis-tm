@@ -270,98 +270,100 @@ class Aurum:
 
     # =================================================================================
     # Jupyter widgets
-    def nb_show_topics(self, top_labels=None, top_words=None):
+    def nb_explore_topics(self, doc_sort_key=None):
         """
-        Convenience function to create an interactive Jupyter notebook widget for
+        Convenience function that creates an interactive Jupyter notebook widget for
         exploring the topics in this model.
 
         Parameters
         ----------
-        top_labels: int, optional
-            Number of top suggested labels for this topic to show.
-            If None, will skip showing labels.
-        top_words: int, optional
-            Number of top words for this topics to show.
-            If None, will skip showing top words.
+        doc_sort_key: fn, optional
+            If specified, will sort topic documents using this key when displaying them
 
         Returns
         -------
         ipywidgets.interact function
         """
         import ipywidgets
+        from IPython.core.display import display, HTML
 
-        # Prepare the display function
+        # Per topic info
         def show_topic(topic_id=1):
-            print(f"[Topic {topic_id}]")
+            # Top words
+            words = ", ".join(
+                word for word, probability in self.get_topic_words(topic_id, top_n=10)
+            )
+            print(f"Top words:\n{words}")
 
             # Labels
-            if top_labels is not None:
+            if self.labeller is not None:
                 labels = ", ".join(
-                    label
-                    for label, score in self.get_topic_labels(
-                        topic_id, top_n=top_labels
-                    )
+                    label for label, score in self.get_topic_labels(topic_id, top_n=10)
                 )
                 print(f"\nSuggested labels:\n{labels}")
 
-            # Top words
-            if top_words is not None:
-                words = [
-                    word
-                    for word, probability in self.get_topic_words(
-                        topic_id, top_n=top_words
-                    )
+            # Topic documents -- `within_top_n`
+            display(
+                HTML(
+                    f"<h4>Documents with Topic {topic_id} in the top <em>n</em> "
+                    f"topics</h4>"
+                )
+            )
+
+            def show_topic_doc(within_top_n=1):
+                # Grab the documents that match the params passed
+                topic_docs = [
+                    doc_id
+                    for doc_id, prob in self.get_topic_documents(topic_id, within_top_n)
                 ]
 
-                words = ", ".join(words)
-                print(f"\nTop words:\n{words}")
+                if len(topic_docs) == 0:
+                    print(
+                        "No documents matching the given topic parameters. "
+                        "Try increasing `n`, or reducing the number of total topics "
+                        "and retraining the model."
+                    )
+                    return
 
-        return ipywidgets.interact(show_topic, topic_id=(1, self.get_num_topics()))
+                topic_docs = [self.get_document(doc_id) for doc_id in topic_docs]
 
-    def nb_show_topic_documents(self, topic_id, within_top_n):
-        """
-        Convenience function to create an interactive Jupyter notebook widget for
-        exploring the documents under a certain topic in the current model.
+                if doc_sort_key is not None:
+                    topic_docs = sorted(topic_docs, key=doc_sort_key)
 
-        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
-        parameters accepted.
+                # Show actual document
+                def show_doc(index=0):
+                    print(f"[Total documents: {len(topic_docs)}]\n")
+                    doc = topic_docs[index]
+                    print(str(doc))
+                    print()
+                    print("Top document topics (in descending order of probability):")
+                    pprint.pprint(self.get_document_topics(doc.id, 10))
 
-        Note that `topic_id` starts from 1 and not 0.
+                return ipywidgets.interact(
+                    show_doc,
+                    index=ipywidgets.IntSlider(
+                        description="Document", min=0, max=len(topic_docs) - 1
+                    ),
+                )
 
-        Parameters
-        ----------
-        topic_id
-        within_top_n
-
-        Returns
-        -------
-        ipywidgets.interact function
-        """
-        import ipywidgets
-
-        # Grab the documents that match the params passed
-        topic_docs = [
-            doc_id
-            for doc_id, prob in self.get_topic_documents(
-                topic_id=topic_id, within_top_n=within_top_n
+            return ipywidgets.interact(
+                show_topic_doc,
+                within_top_n=ipywidgets.IntSlider(
+                    description="n", min=1, max=self.get_num_topics()
+                ),
             )
-        ]
 
-        # Prepare the display function
-        def show_topic_doc(index=0):
-            doc_id = topic_docs[index]
-            doc = self.get_document(doc_id)
-            print(str(doc))
-            print()
-            print("Top document topics (in descending order of probability):")
-            pprint.pprint(self.get_document_topics(doc_id, 10))
-
-        return ipywidgets.interact(show_topic_doc, index=(0, len(topic_docs) - 1))
+        return ipywidgets.interact(
+            show_topic,
+            topic_id=ipywidgets.IntSlider(
+                description="Topic", min=1, max=self.get_num_topics()
+            ),
+        )
 
     # =================================================================================
     # Slicing and Iteration
     # Convenience functions that help with the exploring the Model-Corpus interface
-    def slice_by_topic(self, topic_id, within_top_n):
+    def slice_by_topic(self, topic_id, within_top_n=1):
         """
         Convenience function to create a new CorpusSlice with Documents that come
         under a given topic in the current model.
@@ -374,7 +376,7 @@ class Aurum:
         Parameters
         ----------
         topic_id
-        within_top_n
+        within_top_n: int, optional
 
         Returns
         -------

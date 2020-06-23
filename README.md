@@ -8,6 +8,13 @@ General:
 conda install python=3.7.6 tqdm jupyter
 ```
 
+Corpus-prep Demo:
+
+```
+conda install gensim nltk
+python -m nltk.downloader stopwords
+```
+
 Tomotopy:
 
 ```

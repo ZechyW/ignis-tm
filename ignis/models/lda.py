@@ -225,9 +225,9 @@ class LDAModel(BaseModel):
                 )
                 progress_bar = tqdm.tqdm(miniters=1)
 
-            last_ll = self.model.ll_per_word
+            best_ll = self.model.ll_per_word
             i = 0
-            consecutive_losses = 0
+            batches_since_best = 0
 
             while True:
                 try:
@@ -241,14 +241,14 @@ class LDAModel(BaseModel):
                         )
                         progress_bar.update(update_every)
 
-                    if current_ll < last_ll:
-                        consecutive_losses += 1
+                    if current_ll < best_ll:
+                        batches_since_best += 1
                     else:
-                        consecutive_losses = 0
+                        batches_since_best = 0
                         self.model.save(tmp_model_file)
-                    last_ll = current_ll
+                        best_ll = current_ll
 
-                    if consecutive_losses == 2 or i >= max_extra_iterations:
+                    if batches_since_best == 5 or i >= max_extra_iterations:
                         break
 
                 except KeyboardInterrupt:
