@@ -1,5 +1,6 @@
 import bz2
 import collections
+import json
 import pathlib
 import pickle
 import re
@@ -120,12 +121,14 @@ class CorpusSlice:
 
         Parameters
         ----------
-        doc_id
+        doc_id: str or uuid.UUID
 
         Returns
         -------
         Document
         """
+        if isinstance(doc_id, str):
+            doc_id = uuid.UUID(doc_id)
         return self.documents[doc_id]
 
     def save(self, filename):
@@ -375,9 +378,17 @@ class Document:
         self.id = uuid.uuid3(Document.ignis_uuid_namespace, data)
 
     def __str__(self):
-        return (
-            f"ID: {self.id}\n\nMetadata: {self.metadata}\n\n" f"{self.human_readable}"
-        )
+        metadata = json.dumps(self.metadata, indent=2)
+
+        truncated = []
+        for line in metadata.splitlines():
+            if len(line) > 120:
+                truncated.append(f"{line[:120]}...")
+            else:
+                truncated.append(line)
+        metadata = "\n".join(truncated)
+
+        return f"ID: {self.id}\n\nMetadata: {metadata}\n\n" f"{self.human_readable}"
 
 
 def load_corpus(filename):
