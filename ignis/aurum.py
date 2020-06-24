@@ -363,32 +363,56 @@ class Aurum:
     # =================================================================================
     # Slicing and Iteration
     # Convenience functions that help with the exploring the Model-Corpus interface
-    def slice_by_topic(self, topic_id, within_top_n=1):
+    def slice_by_topics(self, topic_ids, within_top_n=1):
         """
         Convenience function to create a new CorpusSlice with Documents that come
-        under a given topic in the current model.
+        under all the given topics in the current model.
 
         See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
-        parameters accepted.
+        `within_top_n` parameter.
 
         Note that `topic_id` starts from 1 and not 0.
 
         Parameters
         ----------
-        topic_id
+        topic_ids: iterable of int
         within_top_n: int, optional
 
         Returns
         -------
         ignis.corpus.CorpusSlice
         """
-        topic_docs = [
-            doc_id
-            for doc_id, prob in self.get_topic_documents(
-                topic_id=topic_id, within_top_n=within_top_n
-            )
-        ]
-        return self.slice_by_ids(topic_docs)
+        all_doc_ids = []
+        for topic_id in topic_ids:
+            topic_doc_ids = [
+                doc_id
+                for doc_id, prob in self.get_topic_documents(
+                    topic_id=topic_id, within_top_n=within_top_n
+                )
+            ]
+            all_doc_ids += topic_doc_ids
+        return self.slice_by_ids(all_doc_ids)
+
+    def slice_by_topic(self, topic_id, within_top_n=1):
+        """
+        Convenience function to create a new CorpusSlice with Documents that come
+        under a given topic in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        `within_top_n` parameter.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_id: int
+        within_top_n: int, optional
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        """
+        return self.slice_by_topics([topic_id], within_top_n)
 
     def retrain_model(
         self,

@@ -1,8 +1,9 @@
 import bz2
+import collections
 import pathlib
 import pickle
+import re
 import uuid
-import collections
 
 
 class Corpus:
@@ -205,6 +206,98 @@ class CorpusSlice:
 
         return self.slice_by_ids(found_doc_ids)
 
+    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+        """
+        Returns a new CorpusSlice with the Documents that contain `tokens` removed.
+
+        If `human_readable` is True, will match `tokens` against the human-readable
+        representation of the Document rather than its tokenised form.
+
+        `tokens` is canonically an iterable of single tokens, but exact phrase matching
+        can be done by passing in an iterable of full phrases as well, since we do a
+        full-text search and Documents generally retain the original order of the
+        tokens.
+
+        This is especially helpful if `human_readable` is set, since exact phrase
+        matching can be done against the more understandable human-readable
+        representation.
+
+        Parameters
+        ----------
+        tokens: iterable of str
+            The tokens (or phrases) to remove
+        include_root: bool, optional
+            Whether or not to search the root Corpus as well
+        human_readable: bool, optional
+            Whether or not to search the human-readable representation of the
+            Document rather than its tokenised form
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        # Sanity check
+        if type(tokens) is str:
+            raise RuntimeWarning(
+                "Received a single string instead of an iterable of token "
+                "strings -- You probably did not intend to do this."
+            )
+
+        if include_root:
+            search_docs = self.root.documents
+        else:
+            search_docs = self.documents
+
+        search_patterns = [
+            re.compile(fr"(\s|^){re.escape(token)}(\s|$)") for token in tokens
+        ]
+        filtered_doc_ids = []
+        for doc_id, doc in search_docs.items():
+            if human_readable:
+                doc_text = doc.human_readable
+            else:
+                doc_text = " ".join(doc.tokens)
+
+            found_pattern = False
+            for pattern in search_patterns:
+                if pattern.search(doc_text):
+                    found_pattern = True
+                    break
+
+            if not found_pattern:
+                filtered_doc_ids.append(doc_id)
+
+        return self.slice_by_ids(filtered_doc_ids)
+
+    def filter(self, filter_fn, include_root=False):
+        """
+        Returns a new CorpusSlice with the Documents that `filter_fn` returns True for.
+
+        `filter_fn` receives one argument, a single Document in this CorpusSlice.
+
+        Parameters
+        ----------
+        filter_fn: fn
+            The filter function
+        include_root: bool, optional
+            Whether or not to search the root Corpus as well
+
+        Returns
+        -------
+        CorpusSlice
+        """
+        if include_root:
+            search_docs = self.root.documents
+        else:
+            search_docs = self.documents
+
+        filtered_doc_ids = []
+        for doc_id, doc in search_docs.items():
+            if filter_fn(doc):
+                filtered_doc_ids.append(doc_id)
+
+        return self.slice_by_ids(filtered_doc_ids)
+
     def concat(self, *other_slices):
         """
         Returns a new CorpusSlice that has the Documents from this instance and all
@@ -223,6 +316,11 @@ class CorpusSlice:
         new_slice_ids = set(self.documents.keys())
 
         for other_slice in other_slices:
+            if not isinstance(other_slice, CorpusSlice):
+                raise RuntimeError(
+                    "CorpusSlices can only be concatenated with other CorpusSlices."
+                )
+
             if other_slice.root != self.root:
                 raise RuntimeError(
                     "CorpusSlices can only be concatenated if they have the same root "
@@ -235,6 +333,16 @@ class CorpusSlice:
         new_slice_ids = list(new_slice_ids)
 
         return CorpusSlice(self.root, new_slice_ids)
+
+    def __add__(self, other):
+        return self.concat(other)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, CorpusSlice)
+            and self.root == other.root
+            and self.documents == other.documents
+        )
 
 
 class Document:
