@@ -665,9 +665,11 @@ def _load_tomotopy_model(model_type, model_bytes):
     -------
     tp.LDAModel
     """
-    if model_type == "tp_lda":
-        import ignis.models
+    import ignis.models
 
+    if model_type == "tp_lda":
         return ignis.models.LDAModel.load_from_bytes(model_bytes)
+    elif model_type == "tp_hdp":
+        return ignis.models.HDPModel.load_from_bytes(model_bytes)
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")

@@ -90,6 +90,7 @@ def prepare_data(
     sort_topics=False,
     verbose=False,
     use_optimised=True,
+    **other_options,
 ):
     """
     Provides a simple interface for preparing the data for visualisation with pyLDAvis
@@ -128,7 +129,10 @@ def prepare_data(
     # Since we are doing the actual calculations in a separate thread, we collect the
     # options here to pass them through more neatly
     # (Is there a better way to handle this?)
-    options = {"mds": mds, "lambda_step": lambda_step, "sort_topics": sort_topics}
+    options = dict(
+        {"mds": mds, "lambda_step": lambda_step, "sort_topics": sort_topics},
+        **other_options,
+    )
 
     if verbose:
         print("Preparing LDA visualisation...", flush=True, end="")
@@ -201,6 +205,7 @@ def _fast_prepare(
     n_jobs=-1,
     plot_opts=None,
     sort_topics=True,
+    skip_validate=False,
 ):
     """
     Helper function that runs optimised versions of the pyLDAvis functions to reduce
@@ -245,8 +250,11 @@ def _fast_prepare(
     plot_opts : dict, with keys 'xlab' and `ylab`
         Dictionary of plotting options, right now only used for the axis labels.
     sort_topics : sort topics by topic proportion (percentage of tokens covered). Set
-    to false to
-        to keep original topic order.
+        to false to keep original topic order.
+
+    skip_validate: bool, optional
+        If set, will ignore validation errors (e.g., those caused by numerical
+        instability).  Use with caution.
 
     Returns
     -------
@@ -290,9 +298,10 @@ def _fast_prepare(
     term_frequency = _series_with_name(term_frequency, "term_frequency")
     doc_lengths = _series_with_name(doc_lengths, "doc_length")
     vocab = _series_with_name(vocab, "vocab")
-    _prepare._input_validate(
-        topic_term_dists, doc_topic_dists, doc_lengths, vocab, term_frequency
-    )
+    if not skip_validate:
+        _prepare._input_validate(
+            topic_term_dists, doc_topic_dists, doc_lengths, vocab, term_frequency
+        )
     R = min(R, len(vocab))
 
     topic_freq = doc_topic_dists.mul(doc_lengths, axis="index").sum()

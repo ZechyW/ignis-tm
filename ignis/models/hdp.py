@@ -13,21 +13,21 @@ gensim = ignis.util.LazyLoader("gensim")
 
 default_options = {
     "term_weighting": "one",
-    "k": 10,
+    "initial_k": 2,
     "seed": 11399,
     "workers": 8,
     "parallel_scheme": "default",
-    "iterations": 1000,
+    "iterations": 500,
     "update_every": 100,
     "until_max_ll": False,
-    "max_extra_iterations": 2000,
+    "max_extra_iterations": 1000,
     "verbose": False,
 }
 
 
-class LDAModel(BaseModel):
+class HDPModel(BaseModel):
     """
-    An Ignis model that wraps a Tomotopy LDA model.
+    An Ignis model that wraps a Tomotopy HDP model.
 
     Parameters
     ----------
@@ -42,8 +42,9 @@ class LDAModel(BaseModel):
 
     term_weighting: {"idf", "pmi", "one"}
         Tomotopy term weighting scheme
-    k: int
-        Number of topics to infer
+    initial_k: int
+        Number of initial topics; the total number of topics will be adjusted
+        automatically as the model is trained
     seed: int
         Model random seed
     workers: int
@@ -68,7 +69,7 @@ class LDAModel(BaseModel):
         super().__init__(corpus_slice, options)
 
         self.corpus_slice = corpus_slice
-        self.model_type = "tp_lda"
+        self.model_type = "tp_hdp"
 
         # `options` is a dict holding any user-defined model options.
         # Since it comes from an external source, we keep it as a separate dict rather
@@ -110,8 +111,13 @@ class LDAModel(BaseModel):
         self.options["parallel"] = parallel
 
         # Initialise model
-        self.model = tp.LDAModel(
-            tw=self.options["tw"], k=self.options["k"], seed=self.options["seed"]
+        self.model = tp.HDPModel(
+            tw=self.options["tw"],
+            initial_k=self.options["initial_k"],
+            seed=self.options["seed"],
+            alpha=0.05,
+            eta=0.07,
+            gamma=0.001,
         )
 
         # When docs are added to `self.model`, we can only retrieve them from
@@ -125,6 +131,13 @@ class LDAModel(BaseModel):
             self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
+
+        # After a HDP model is trained, some number of topics might not be alive; we
+        # should ignore these topics when dealing with user input.
+        # User topic starts from 1; model_topic is in range (0, k), including dead
+        # topics
+        self.user_topic_to_model_topic = {}
+        self.model_topic_to_user_topic = {}
 
     @staticmethod
     def load_from_bytes(model_bytes):
@@ -147,7 +160,7 @@ class LDAModel(BaseModel):
                 fp.write(model_bytes)
 
             # noinspection PyTypeChecker,PyCallByClass
-            tp_model = tp.LDAModel.load(tmp_model_file)
+            tp_model = tp.HDPModel.load(tmp_model_file)
 
         return tp_model
 
@@ -189,6 +202,17 @@ class LDAModel(BaseModel):
 
         if until_max_ll:
             self._train_until_max_ll()
+
+        # Check for live topics, map to user topics
+        self.user_topic_to_model_topic = {}
+        self.model_topic_to_user_topic = {}
+        current_user_topic = 1
+        for tp_topic_id in range(self.model.k):
+            if self.model.is_live_topic(tp_topic_id):
+                self.user_topic_to_model_topic[current_user_topic] = tp_topic_id
+                current_user_topic += 1
+        for user_topic, model_topic in self.user_topic_to_model_topic.items():
+            self.model_topic_to_user_topic[model_topic] = user_topic
 
         elapsed = time.perf_counter() - origin_time
         if verbose:
@@ -261,14 +285,14 @@ class LDAModel(BaseModel):
                 progress_bar.close()
 
             # noinspection PyTypeChecker,PyCallByClass
-            self.model = tp.LDAModel.load(tmp_model_file)
+            self.model = tp.HDPModel.load(tmp_model_file)
 
     def get_num_topics(self):
-        return self.model.k
+        return self.model.live_k
 
     def get_topic_words(self, topic_id, top_n):
         # Tomotopy topics are 0-indexed
-        tp_topic_id = topic_id - 1
+        tp_topic_id = self.user_topic_to_model_topic[topic_id]
         return self.model.get_topic_words(tp_topic_id, top_n)
 
     def get_topic_documents(self, topic_id, within_top_n):
@@ -287,7 +311,7 @@ class LDAModel(BaseModel):
 
         """
         # Tomotopy topics are 0-indexed
-        tp_topic_id = topic_id - 1
+        tp_topic_id = self.user_topic_to_model_topic[topic_id]
 
         topic_documents = []
         for doc_id in self.corpus_slice.document_ids():
@@ -309,7 +333,10 @@ class LDAModel(BaseModel):
 
         # Each item in doc_topics is a tuple of (<topic_id>, <probability>),
         # but the `topic_id` returned by Tomotopy is 0-indexed, so we need to add 1
-        doc_topics = [(tp_topic_id + 1, prob) for tp_topic_id, prob in doc_topics]
+        doc_topics = [
+            (self.model_topic_to_user_topic[tp_topic_id], prob)
+            for tp_topic_id, prob in doc_topics
+        ]
 
         return doc_topics
 
@@ -334,6 +361,9 @@ class LDAModel(BaseModel):
         """
         topics = []
         for k in range(self.model.k):
+            if not self.model.is_live_topic(k):
+                continue
+
             word_probs = self.model.get_topic_words(k, top_n)
             topics.append([word for word, prob in word_probs])
 

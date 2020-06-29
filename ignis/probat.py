@@ -60,8 +60,9 @@ def train_model(
         model.train()
         aurum = ignis.aurum.Aurum(model)
     elif model_type == "tp_hdp":
-        # Not implemented yet
-        aurum = None
+        model = ignis.models.HDPModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
     else:
         raise ValueError(f"Unknown model type: '{model_type}'")
 
