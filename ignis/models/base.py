@@ -5,6 +5,9 @@ class BaseModel:
     """
     The base class for all Ignis models.
 
+    Implemented child classes have the freedom to define their own default values for
+    each method.
+
     NOTE: All Ignis models should have topic IDs that start from 1 and not 0;
     i.e., they should be in range(1, num_topics + 1)
 
@@ -102,5 +105,23 @@ class BaseModel:
         -------
         iterable of tuples
             A list of tuples (<topic ID>, <probability>)
+        """
+        pass
+
+    def get_coherence(self, coherence, top_n):
+        """
+        Use Gensim's `models.coherencemodel` to get a coherence score for a trained
+        model.
+
+        Parameters
+        ----------
+        coherence: {"u_mass", "c_v", "c_uci", "c_npmi"}
+            Coherence measure to calculate
+        top_n: int
+            Number of top words to extract from each topic
+
+        Returns
+        -------
+        float
         """
         pass

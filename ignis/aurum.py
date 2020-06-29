@@ -122,6 +122,12 @@ class Aurum:
         """
         return self.ignis_model.get_document_topics(doc_id, top_n)
 
+    def get_coherence(self, coherence, top_n):
+        """
+        See `ignis.models.base.BaseModel.get_coherence()`
+        """
+        return self.ignis_model.get_coherence(coherence, top_n)
+
     # =================================================================================
     # Corpus Slice
     def get_documents(self):
@@ -391,7 +397,7 @@ class Aurum:
     # =================================================================================
     # Slicing and Iteration
     # Convenience functions that help with the exploring the Model-Corpus interface
-    def slice_by_topics(self, topic_ids, within_top_n=1):
+    def slice_by_topics(self, topic_ids, within_top_n=1, ignore_topics=None):
         """
         Convenience function to create a new CorpusSlice with Documents that come
         under all the given topics in the current model.
@@ -405,29 +411,50 @@ class Aurum:
         ----------
         topic_ids: iterable of int
         within_top_n: int, optional
+        ignore_topics: iterable of int, optional
+            Don't count any of these topics if they are within the top `n` for a
+            document.  E.g., for a document with top topics [5, 1, 3, ...], setting
+            `ignore_topics` to [5] will consider the document's top topics to be [1,
+            3, ...] instead.
 
         Returns
         -------
         ignis.corpus.CorpusSlice
         """
+        if ignore_topics is None:
+            ignore_topics = []
+
         all_doc_ids = []
-        for topic_id in topic_ids:
-            topic_doc_ids = [
-                doc_id
-                for doc_id, prob in self.get_topic_documents(
-                    topic_id=topic_id, within_top_n=within_top_n
-                )
-            ]
-            all_doc_ids += topic_doc_ids
+        for doc_id in self.get_documents():
+            # This is a list of (<topic>, <prob>)
+            doc_topics = self.get_document_topics(
+                doc_id, within_top_n + len(ignore_topics)
+            )
+            doc_topics = sorted(doc_topics, key=lambda x: x[1], reverse=True)
+            checked_topics = 0
+            for topic, prob in doc_topics:
+                if topic not in ignore_topics:
+                    # We've seen one more topic for this document
+                    checked_topics += 1
+
+                if checked_topics > within_top_n:
+                    # Exceeded the topic check limit for this document
+                    break
+
+                if topic in topic_ids:
+                    # Add it and go to the next document, we're done here
+                    all_doc_ids.append(doc_id)
+                    break
+
         return self.slice_by_ids(all_doc_ids)
 
-    def slice_by_topic(self, topic_id, within_top_n=1):
+    def slice_by_topic(self, topic_id, within_top_n=1, ignore_topics=None):
         """
         Convenience function to create a new CorpusSlice with Documents that come
         under a given topic in the current model.
 
         See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
-        `within_top_n` parameter.
+        `within_top_n` and `ignore_topics` parameters.
 
         Note that `topic_id` starts from 1 and not 0.
 
@@ -435,12 +462,13 @@ class Aurum:
         ----------
         topic_id: int
         within_top_n: int, optional
+        ignore_topics: iterable of int, optional
 
         Returns
         -------
         ignis.corpus.CorpusSlice
         """
-        return self.slice_by_topics([topic_id], within_top_n)
+        return self.slice_by_topics([topic_id], within_top_n, ignore_topics)
 
     def retrain_model(
         self,
@@ -474,6 +502,9 @@ class Aurum:
             The Aurum results object for the newly-trained model, which can be used
             for further exploration and iteration
         """
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError("Cannot retrain model on an empty CorpusSlice.")
+
         new_kwargs = {
             "corpus_slice": corpus_slice or self.corpus_slice,
             "model_type": model_type or self.model_type,
@@ -511,6 +542,71 @@ class Aurum:
             new_kwargs["vis_options"] = self.vis_options
 
         return ignis.probat.train_model(**new_kwargs)
+
+    def resuggest_num_topics(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        coherence=None,
+        top_n=None,
+        start_k=None,
+        end_k=None,
+        iterations=None,
+    ):
+        """
+        (Re-)suggests a possible number of topics for the given corpus slice and
+        model type; any parameters that are None will be kept the same as the
+        current model or set to the Ignis defaults, where appropriate.
+
+        See `ignis.probat.suggest_num_topics()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        coherence
+        top_n
+        start_k
+        end_k
+        iterations
+
+        Returns
+        -------
+        (int, float)
+            Suggested topic count, associated coherence score
+        """
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError("Cannot retrain model on an empty CorpusSlice.")
+
+        # The only options that are inherited from this Aurum instance are
+        # `corpus_slice`, `model_type`, and `model_options`, where appropriate
+        new_kwargs = {
+            "corpus_slice": corpus_slice or self.corpus_slice,
+            "model_type": model_type or self.model_type,
+        }
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs["model_options"] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs["model_options"] = self.model_options
+
+        # All other arguments can be passed straight to
+        # `ignis.probat.suggest_num_topics()`, if set
+        if coherence is not None:
+            new_kwargs["coherence"] = coherence
+        if top_n is not None:
+            new_kwargs["top_n"] = top_n
+        if start_k is not None:
+            new_kwargs["start_k"] = start_k
+        if end_k is not None:
+            new_kwargs["end_k"] = end_k
+        if iterations is not None:
+            new_kwargs["iterations"] = iterations
+
+        return ignis.probat.suggest_num_topics(**new_kwargs)
 
 
 def load_results(filename):

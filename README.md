@@ -33,8 +33,8 @@ For ease of use:
 conda install jupyter_contrib_nbextensions black
 ```
 
-## Tomotopy
-N.B.: As at version 0.8.1, Tomotopy sometimes seems to rely on `PYTHONHASHSEED` being set in order to consistently reproduce results (together with setting the actual model seed), although this behaviour is not always reproducible.  To be safe, `PYTHONHASHSEED` should be explicitly set where necessary.
+## Indeterminacy
+N.B.: Some of the dependencies (e.g., Tomotopy, Gensim) sometimes seem to rely on `PYTHONHASHSEED` being set in order to consistently reproduce results (together with setting the actual random seed), although this behaviour is not always reproducible.  To be safe, `PYTHONHASHSEED` should be explicitly set where necessary.
 
 P.S.: This may have been an artifact of Windows Prefetching; needs further testing.
 
@@ -66,3 +66,5 @@ pip install pyLDAvis-2.1.3-py2.py3-none-any.whl
 ```
 
 In particular, the older versions of Pandas (e.g., v0.23.4) seem to generate the visualisation data much more quickly than the latest versions, for the latest version of pyLDAvis.
+
+Ignis also has a built-in monkey-patched version of the pyLDAvis `.prepare()` function that works better with newer versions of Pandas.

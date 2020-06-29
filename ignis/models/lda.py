@@ -1,6 +1,7 @@
 import pathlib
 import tempfile
 import time
+import collections
 
 import tqdm
 
@@ -8,6 +9,7 @@ import ignis.util
 from .base import BaseModel
 
 tp = ignis.util.LazyLoader("tomotopy")
+gensim = ignis.util.LazyLoader("gensim")
 
 default_options = {
     "term_weighting": "one",
@@ -18,7 +20,7 @@ default_options = {
     "iterations": 1000,
     "update_every": 100,
     "until_max_ll": False,
-    "max_extra_iterations": 5000,
+    "max_extra_iterations": 2000,
     "verbose": False,
 }
 
@@ -270,6 +272,20 @@ class LDAModel(BaseModel):
         return self.model.get_topic_words(tp_topic_id, top_n)
 
     def get_topic_documents(self, topic_id, within_top_n):
+        """
+        If calling consecutively for multiple topic IDs, this is less efficient than
+        iterating over the documents directly and calling `.get_document_topics()`
+        instead.
+
+        Parameters
+        ----------
+        topic_id
+        within_top_n
+
+        Returns
+        -------
+
+        """
         # Tomotopy topics are 0-indexed
         tp_topic_id = topic_id - 1
 
@@ -296,3 +312,59 @@ class LDAModel(BaseModel):
         doc_topics = [(tp_topic_id + 1, prob) for tp_topic_id, prob in doc_topics]
 
         return doc_topics
+
+    def get_coherence(self, coherence="u_mass", top_n=20, processes=8):
+        """
+        Use Gensim's `models.coherencemodel` to get a coherence score for a trained
+        LDAModel.
+
+        Parameters
+        ----------
+        coherence: {"u_mass", "c_v", "c_uci", "c_npmi"}, optional
+            Coherence measure to calculate.
+            N.B.: Unlike Gensim, the default is "u_mass", which is faster to calculate
+        top_n: int, optional
+            Number of top words to extract from each topic
+        processes: int, optional
+            Number of processes to use for probability estimation phase
+
+        Returns
+        -------
+        float
+        """
+        topics = []
+        for k in range(self.model.k):
+            word_probs = self.model.get_topic_words(k, top_n)
+            topics.append([word for word, prob in word_probs])
+
+        texts = []
+        corpus = []
+        for doc in self.model.docs:
+            words = [self.model.vocabs[token_id] for token_id in doc.words]
+            texts.append(words)
+            freqs = list(collections.Counter(doc.words).items())
+            corpus.append(freqs)
+
+        id2word = dict(enumerate(self.model.vocabs))
+        dictionary = gensim.corpora.dictionary.Dictionary.from_corpus(corpus, id2word)
+
+        cm = gensim.models.coherencemodel.CoherenceModel(
+            topics=topics,
+            texts=texts,
+            corpus=corpus,
+            dictionary=dictionary,
+            coherence=coherence,
+            topn=top_n,
+            processes=processes,
+        )
+
+        # For debugging the interface between Tomotopy and Gensim
+        # coherence = cm.get_coherence()
+        # return {
+        #     "coherence": coherence,
+        #     "topics": topics,
+        #     "texts": texts,
+        #     "corpus": corpus,
+        #     "dictionary": dictionary,
+        # }
+        return cm.get_coherence()
