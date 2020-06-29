@@ -14,6 +14,9 @@ class Corpus:
     The same Corpus will be used even as sub-slices of the data go through iterative
     modelling -- Smaller sets of Documents will just be selected by ID.
 
+    Corpora Documents are tracked by insertion order, but CorpusSlices are shuffled
+    (viz., they are sorted by the randomly-generated Document IDs).
+
     Attributes
     ----------
     documents: dict
@@ -98,8 +101,8 @@ class CorpusSlice:
     Attributes
     ----------
     documents: collections.OrderedDict
-        Mapping of IDs to Documents.  Ordered by Document ID, but this shouldn't
-        substantively affect the topic-modelling results.
+        Mapping of IDs to Documents.  Ordered by Document ID as a form of shuffling
+        (useful for things like preventing time bias in the document order).
     """
 
     def __init__(self, root, slice_ids):
@@ -272,7 +275,7 @@ class CorpusSlice:
 
         return self.slice_by_ids(filtered_doc_ids)
 
-    def filter(self, filter_fn, include_root=False):
+    def slice_filter(self, filter_fn, include_root=False):
         """
         Returns a new CorpusSlice with the Documents that `filter_fn` returns True for.
 

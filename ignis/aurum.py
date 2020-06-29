@@ -152,6 +152,20 @@ class Aurum:
         """
         return self.corpus_slice.slice_by_tokens(tokens, include_root)
 
+    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+        """
+        See `ignis.corpus.CorpusSlice.slice_without_tokens()`
+        """
+        return self.corpus_slice.slice_without_tokens(
+            tokens, include_root, human_readable
+        )
+
+    def slice_filter(self, filter_fn, include_root=False):
+        """
+        See `ignis.corpus.CorpusSlice.slice_filter()`
+        """
+        return self.corpus_slice.slice_filter(filter_fn, include_root)
+
     # =================================================================================
     # Automated Labeller
     def init_labeller(self, labeller_type, **labeller_options):
@@ -270,13 +284,22 @@ class Aurum:
 
     # =================================================================================
     # Jupyter widgets
-    def nb_explore_topics(self, doc_sort_key=None):
+    def nb_explore_topics(self, top_words=15, top_labels=15, doc_sort_key=None):
         """
         Convenience function that creates an interactive Jupyter notebook widget for
         exploring the topics in this model.
 
+        By default, documents are shown in decreasing order of probability for each
+        specified topic, but a custom sorting function can be passed via `doc_sort_key`
+        as well.
+
         Parameters
         ----------
+        top_words: int, optional
+            The top `n` most probable terms for each topic to show
+        top_labels: int, optional
+            The top `n` most probably labels for each topic to show.  Will have no
+            effect if the model does not have a labeller initialised.
         doc_sort_key: fn, optional
             If specified, will sort topic documents using this key when displaying them
 
@@ -291,14 +314,18 @@ class Aurum:
         def show_topic(topic_id=1):
             # Top words
             words = ", ".join(
-                word for word, probability in self.get_topic_words(topic_id, top_n=10)
+                word
+                for word, probability in self.get_topic_words(topic_id, top_n=top_words)
             )
             print(f"Top words:\n{words}")
 
             # Labels
             if self.labeller is not None:
                 labels = ", ".join(
-                    label for label, score in self.get_topic_labels(topic_id, top_n=10)
+                    label
+                    for label, score in self.get_topic_labels(
+                        topic_id, top_n=top_labels
+                    )
                 )
                 print(f"\nSuggested labels:\n{labels}")
 
@@ -311,11 +338,12 @@ class Aurum:
             )
 
             def show_topic_doc(within_top_n=1):
-                # Grab the documents that match the params passed
-                topic_docs = [
-                    doc_id
-                    for doc_id, prob in self.get_topic_documents(topic_id, within_top_n)
-                ]
+                # Grab the documents that match the params passed, sorted by topic
+                # probability in descending order
+                topic_probs = self.get_topic_documents(topic_id, within_top_n)
+                topic_probs = sorted(topic_probs, key=lambda x: x[1], reverse=True)
+
+                topic_docs = [doc_id for doc_id, prob in topic_probs]
 
                 if len(topic_docs) == 0:
                     print(
