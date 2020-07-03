@@ -94,11 +94,13 @@ class BaseModel:
         """
         Get the top `n` most probable topics for the Document with the given ID.
 
+        Children must accept either a string or UUID for `doc_id`.
+
         NOTE: The topic IDs in the results start from 1 and not 0.
 
         Parameters
         ----------
-        doc_id
+        doc_id: str or uuid.UUID
         top_n
 
         Returns

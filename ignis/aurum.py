@@ -98,6 +98,8 @@ class Aurum:
 
     # =================================================================================
     # Topic Model
+    # (Default arguments are defined by the models themselves, in case different
+    # values work better with different models)
     def get_num_topics(self):
         """
         See `ignis.models.base.BaseModel.get_num_topics()`
@@ -110,23 +112,23 @@ class Aurum:
         """
         return self.ignis_model.get_topic_words(*args, **kwargs)
 
-    def get_topic_documents(self, topic_id, within_top_n):
+    def get_topic_documents(self, *args, **kwargs):
         """
         See `ignis.models.base.BaseModel.get_topic_documents()`
         """
-        return self.ignis_model.get_topic_documents(topic_id, within_top_n)
+        return self.ignis_model.get_topic_documents(*args, **kwargs)
 
-    def get_document_topics(self, doc_id, top_n):
+    def get_document_topics(self, *args, **kwargs):
         """
         See `ignis.models.base.BaseModel.get_document_topics()`
         """
-        return self.ignis_model.get_document_topics(doc_id, top_n)
+        return self.ignis_model.get_document_topics(*args, **kwargs)
 
-    def get_coherence(self, coherence, top_n):
+    def get_coherence(self, *args, **kwargs):
         """
         See `ignis.models.base.BaseModel.get_coherence()`
         """
-        return self.ignis_model.get_coherence(coherence, top_n)
+        return self.ignis_model.get_coherence(*args, **kwargs)
 
     # =================================================================================
     # Corpus Slice
@@ -140,11 +142,11 @@ class Aurum:
         """
         return list(self.corpus_slice.documents.keys())
 
-    def get_document(self, doc_id):
+    def get_document(self, *args, **kwargs):
         """
         See `ignis.corpus.CorpusSlice.get_document()`
         """
-        return self.corpus_slice.get_document(doc_id)
+        return self.corpus_slice.get_document(*args, **kwargs)
 
     def slice_by_ids(self, doc_ids):
         """
@@ -290,7 +292,7 @@ class Aurum:
 
     # =================================================================================
     # Jupyter widgets
-    def nb_explore_topics(self, top_words=15, top_labels=15, doc_sort_key=None):
+    def nb_explore_topics(self, top_words=30, top_labels=15, doc_sort_key=None):
         """
         Convenience function that creates an interactive Jupyter notebook widget for
         exploring the topics in this model.
@@ -553,6 +555,7 @@ class Aurum:
         start_k=None,
         end_k=None,
         iterations=None,
+        verbose=False,
     ):
         """
         (Re-)suggests a possible number of topics for the given corpus slice and
@@ -571,11 +574,12 @@ class Aurum:
         start_k
         end_k
         iterations
+        verbose
 
         Returns
         -------
-        (int, float)
-            Suggested topic count, associated coherence score
+        int
+            Suggested topic count
         """
         if corpus_slice is not None and len(corpus_slice) == 0:
             raise RuntimeError("Cannot retrain model on an empty CorpusSlice.")
@@ -605,6 +609,8 @@ class Aurum:
             new_kwargs["end_k"] = end_k
         if iterations is not None:
             new_kwargs["iterations"] = iterations
+
+        new_kwargs["verbose"] = verbose
 
         return ignis.probat.suggest_num_topics(**new_kwargs)
 

@@ -2,6 +2,7 @@ import pathlib
 import tempfile
 import time
 import collections
+import uuid
 
 import tqdm
 
@@ -20,6 +21,7 @@ default_options = {
     "iterations": 1000,
     "update_every": 100,
     "until_max_ll": False,
+    "until_max_coherence": False,
     "max_extra_iterations": 2000,
     "verbose": False,
 }
@@ -126,6 +128,10 @@ class LDAModel(BaseModel):
             self.doc_id_to_model_index[doc_id] = index
             index += 1
 
+        # Burn-in: Numer of iterations before Tomotopy starts optimising
+        # hyper-parameters
+        self.model.burn_in = 50
+
     @staticmethod
     def load_from_bytes(model_bytes):
         """
@@ -160,6 +166,7 @@ class LDAModel(BaseModel):
         iterations = self.options["iterations"]
         update_every = self.options["update_every"]
         until_max_ll = self.options["until_max_ll"]
+        until_max_coherence = self.options["until_max_coherence"]
         verbose = self.options["verbose"]
 
         origin_time = time.perf_counter()
@@ -189,6 +196,9 @@ class LDAModel(BaseModel):
 
         if until_max_ll:
             self._train_until_max_ll()
+
+        if until_max_coherence:
+            self._train_until_max_coherence()
 
         elapsed = time.perf_counter() - origin_time
         if verbose:
@@ -263,6 +273,72 @@ class LDAModel(BaseModel):
             # noinspection PyTypeChecker,PyCallByClass
             self.model = tp.LDAModel.load(tmp_model_file)
 
+    def _train_until_max_coherence(self):
+        """
+        Extended training until an approximate maximum per-word LL is reached.
+
+        Saves a temporary copy of the model before every iteration batch, and loads
+        the last best model once LL stops increasing.
+        """
+        parallel = self.options["parallel"]
+        workers = self.options["workers"]
+        update_every = self.options["update_every"]
+        max_extra_iterations = self.options["max_extra_iterations"]
+        verbose = self.options["verbose"]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_model_file = pathlib.Path(tmpdir) / "max_coherence_model.bin"
+            # model.save() expects the filename to be a string
+            tmp_model_file = str(tmp_model_file)
+            self.model.save(tmp_model_file)
+
+            if verbose:
+                print(
+                    "\n" "Continuing to train until maximum coherence.\n", flush=True,
+                )
+                progress_bar = tqdm.tqdm(miniters=1)
+
+            best_coherence = self.get_coherence(processes=workers)
+            start_coherence = best_coherence
+            i = 0
+            batches_since_best = 0
+
+            while True:
+                try:
+                    self.model.train(update_every, workers=workers, parallel=parallel)
+                    i += update_every
+
+                    current_coherence = self.get_coherence(processes=workers)
+                    if verbose:
+                        progress_bar.set_postfix(
+                            {"Coherence": f"{current_coherence:.5f}"}
+                        )
+                        progress_bar.update(update_every)
+
+                    if current_coherence < best_coherence:
+                        batches_since_best += 1
+                    else:
+                        batches_since_best = 0
+                        self.model.save(tmp_model_file)
+                        best_coherence = current_coherence
+
+                    if batches_since_best == 5 or i >= max_extra_iterations:
+                        break
+
+                except KeyboardInterrupt:
+                    print("Stopping extended train sequence.")
+                    break
+
+            if verbose:
+                progress_bar.close()
+                print(
+                    f"Best coherence: {best_coherence:.5f} "
+                    f"(Starting: {start_coherence:.5f}"
+                )
+
+            # noinspection PyTypeChecker,PyCallByClass
+            self.model = tp.LDAModel.load(tmp_model_file)
+
     def get_num_topics(self):
         return self.model.k
 
@@ -303,6 +379,9 @@ class LDAModel(BaseModel):
         return topic_documents
 
     def get_document_topics(self, doc_id, top_n):
+        if isinstance(doc_id, str):
+            doc_id = uuid.UUID(doc_id)
+
         model_index = self.doc_id_to_model_index[doc_id]
         model_doc = self.model.docs[model_index]
         doc_topics = model_doc.get_topics(top_n=top_n)

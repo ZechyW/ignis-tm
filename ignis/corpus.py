@@ -46,6 +46,9 @@ class Corpus:
         str
             The ID for the added Document
         """
+        if len(tokens) == 0:
+            raise RuntimeError("Cannot add a Document with no tokens to a Corpus.")
+
         if metadata is None:
             metadata = collections.OrderedDict()
         if human_readable is None:

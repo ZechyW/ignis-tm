@@ -2,6 +2,8 @@
 The methods in this class are used for performing the actual topic modelling to get
 Aurum results.
 """
+import tqdm
+
 import ignis
 import ignis.aurum
 import ignis.corpus
@@ -87,9 +89,10 @@ def suggest_num_topics(
     model_options=None,
     coherence="u_mass",
     top_n=10,
-    start_k=5,
-    end_k=15,
+    start_k=2,
+    end_k=10,
     iterations=100,
+    verbose=False,
 ):
     """
     Lightly trains models with various topic counts and uses the resultant coherence
@@ -116,11 +119,13 @@ def suggest_num_topics(
         Maximum topic count to consider
     iterations: int, optional
         Number of iterations to train each candidate model for
+    verbose: bool, optional
+        Whether or not to show interim training progress
 
     Returns
     -------
-    (int, float)
-        Suggested topic count, associated coherence score
+    int
+        Suggested topic count
     """
     if isinstance(corpus_slice, ignis.corpus.Corpus):
         corpus_slice = corpus_slice.slice_full()
@@ -131,6 +136,16 @@ def suggest_num_topics(
 
     candidate_counts = range(start_k, end_k + 1)
 
+    progress_bar = None
+    if verbose:
+        total_models = end_k - start_k + 1
+        print(
+            f"Training {total_models} mini-models to suggest a suitable number of "
+            f"topics between {start_k} and {end_k}..."
+            f"({len(corpus_slice)} documents, {iterations} iterations each)"
+        )
+        progress_bar = tqdm.tqdm(total=total_models * iterations, miniters=1)
+
     results = []
     for k in candidate_counts:
         this_options = dict(
@@ -139,6 +154,7 @@ def suggest_num_topics(
             iterations=iterations,
             update_every=iterations,
             until_max_ll=False,
+            verbose=False,
         )
 
         if model_type == "tp_lda":
@@ -154,6 +170,18 @@ def suggest_num_topics(
                     ),
                 )
             )
-    results = sorted(results, key=lambda x: x[1], reverse=True)
 
-    return results[0]
+        if verbose:
+            progress_bar.update(iterations)
+
+    results = sorted(results, key=lambda x: x[1], reverse=True)
+    best = results[0]
+
+    if verbose:
+        print(
+            f"Suggested topic count: {best[0]}\t"
+            f"Coherence: {best[1]} (always negative, closer to 0 is better)"
+        )
+        progress_bar.close()
+
+    return best[0]
