@@ -154,6 +154,7 @@ def suggest_num_topics(
             iterations=iterations,
             update_every=iterations,
             until_max_ll=False,
+            until_max_coherence=False,
             verbose=False,
         )
 
