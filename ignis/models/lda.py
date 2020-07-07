@@ -128,7 +128,7 @@ class LDAModel(BaseModel):
             self.doc_id_to_model_index[doc_id] = index
             index += 1
 
-        # Burn-in: Numer of iterations before Tomotopy starts optimising
+        # Burn-in: Number of iterations before Tomotopy starts optimising
         # hyper-parameters
         self.model.burn_in = 50
 
