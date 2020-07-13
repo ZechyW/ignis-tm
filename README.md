@@ -2,6 +2,8 @@
 
 ## Dependencies
 
+The `conda-forge` (https://conda-forge.org/) channel may need to be enabled for some of these dependencies to be installed.
+
 General:
 
 ```
@@ -31,6 +33,14 @@ conda install pandas=0.23.4 pyldavis
 For ease of use:
 ```
 conda install jupyter_contrib_nbextensions black
+```
+
+Documentation:
+```
+conda install sphinx sphinx_rtd_theme
+pip install m2r2
+cd docs
+sphinx-build -b html . _build
 ```
 
 ## Indeterminacy

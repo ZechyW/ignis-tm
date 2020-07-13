@@ -11,25 +11,25 @@ import ignis.vis.pyldavis
 
 class Aurum:
     """
-    Aurum instances hold the results of performing topic modelling over Documents.
-    They provide methods for easily exploring the results and iterating over the topic
-    modelling process.
+    Aurum instances hold the results of performing topic modelling over
+    :class:`~ignis.corpus.Document` instances. They provide methods for easily
+    exploring the results and iterating over the topic modelling process.
 
     Aurum objects basically bring together the public APIs for Ignis models,
     automated labellers, and visualisation data providers, while also providing general
     save/load functionality.
 
     NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
-    0-indexed. So a model with 5 topics has topic IDs [1, 2, 3, 4, 5] and not
-    [0, 1, 2, 3, 4].
+    0-indexed. So a model with 5 topics has topic IDs `[1, 2, 3, 4, 5]` and not
+    `[0, 1, 2, 3, 4]`.
 
     This is for easier matching against pyLDAvis visualisations, and for easier usage
     by non-technical users.
 
     Parameters
     ----------
-    ignis_model: ignis.models.BaseModel
-        The specific Ignis topic model that was trained
+    ignis_model: ignis.models.base.BaseModel
+        The specific Ignis topic model used to generate this Aurum object.
     """
 
     def __init__(self, ignis_model):
