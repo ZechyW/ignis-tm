@@ -154,11 +154,11 @@ class Aurum:
         """
         return self.corpus_slice.slice_by_ids(doc_ids)
 
-    def slice_by_tokens(self, tokens, include_root=False):
+    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
         """
         See `ignis.corpus.CorpusSlice.slice_by_tokens()`
         """
-        return self.corpus_slice.slice_by_tokens(tokens, include_root)
+        return self.corpus_slice.slice_by_tokens(tokens, include_root, human_readable)
 
     def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
         """

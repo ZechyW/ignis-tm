@@ -175,10 +175,23 @@ class CorpusSlice:
 
         return CorpusSlice(self.root, doc_ids)
 
-    def slice_by_tokens(self, tokens, include_root=False):
+    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
         """
         Create a new CorpusSlice with Documents that contain at least one of the
         given tokens.
+
+        If `human_readable` is True, will match `tokens` against the human-readable
+        representation of the Document rather than its tokenised form.
+
+        `tokens` is canonically an iterable of single tokens, but exact phrase matching
+        can be done by passing in an iterable of full phrases as well, since we do a
+        full-text search and Documents generally retain the original order of the
+        tokens.
+
+        This is especially helpful if `human_readable` is set, since exact phrase
+        matching can be done against the more understandable human-readable
+        representation.
+
         If `include_root` is True, will also search the root Corpus for Documents
         instead of limiting the search to the current CorpusSlice.
 
@@ -188,6 +201,9 @@ class CorpusSlice:
             A list of the tokens to search Documents for
         include_root: bool, optional
             Whether or not to search the root Corpus as well
+        human_readable: bool, optional
+            Whether or not to search the human-readable representation of the
+            Document rather than its tokenised form
 
         Returns
         -------
@@ -205,13 +221,32 @@ class CorpusSlice:
         else:
             search_docs = self.documents
 
+        # By-token search matches tokens directly
         search_tokens = set(tokens)
+
+        # Human-readable search performs a regex text search
+        search_patterns = [
+            re.compile(fr"(\s|^){re.escape(token)}(\s|$)") for token in tokens
+        ]
 
         found_doc_ids = []
         for doc_id, doc in search_docs.items():
-            doc_tokens = set(doc.tokens)
-            if len(search_tokens & doc_tokens) > 0:
-                found_doc_ids.append(doc_id)
+            if human_readable:
+                doc_text = doc.human_readable
+
+                found_pattern = False
+                for pattern in search_patterns:
+                    if pattern.search(doc_text):
+                        found_pattern = True
+                        break
+
+                if found_pattern:
+                    found_doc_ids.append(doc_id)
+
+            else:
+                doc_tokens = set(doc.tokens)
+                if len(search_tokens & doc_tokens) > 0:
+                    found_doc_ids.append(doc_id)
 
         return self.slice_by_ids(found_doc_ids)
 
@@ -257,24 +292,32 @@ class CorpusSlice:
         else:
             search_docs = self.documents
 
+        # By-token search matches tokens directly
+        search_tokens = set(tokens)
+
+        # Human-readable search performs a regex text search
         search_patterns = [
             re.compile(fr"(\s|^){re.escape(token)}(\s|$)") for token in tokens
         ]
+
         filtered_doc_ids = []
         for doc_id, doc in search_docs.items():
             if human_readable:
                 doc_text = doc.human_readable
+
+                found_pattern = False
+                for pattern in search_patterns:
+                    if pattern.search(doc_text):
+                        found_pattern = True
+                        break
+
+                if not found_pattern:
+                    filtered_doc_ids.append(doc_id)
+
             else:
-                doc_text = " ".join(doc.tokens)
-
-            found_pattern = False
-            for pattern in search_patterns:
-                if pattern.search(doc_text):
-                    found_pattern = True
-                    break
-
-            if not found_pattern:
-                filtered_doc_ids.append(doc_id)
+                doc_tokens = set(doc.tokens)
+                if len(search_tokens & doc_tokens) == 0:
+                    filtered_doc_ids.append(doc_id)
 
         return self.slice_by_ids(filtered_doc_ids)
 
