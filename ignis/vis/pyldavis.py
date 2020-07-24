@@ -4,6 +4,8 @@ import threading
 import time
 import warnings
 
+from IPython.core.display import display, HTML
+
 # We monkey patch pyLDAvis to optimise various pandas calculations below
 from joblib import Parallel, delayed
 
@@ -30,6 +32,21 @@ def show_visualisation(vis_data):
     -------
     IPython.display.HTML
     """
+    # CSS styles for displaying pyLDAvis visualisations nicely
+    # - Resize to fit visualisations without causing other cells to overflow
+    jupyter_styles = """
+    <style>
+        #notebook-container {
+            width: 1370px !important;
+        }
+    
+        div.output_area {
+            width: unset !important;
+        }
+    </style>
+    """
+    display(HTML(jupyter_styles))
+
     with warnings.catch_warnings():
         try:
             import IPython.utils.shimmodule

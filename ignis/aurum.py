@@ -1,5 +1,6 @@
 import bz2
 import copy
+import json
 import pathlib
 import pickle
 import pprint
@@ -292,7 +293,9 @@ class Aurum:
 
     # =================================================================================
     # Jupyter widgets
-    def nb_explore_topics(self, top_words=30, top_labels=15, doc_sort_key=None):
+    def nb_explore_topics(
+        self, top_words=30, top_labels=15, doc_sort_key=None, display_fn=None
+    ):
         """
         Convenience function that creates an interactive Jupyter notebook widget for
         exploring the topics in this model.
@@ -310,6 +313,11 @@ class Aurum:
             effect if the model does not have a labeller initialised.
         doc_sort_key: fn, optional
             If specified, will sort topic documents using this key when displaying them
+        display_fn: fn, optional
+            Custom display function that receives an individual Document as input and
+            should display the Document in human-readable form as a side effect.
+            If unset, will assume that the human-readable representation of the
+            Document is in HTML format and display it accordingly.
 
         Returns
         -------
@@ -320,6 +328,30 @@ class Aurum:
 
         # Per topic info
         def show_topic(topic_id=1):
+            # Styles
+            # - Prevent vertical scrollbars in output subareas
+            jupyter_styles = """
+            <style>
+                div.cell > div.output_wrapper > div.output.output_scroll {
+                    height: auto;
+                }
+            
+                .jupyter-widgets-output-area .output_scroll {
+                    height: unset;
+                    border-radius: unset;
+                    -webkit-box-shadow: unset;
+                    box-shadow: unset;
+                }
+            
+                .jupyter-widgets-output-area, div.output_stdout, div.output_result {
+                    height: auto;
+                    max-height: 50em;
+                    overflow-y: auto;
+                }
+            </style>
+            """
+            display(HTML(jupyter_styles))
+
             # Top words
             words = ", ".join(
                 word
@@ -370,7 +402,30 @@ class Aurum:
                 def show_doc(index=0):
                     print(f"[Total documents: {len(topic_docs)}]\n")
                     doc = topic_docs[index]
-                    print(str(doc))
+
+                    if display_fn is None:
+                        # Default HTML display
+                        print(f"ID: {doc.id}")
+                        if "filename" in doc.metadata:
+                            print(f"Filename: {doc.metadata['filename']}")
+                        if "txt_filename" in doc.metadata:
+                            print(f"Processed: {doc.metadata['txt_filename']}")
+
+                        if "sender" in doc.metadata:
+                            print(f"Sender: {doc.metadata['sender']}")
+                        if "recipients" in doc.metadata:
+                            recipients = doc.metadata["recipients"]
+
+                            # Truncate long recipient lists for display
+                            # (TODO: Make this optional?)
+                            if len(recipients) > 5:
+                                recipients = recipients[:5] + ["..."]
+
+                            print(f"Recipients:\n{json.dumps(recipients, indent=2)}")
+
+                        display(HTML(doc.human_readable))
+                    else:
+                        display_fn(doc)
                     print()
                     print("Top document topics (in descending order of probability):")
                     pprint.pprint(self.get_document_topics(doc.id, 10))

@@ -6,6 +6,8 @@ import pickle
 import re
 import uuid
 
+from bs4 import BeautifulSoup
+
 
 class Corpus:
     """
@@ -39,6 +41,7 @@ class Corpus:
             track.
         human_readable: str, optional
             A human-readable version of the Document text.
+            Assumed to be in HTML format by default.
             If None, will use the Document tokens joined with single spaces.
 
         Returns
@@ -397,7 +400,7 @@ class CorpusSlice:
         )
 
 
-class Document:
+class Document(object):
     """
     Documents hold the textual content of each file in the Corpus, as well as any
     relevant metadata.
@@ -411,6 +414,8 @@ class Document:
         track.
     human_readable: str
         A string representing the Document in human-readable form.
+        Assumed to be in HTML format by default.
+        FIXME: Make this an optional param
     """
 
     # Let's make Document IDs deterministic on their data, so that multiple runs of a
@@ -424,7 +429,11 @@ class Document:
         self.human_readable = human_readable
 
         data = f"{tokens}{metadata}{human_readable}"
-        self.id = uuid.uuid3(Document.ignis_uuid_namespace, data)
+        self.id = uuid.uuid5(Document.ignis_uuid_namespace, data)
+
+        # Cache the plain-text representation of this Document's HTML to avoid
+        # unnecessary recalculation; loaded when first queried
+        self.plain_text = None
 
     def __str__(self):
         metadata = json.dumps(self.metadata, indent=2)
@@ -438,6 +447,17 @@ class Document:
         metadata = "\n".join(truncated)
 
         return f"ID: {self.id}\n\nMetadata: {metadata}\n\n" f"{self.human_readable}"
+
+    def __getattribute__(self, item):
+        if item == "plain_text" and object.__getattribute__(self, "plain_text") is None:
+            # Convert this Document's HTML representation to plain text.
+            soup = BeautifulSoup(self.human_readable, "lxml")
+
+            # The text returned by BeautifulSoup might contain whitespace --
+            # Concatenate, split, and concatenate again to normalise the spacing
+            self.plain_text = " ".join(soup.get_text().split())
+            return self.plain_text
+        return object.__getattribute__(self, item)
 
 
 def load_corpus(filename):
