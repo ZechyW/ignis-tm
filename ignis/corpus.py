@@ -28,21 +28,32 @@ class Corpus:
     def __init__(self):
         self.documents = collections.OrderedDict()
 
-    def add_doc(self, tokens, metadata=None, human_readable=None):
+    def add_doc(self, tokens, metadata=None, display_str=None, plain_text=None):
         """
         Creates a new Document with the given parameters and starts tracking it.
 
         Parameters
         ----------
         tokens: iterable of str
-            The individual content tokens in the given document.
+            The individual content tokens in the given document; will be fed directly
+            into the various topic modelling algorithms. Assumed to have already
+            undergone any necessary munging.
         metadata: dict, optional
             A general-purpose dictionary containing any metadata the user wants to
             track.
-        human_readable: str, optional
-            A human-readable version of the Document text.
-            Assumed to be in HTML format by default.
+        display_str: str, optional
+            The content of the document, as a single string containing any necessary
+            markup or other formatting for human-readable display. By default,
+            `display_str` is assumed to contain a HTML representation of the document
+            (e.g., when the document is rendered in `ignis.aurum.nb_explore_topics()`),
+            but a custom display function can be passed where necessary.
             If None, will use the Document tokens joined with single spaces.
+        plain_text: str, optional
+            The full text of the given document as a single normalised string. If
+            `plain_text` is None, `display_str` is assumed to contain a HTML
+            representation of the document, and a corresponding plain-text
+            representation is automatically generated via BeautifulSoup when the
+            attribute is first accessed.
 
         Returns
         -------
@@ -54,9 +65,9 @@ class Corpus:
 
         if metadata is None:
             metadata = collections.OrderedDict()
-        if human_readable is None:
-            human_readable = " ".join(tokens)
-        doc = Document(tokens, metadata, human_readable)
+        if display_str is None:
+            display_str = " ".join(tokens)
+        doc = Document(tokens, metadata, display_str, plain_text)
         if doc.id in self.documents:
             raise RuntimeError(
                 f"This Document's hash is already present in the Corpus; it may be a "
@@ -178,22 +189,18 @@ class CorpusSlice:
 
         return CorpusSlice(self.root, doc_ids)
 
-    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
+    def slice_by_tokens(self, tokens, include_root=False, plain_text=False):
         """
         Create a new CorpusSlice with Documents that contain at least one of the
         given tokens.
 
-        If `human_readable` is True, will match `tokens` against the human-readable
-        representation of the Document rather than its tokenised form.
+        If `plain_text` is True, will match `tokens` against the plain-text
+        representation of the Document rather than its raw tokens (which might have
+        undergone various transformations).
 
-        `tokens` is canonically an iterable of single tokens, but exact phrase matching
-        can be done by passing in an iterable of full phrases as well, since we do a
-        full-text search and Documents generally retain the original order of the
-        tokens.
-
-        This is especially helpful if `human_readable` is set, since exact phrase
-        matching can be done against the more understandable human-readable
-        representation.
+        `tokens` is canonically an iterable of single tokens, but if `plain_text` is
+        set, a search will be done using the literal text of each element, allowing
+        for exact phrase matching as well.
 
         If `include_root` is True, will also search the root Corpus for Documents
         instead of limiting the search to the current CorpusSlice.
@@ -204,9 +211,9 @@ class CorpusSlice:
             A list of the tokens to search Documents for
         include_root: bool, optional
             Whether or not to search the root Corpus as well
-        human_readable: bool, optional
-            Whether or not to search the human-readable representation of the
-            Document rather than its tokenised form
+        plain_text: bool, optional
+            Whether or not to search the plain-text representation of the Document
+            rather than its tokenised form
 
         Returns
         -------
@@ -234,8 +241,8 @@ class CorpusSlice:
 
         found_doc_ids = []
         for doc_id, doc in search_docs.items():
-            if human_readable:
-                doc_text = doc.human_readable
+            if plain_text:
+                doc_text = doc.plain_text
 
                 found_pattern = False
                 for pattern in search_patterns:
@@ -253,21 +260,20 @@ class CorpusSlice:
 
         return self.slice_by_ids(found_doc_ids)
 
-    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+    def slice_without_tokens(self, tokens, include_root=False, plain_text=False):
         """
         Returns a new CorpusSlice with the Documents that contain `tokens` removed.
 
-        If `human_readable` is True, will match `tokens` against the human-readable
-        representation of the Document rather than its tokenised form.
+        If `plain_text` is True, will match `tokens` against the plain-text
+        representation of the Document rather than its raw tokens (which might have
+        undergone various transformations).
 
-        `tokens` is canonically an iterable of single tokens, but exact phrase matching
-        can be done by passing in an iterable of full phrases as well, since we do a
-        full-text search and Documents generally retain the original order of the
-        tokens.
+        `tokens` is canonically an iterable of single tokens, but if `plain_text` is
+        set, a search will be done using the literal text of each element, allowing
+        for exact phrase matching as well.
 
-        This is especially helpful if `human_readable` is set, since exact phrase
-        matching can be done against the more understandable human-readable
-        representation.
+        If `include_root` is True, will also search the root Corpus for Documents
+        instead of limiting the search to the current CorpusSlice.
 
         Parameters
         ----------
@@ -275,9 +281,9 @@ class CorpusSlice:
             The tokens (or phrases) to remove
         include_root: bool, optional
             Whether or not to search the root Corpus as well
-        human_readable: bool, optional
-            Whether or not to search the human-readable representation of the
-            Document rather than its tokenised form
+        plain_text: bool, optional
+            Whether or not to search the plain-text representation of the Document
+            rather than its tokenised form
 
         Returns
         -------
@@ -305,8 +311,8 @@ class CorpusSlice:
 
         filtered_doc_ids = []
         for doc_id, doc in search_docs.items():
-            if human_readable:
-                doc_text = doc.human_readable
+            if plain_text:
+                doc_text = doc.plain_text
 
                 found_pattern = False
                 for pattern in search_patterns:
@@ -408,14 +414,23 @@ class Document(object):
     Parameters
     ----------
     tokens: iterable of str
-        The individual content tokens in the given document.
+        The individual content tokens in the given document; will be fed directly
+        into the various topic modelling algorithms. Assumed to have already
+        undergone any necessary munging.
     metadata: dict
         A general-purpose dictionary containing any metadata the user wants to
         track.
-    human_readable: str
-        A string representing the Document in human-readable form.
-        Assumed to be in HTML format by default.
-        FIXME: Make this an optional param
+    display_str: str
+        The content of the document, as a single string containing any necessary
+        markup or other formatting for human-readable display. By default,
+        `display_str` is assumed to contain a HTML representation of the document (
+        e.g., when the document is rendered in `ignis.aurum.nb_explore_topics()`),
+        but a custom display function can be passed where necessary.
+    plain_text: str, optional
+        The full text of the given document as a single normalised string. If
+        `plain_text` is None, `display_str` is assumed to contain a HTML representation
+        of the document, and a corresponding plain-text representation is
+        automatically generated via BeautifulSoup when the attribute is first accessed.
     """
 
     # Let's make Document IDs deterministic on their data, so that multiple runs of a
@@ -423,17 +438,14 @@ class Document(object):
     # We will create a UUID5 for each Document against this fixed namespace:
     ignis_uuid_namespace = uuid.UUID("58ca78f2-0347-4b96-b2e7-63796bf87889")
 
-    def __init__(self, tokens, metadata, human_readable):
+    def __init__(self, tokens, metadata, display_str, plain_text=None):
         self.tokens = tokens
         self.metadata = metadata
-        self.human_readable = human_readable
+        self.display_str = display_str
+        self.plain_text = plain_text
 
-        data = f"{tokens}{metadata}{human_readable}"
+        data = f"{tokens}{metadata}{display_str}"
         self.id = uuid.uuid5(Document.ignis_uuid_namespace, data)
-
-        # Cache the plain-text representation of this Document's HTML to avoid
-        # unnecessary recalculation; loaded when first queried
-        self.plain_text = None
 
     def __str__(self):
         metadata = json.dumps(self.metadata, indent=2)
@@ -446,11 +458,12 @@ class Document(object):
                 truncated.append(line)
         metadata = "\n".join(truncated)
 
-        return f"ID: {self.id}\n\nMetadata: {metadata}\n\n" f"{self.human_readable}"
+        return f"ID: {self.id}\n\nMetadata: {metadata}\n\n" f"{self.display_str}"
 
     def __getattribute__(self, item):
         if item == "plain_text" and object.__getattribute__(self, "plain_text") is None:
-            # Convert this Document's HTML representation to plain text.
+            # There is no `plain_text` set for this document; assume that
+            # `display_str` contains a HTML representation of the document.
             soup = BeautifulSoup(self.human_readable, "lxml")
 
             # The text returned by BeautifulSoup might contain whitespace --

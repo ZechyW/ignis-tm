@@ -11,16 +11,22 @@ class TestCorpus(unittest.TestCase):
         """
         Prepare test Corpus objects
         """
+        # Fully-specified Documents
         self.corpus_1 = ignis.corpus.Corpus()
         self.corpus_1_doc_1 = self.corpus_1.add_doc(
-            ["these", "are", "some", "document", "tokens"],
-            human_readable="THESE are some document- +tokens",
+            tokens=["these", "are", "some", "document", "tokens"],
+            metadata=None,
+            display_str="<html><body>THESE are some document- +tokens</body></html>",
+            plain_text="THESE are some document- +tokens",
         )
         self.corpus_1_doc_2 = self.corpus_1.add_doc(
             ["these", "are", "some", "other", "words"],
-            human_readable="these ARE some (other words)",
+            metadata=None,
+            display_str="<html><body>these ARE some (other words)</body></html>",
+            plain_text="these ARE some (other words)",
         )
 
+        # `display_str` and `plain_text` will be automatically generated
         self.corpus_2 = ignis.corpus.Corpus()
         self.corpus_2_doc_1 = self.corpus_2.add_doc(["document", "tokens"])
 
@@ -82,21 +88,23 @@ class TestCorpus(unittest.TestCase):
         self.assertEqual(test_slice_2, all_slice)
 
         # Human-readable representation
-        test_slice_1 = all_slice.slice_without_tokens(["(other"], human_readable=True)
+        test_slice_1 = all_slice.slice_without_tokens(["(other"], plain_text=True)
         self.assertEqual(len(test_slice_1), 1)
         self.assertEqual(test_slice_1, doc_1_slice)
 
-        test_slice_2 = all_slice.slice_without_tokens(["tokens"], human_readable=True)
+        test_slice_2 = all_slice.slice_without_tokens(["tokens"], plain_text=True)
         self.assertEqual(len(test_slice_2), 2)
         self.assertEqual(test_slice_2, all_slice)
 
         # Phrase matching
         test_slice_1 = all_slice.slice_without_tokens(
-            ["(other words)"], human_readable=True
+            ["(other words)"], plain_text=True
         )
         self.assertEqual(len(test_slice_1), 1)
         self.assertEqual(test_slice_1, doc_1_slice)
 
-        test_slice_2 = all_slice.slice_without_tokens(["document tokens"])
+        test_slice_2 = all_slice.slice_without_tokens(
+            ["document- +tokens"], plain_text=True
+        )
         self.assertEqual(len(test_slice_2), 1)
         self.assertEqual(test_slice_2, doc_2_slice)
