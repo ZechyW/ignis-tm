@@ -70,7 +70,7 @@ class ImprovedPhraser:
         elapsed = time.perf_counter() - start_time
         start_time = time.perf_counter()
         if verbose:
-            print(f"Gensim Phraser initialised. {elapsed:.3f}s")
+            print(f"Gensim Phraser initialised. {elapsed:.3f}s", flush=True)
 
         # model is a list of tuples(<n-gram>, <score>), where <n-gram> is a
         # tuple (<token 1>, <token 2>, ...).
@@ -158,7 +158,7 @@ class ImprovedPhraser:
         # And done -- Ready to phrase.
         elapsed = time.perf_counter() - start_time
         if verbose:
-            print(f"Improved Phraser initialised. {elapsed:.3f}s")
+            print(f"Improved Phraser initialised. {elapsed:.3f}s", flush=True)
 
     def _map_by_first_token(self):
         """
@@ -173,10 +173,18 @@ class ImprovedPhraser:
                 self.by_first[head] = []
             self.by_first[head].append((phrase, score))
 
-    def find_ngrams(self, docs, threshold=-math.inf):
+    def find_ngrams(self, docs, threshold=-math.inf, verbose=False):
         """
         Perform n-gram replacement on the given documents using the phrase model
         trained for this instance.
+
+        Detects significant bigrams by default, but bigrams with the same phrase
+        score are merged, and common terms are ignored (as described in the class
+        documentation).
+
+        To detect the next higher order of n-grams (viz., trigrams and above),
+        you will need to create a new ImprovedPhraser instance, passing the results
+        of this function as the new set of base sentences to use.
 
         Parameters
         ----------
@@ -187,13 +195,18 @@ class ImprovedPhraser:
             Optionally set a new phrasing threshold; if not set, will apply all the
             available phrases (which are determined by the value of `threshold`
             passed to the base gensim model on init)
+        verbose: bool, optional
 
         Returns
         -------
         iterable of iterable of str
         """
         new_docs = []
-        for doc in tqdm.tqdm(docs):
+
+        if verbose:
+            docs = tqdm.tqdm(docs)
+
+        for doc in docs:
             # Find all candidate phrase chains originating from each token,
             # then merge the highest-scoring one.
             new_doc = doc[:]
