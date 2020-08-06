@@ -36,6 +36,7 @@ def show_visualisation(vis_data):
     # - Resize to fit visualisations without causing other cells to overflow
     jupyter_styles = """
     <style>
+        /* These have to be marked important to override pyLDAvis default styles */
         #notebook-container {
             width: 1370px !important;
         }
@@ -43,8 +44,13 @@ def show_visualisation(vis_data):
         div.output_area {
             width: unset !important;
         }
+        
+        div.output_html.rendered_html {
+            max-height: unset;
+        }
     </style>
     """
+    # noinspection PyTypeChecker
     display(HTML(jupyter_styles))
 
     with warnings.catch_warnings():

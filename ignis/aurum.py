@@ -329,7 +329,8 @@ class Aurum:
         # Per topic info
         def show_topic(topic_id=1):
             # Styles
-            # - Prevent vertical scrollbars in output subareas
+            # - Limit most output areas to 60em for readability
+            # - Prevent vertical scrollbars in nested output subareas
             jupyter_styles = """
             <style>
                 div.cell > div.output_wrapper > div.output.output_scroll {
@@ -343,13 +344,17 @@ class Aurum:
                     box-shadow: unset;
                 }
             
-                .jupyter-widgets-output-area, div.output_stdout, div.output_result {
+                .jupyter-widgets-output-area, .output_stdout, .output_result {
                     height: auto;
                     max-height: 50em;
                     overflow-y: auto;
                 }
+                .jupyter-widgets-output-area .jupyter-widgets-output-area {
+                    max-height: unset;
+                }
             </style>
             """
+            # noinspection PyTypeChecker
             display(HTML(jupyter_styles))
 
             # Top words
@@ -370,6 +375,7 @@ class Aurum:
                 print(f"\nSuggested labels:\n{labels}")
 
             # Topic documents -- `within_top_n`
+            # noinspection PyTypeChecker
             display(
                 HTML(
                     f"<h4>Documents with Topic {topic_id} in the top <em>n</em> "
@@ -423,8 +429,16 @@ class Aurum:
 
                             print(f"Recipients:\n{json.dumps(recipients, indent=2)}")
 
-                        display(HTML(doc.human_readable))
+                        # Jupyter notebooks will interpret anything between $ signs
+                        # as LaTeX formulae when rendering HTML output, so we need to
+                        # replace them with escaped $ signs (only in Jupyter
+                        # environments)
+                        display_str = doc.display_str.replace("$", r"\$")
+
+                        # noinspection PyTypeChecker
+                        display(HTML(display_str))
                     else:
+                        # User-provided display function
                         display_fn(doc)
                     print()
                     print("Top document topics (in descending order of probability):")
