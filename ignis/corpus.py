@@ -464,7 +464,7 @@ class Document(object):
         if item == "plain_text" and object.__getattribute__(self, "plain_text") is None:
             # There is no `plain_text` set for this document; assume that
             # `display_str` contains a HTML representation of the document.
-            soup = BeautifulSoup(self.human_readable, "lxml")
+            soup = BeautifulSoup(self.display_str, "lxml")
 
             # The text returned by BeautifulSoup might contain whitespace --
             # Concatenate, split, and concatenate again to normalise the spacing
