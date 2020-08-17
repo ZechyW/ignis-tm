@@ -71,9 +71,11 @@ class Corpus:
         if doc.id in self.documents:
             raise RuntimeError(
                 f"This Document's hash is already present in the Corpus; it may be a "
-                f"duplicate. Ignoring."
+                f"duplicate. Ignoring.\n"
                 f"(If this is a genuine hash collision, create a new Document with "
-                f"different metadata values and try adding it again.)"
+                f"different metadata values and try adding it again.)\n"
+                f"{doc.id}\n"
+                f"{doc.tokens}{doc.metadata}{doc.display_str}"
             )
         self.documents[doc.id] = doc
         return doc.id
