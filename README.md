@@ -27,7 +27,7 @@ pip install tomotopy
 pyLDAvis:
 
 ```
-conda install pandas=0.23.4 pyldavis
+conda install pandas pyldavis
 ```
 
 For ease of use:
