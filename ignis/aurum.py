@@ -312,7 +312,7 @@ class Aurum:
             The top `n` most probably labels for each topic to show.  Will have no
             effect if the model does not have a labeller initialised.
         doc_sort_key: fn, optional
-            If specified, will sort topic documents using this key when displaying them
+            If specified, will sort topic documents using this key when displaying them.
         display_fn: fn, optional
             Custom display function that receives an individual Document as input and
             should display the Document in human-readable form as a side effect.

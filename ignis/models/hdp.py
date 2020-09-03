@@ -1,9 +1,9 @@
+import collections
 import pathlib
 import tempfile
 import time
-import collections
 
-import tqdm
+from tqdm.auto import tqdm
 
 import ignis.util
 from .base import BaseModel
@@ -184,7 +184,7 @@ class HDPModel(BaseModel):
                 f"{self.options}\n",
                 flush=True,
             )
-            progress_bar = tqdm.tqdm(total=iterations, miniters=1)
+            progress_bar = tqdm(total=iterations, miniters=1)
 
         try:
             for i in range(0, iterations, update_every):
@@ -249,7 +249,7 @@ class HDPModel(BaseModel):
                     "(N.B.: This may not correlate with increased interpretability)\n",
                     flush=True,
                 )
-                progress_bar = tqdm.tqdm(miniters=1)
+                progress_bar = tqdm(miniters=1)
 
             best_ll = self.model.ll_per_word
             i = 0

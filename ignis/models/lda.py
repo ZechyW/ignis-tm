@@ -1,10 +1,11 @@
+import collections
 import pathlib
 import tempfile
 import time
-import collections
 import uuid
+import warnings
 
-import tqdm
+from tqdm.auto import tqdm
 
 import ignis.util
 from .base import BaseModel
@@ -178,7 +179,7 @@ class LDAModel(BaseModel):
                 f"{self.options}\n",
                 flush=True,
             )
-            progress_bar = tqdm.tqdm(total=iterations, miniters=1)
+            progress_bar = tqdm(total=iterations)
 
         try:
             for i in range(0, iterations, update_every):
@@ -188,6 +189,8 @@ class LDAModel(BaseModel):
                         {"Log-likelihood": f"{self.model.ll_per_word:.5f}"}
                     )
                     progress_bar.update(update_every)
+                    # To allow the tqdm bar to update, if in a Jupyter notebook
+                    time.sleep(0.01)
         except KeyboardInterrupt:
             print("Stopping train sequence.")
 
@@ -235,7 +238,7 @@ class LDAModel(BaseModel):
                     "(N.B.: This may not correlate with increased interpretability)\n",
                     flush=True,
                 )
-                progress_bar = tqdm.tqdm(miniters=1)
+                progress_bar = tqdm(miniters=1)
 
             best_ll = self.model.ll_per_word
             i = 0
@@ -252,6 +255,8 @@ class LDAModel(BaseModel):
                             {"Log-likelihood": f"{current_ll:.5f}"}
                         )
                         progress_bar.update(update_every)
+                        # To allow the tqdm bar to update, if in a Jupyter notebook
+                        time.sleep(0.01)
 
                     if current_ll < best_ll:
                         batches_since_best += 1
@@ -296,7 +301,7 @@ class LDAModel(BaseModel):
                 print(
                     "\n" "Continuing to train until maximum coherence.\n", flush=True,
                 )
-                progress_bar = tqdm.tqdm(miniters=1)
+                progress_bar = tqdm(miniters=1)
 
             best_coherence = self.get_coherence(processes=workers)
             start_coherence = best_coherence
@@ -314,6 +319,8 @@ class LDAModel(BaseModel):
                             {"Coherence": f"{current_coherence:.5f}"}
                         )
                         progress_bar.update(update_every)
+                        # To allow the tqdm bar to update, if in a Jupyter notebook
+                        time.sleep(0.01)
 
                     if current_coherence < best_coherence:
                         batches_since_best += 1
@@ -333,7 +340,7 @@ class LDAModel(BaseModel):
                 progress_bar.close()
                 print(
                     f"Best coherence: {best_coherence:.5f} "
-                    f"(Starting: {start_coherence:.5f}"
+                    f"(Starting: {start_coherence:.5f})"
                 )
 
             # noinspection PyTypeChecker,PyCallByClass
@@ -411,39 +418,47 @@ class LDAModel(BaseModel):
         -------
         float
         """
-        topics = []
-        for k in range(self.model.k):
-            word_probs = self.model.get_topic_words(k, top_n)
-            topics.append([word for word, prob in word_probs])
+        with warnings.catch_warnings():
+            # At time of coding, Gensim 3.8.0 is the latest version available on the
+            # main Anaconda repo, and it triggers DeprecationWarnings when the
+            # CoherenceModel is used in this way
+            warnings.simplefilter("ignore", category=DeprecationWarning)
 
-        texts = []
-        corpus = []
-        for doc in self.model.docs:
-            words = [self.model.vocabs[token_id] for token_id in doc.words]
-            texts.append(words)
-            freqs = list(collections.Counter(doc.words).items())
-            corpus.append(freqs)
+            topics = []
+            for k in range(self.model.k):
+                word_probs = self.model.get_topic_words(k, top_n)
+                topics.append([word for word, prob in word_probs])
 
-        id2word = dict(enumerate(self.model.vocabs))
-        dictionary = gensim.corpora.dictionary.Dictionary.from_corpus(corpus, id2word)
+            texts = []
+            corpus = []
+            for doc in self.model.docs:
+                words = [self.model.vocabs[token_id] for token_id in doc.words]
+                texts.append(words)
+                freqs = list(collections.Counter(doc.words).items())
+                corpus.append(freqs)
 
-        cm = gensim.models.coherencemodel.CoherenceModel(
-            topics=topics,
-            texts=texts,
-            corpus=corpus,
-            dictionary=dictionary,
-            coherence=coherence,
-            topn=top_n,
-            processes=processes,
-        )
+            id2word = dict(enumerate(self.model.vocabs))
+            dictionary = gensim.corpora.dictionary.Dictionary.from_corpus(
+                corpus, id2word
+            )
 
-        # For debugging the interface between Tomotopy and Gensim
-        # coherence = cm.get_coherence()
-        # return {
-        #     "coherence": coherence,
-        #     "topics": topics,
-        #     "texts": texts,
-        #     "corpus": corpus,
-        #     "dictionary": dictionary,
-        # }
-        return cm.get_coherence()
+            cm = gensim.models.coherencemodel.CoherenceModel(
+                topics=topics,
+                texts=texts,
+                corpus=corpus,
+                dictionary=dictionary,
+                coherence=coherence,
+                topn=top_n,
+                processes=processes,
+            )
+
+            # For debugging the interface between Tomotopy and Gensim
+            # coherence = cm.get_coherence()
+            # return {
+            #     "coherence": coherence,
+            #     "topics": topics,
+            #     "texts": texts,
+            #     "corpus": corpus,
+            #     "dictionary": dictionary,
+            # }
+            return cm.get_coherence()

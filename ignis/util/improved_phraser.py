@@ -2,7 +2,7 @@ import math
 import time
 import uuid
 
-import tqdm
+from tqdm.auto import tqdm
 
 from ignis.util.lazy_loader import LazyLoader
 
@@ -204,7 +204,7 @@ class ImprovedPhraser:
         new_docs = []
 
         if verbose:
-            docs = tqdm.tqdm(docs)
+            docs = tqdm(docs)
 
         for doc in docs:
             # Find all candidate phrase chains originating from each token,

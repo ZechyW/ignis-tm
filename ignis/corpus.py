@@ -236,7 +236,7 @@ class CorpusSlice:
         # By-token search matches tokens directly
         search_tokens = set(tokens)
 
-        # Human-readable search performs a regex text search
+        # Plain-text search performs a regex text search
         search_patterns = [
             re.compile(fr"(\s|^){re.escape(token)}(\s|$)") for token in tokens
         ]
@@ -306,7 +306,7 @@ class CorpusSlice:
         # By-token search matches tokens directly
         search_tokens = set(tokens)
 
-        # Human-readable search performs a regex text search
+        # Plain-text search performs a regex text search
         search_patterns = [
             re.compile(fr"(\s|^){re.escape(token)}(\s|$)") for token in tokens
         ]
@@ -405,6 +405,79 @@ class CorpusSlice:
             isinstance(other, CorpusSlice)
             and self.root == other.root
             and self.documents == other.documents
+        )
+
+    def nb_explore(self, doc_sort_key=None, display_fn=None):
+        """
+        Convenience function that creates an interactive Jupyter notebook widget for
+        exploring the Documents contained in this CorpusSlice.
+
+        Documents do not have any sort order imposed on them by default, but a custom
+        sorting function can be passed via `doc_sort_key` as well.
+
+        Parameters
+        ----------
+        doc_sort_key: fn, optional
+            If specified, will sort documents using this key when displaying them.
+        display_fn: fn, optional
+            Custom display function that receives an individual Document as input and
+            should display the Document in human-readable form as a side effect.
+            If unset, will assume that the human-readable representation of the
+            Document is in HTML format and display it accordingly.
+
+        Returns
+        -------
+        ipywidgets.interact function
+        """
+        import ipywidgets
+        from IPython.core.display import display, HTML
+
+        docs = list(self.documents.values())
+
+        if doc_sort_key is not None:
+            docs = sorted(docs, key=doc_sort_key)
+
+        def show_doc(index=0):
+            print(f"[Total documents: {len(docs)}]\n")
+            doc = docs[index]
+
+            if display_fn is None:
+                # Default HTML display
+                print(f"ID: {doc.id}")
+                if "filename" in doc.metadata:
+                    print(f"Filename: {doc.metadata['filename']}")
+                if "txt_filename" in doc.metadata:
+                    print(f"Processed: {doc.metadata['txt_filename']}")
+
+                if "sender" in doc.metadata:
+                    print(f"Sender: {doc.metadata['sender']}")
+                if "recipients" in doc.metadata:
+                    recipients = doc.metadata["recipients"]
+
+                    # Truncate long recipient lists for display
+                    # (TODO: Make this optional?)
+                    if len(recipients) > 5:
+                        recipients = recipients[:5] + ["..."]
+
+                    print(f"Recipients:\n{json.dumps(recipients, indent=2)}")
+
+                # Jupyter notebooks will interpret anything between $ signs
+                # as LaTeX formulae when rendering HTML output, so we need to
+                # replace them with escaped $ signs (only in Jupyter
+                # environments)
+                display_str = doc.display_str.replace("$", r"\$")
+
+                # noinspection PyTypeChecker
+                display(HTML(display_str))
+            else:
+                # User-provided display function
+                display_fn(doc)
+
+        return ipywidgets.interact(
+            show_doc,
+            index=ipywidgets.IntSlider(
+                description="Document", min=0, max=len(docs) - 1
+            ),
         )
 
 

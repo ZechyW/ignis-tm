@@ -2,7 +2,7 @@
 The methods in this class are used for performing the actual topic modelling to get
 Aurum results.
 """
-import tqdm
+from tqdm.auto import tqdm
 
 import ignis
 import ignis.aurum
@@ -144,7 +144,7 @@ def suggest_num_topics(
             f"topics between {start_k} and {end_k}..."
             f"({len(corpus_slice)} documents, {iterations} iterations each)"
         )
-        progress_bar = tqdm.tqdm(total=total_models * iterations, miniters=1)
+        progress_bar = tqdm(total=total_models * iterations, miniters=1)
 
     results = []
     for k in candidate_counts:
