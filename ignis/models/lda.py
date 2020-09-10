@@ -280,10 +280,14 @@ class LDAModel(BaseModel):
 
     def _train_until_max_coherence(self):
         """
-        Extended training until an approximate maximum per-word LL is reached.
+        Extended training until an approximate best coherence score is reached.
 
         Saves a temporary copy of the model before every iteration batch, and loads
-        the last best model once LL stops increasing.
+        the last best model once coherence stops improving.
+
+        N.B.: Currently assumes that a higher coherence score is always better;
+        should be true for u_mass, but might need to be checked if a different
+        measure is used.
         """
         parallel = self.options["parallel"]
         workers = self.options["workers"]
@@ -399,7 +403,7 @@ class LDAModel(BaseModel):
 
         return doc_topics
 
-    def get_coherence(self, coherence="u_mass", top_n=20, processes=8):
+    def get_coherence(self, coherence="u_mass", top_n=30, processes=8):
         """
         Use Gensim's `models.coherencemodel` to get a coherence score for a trained
         LDAModel.
