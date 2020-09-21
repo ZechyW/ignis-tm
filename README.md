@@ -7,7 +7,7 @@ The `conda-forge` (https://conda-forge.org/) channel may need to be enabled for 
 General:
 
 ```
-conda install python=3.7.6 tqdm jupyter
+conda install python=3.7 tqdm jupyter
 ```
 
 Corpus-prep Demo:

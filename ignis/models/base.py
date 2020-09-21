@@ -110,7 +110,22 @@ class BaseModel:
         """
         pass
 
-    def get_coherence(self, coherence, top_n):
+    def get_document_top_topic(self, doc_id):
+        """
+        Get the topic with the highest probability for the given document
+
+        Parameters
+        ----------
+        doc_id
+
+        Returns
+        -------
+        tuple
+            A single tuple (<topic ID>, <probability>)
+        """
+        pass
+
+    def get_coherence(self, coherence, top_n, window_size, processes):
         """
         Use Gensim's `models.coherencemodel` to get a coherence score for a trained
         model.
@@ -121,6 +136,10 @@ class BaseModel:
             Coherence measure to calculate
         top_n: int
             Number of top words to extract from each topic
+        window_size: int
+            Window size for "c_v", "c_uci", and "c_npmi"
+        processes: int
+            Number of worker processes
 
         Returns
         -------

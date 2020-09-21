@@ -407,7 +407,7 @@ class CorpusSlice:
             and self.documents == other.documents
         )
 
-    def nb_explore(self, doc_sort_key=None, display_fn=None):
+    def nb_explore(self, doc_sort_key=None, reverse=False, display_fn=None):
         """
         Convenience function that creates an interactive Jupyter notebook widget for
         exploring the Documents contained in this CorpusSlice.
@@ -419,6 +419,8 @@ class CorpusSlice:
         ----------
         doc_sort_key: fn, optional
             If specified, will sort documents using this key when displaying them.
+        reverse: bool, optional
+            Sets the sort direction for `doc_sort_key`, if specified.
         display_fn: fn, optional
             Custom display function that receives an individual Document as input and
             should display the Document in human-readable form as a side effect.
@@ -435,7 +437,7 @@ class CorpusSlice:
         docs = list(self.documents.values())
 
         if doc_sort_key is not None:
-            docs = sorted(docs, key=doc_sort_key)
+            docs = sorted(docs, key=doc_sort_key, reverse=reverse)
 
         def show_doc(index=0):
             print(f"[Total documents: {len(docs)}]\n")
@@ -446,20 +448,6 @@ class CorpusSlice:
                 print(f"ID: {doc.id}")
                 if "filename" in doc.metadata:
                     print(f"Filename: {doc.metadata['filename']}")
-                if "txt_filename" in doc.metadata:
-                    print(f"Processed: {doc.metadata['txt_filename']}")
-
-                if "sender" in doc.metadata:
-                    print(f"Sender: {doc.metadata['sender']}")
-                if "recipients" in doc.metadata:
-                    recipients = doc.metadata["recipients"]
-
-                    # Truncate long recipient lists for display
-                    # (TODO: Make this optional?)
-                    if len(recipients) > 5:
-                        recipients = recipients[:5] + ["..."]
-
-                    print(f"Recipients:\n{json.dumps(recipients, indent=2)}")
 
                 # Jupyter notebooks will interpret anything between $ signs
                 # as LaTeX formulae when rendering HTML output, so we need to

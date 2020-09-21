@@ -107,10 +107,10 @@ class TestUtil(unittest.TestCase):
             ["this", "swimming", "pool"],
         ]
         phrased_docs = phraser.find_ngrams(test_docs)
-        expected_phrase_docs = [
+        expected_phrased_docs = [
             ["John", "likes", "swimming pool", "tubes"],
             ["swimming pool", "tubes"],
             ["this", "swimming pool"],
         ]
 
-        self.assertEqual(phrased_docs, expected_phrase_docs)
+        self.assertEqual(phrased_docs, expected_phrased_docs)

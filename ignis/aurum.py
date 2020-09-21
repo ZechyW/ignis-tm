@@ -125,6 +125,12 @@ class Aurum:
         """
         return self.ignis_model.get_document_topics(*args, **kwargs)
 
+    def get_document_top_topic(self, *args, **kwargs):
+        """
+        See `ignis.models.base.BaseModel.get_document_top_topic()`
+        """
+        return self.ignis_model.get_document_top_topic(*args, **kwargs)
+
     def get_coherence(self, *args, **kwargs):
         """
         See `ignis.models.base.BaseModel.get_coherence()`
@@ -329,7 +335,7 @@ class Aurum:
         # Per topic info
         def show_topic(topic_id=1):
             # Styles
-            # - Limit most output areas to 60em for readability
+            # - Limit the height of most output areas for readability
             # - Prevent vertical scrollbars in nested output subareas
             jupyter_styles = """
             <style>

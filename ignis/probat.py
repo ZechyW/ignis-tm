@@ -88,7 +88,8 @@ def suggest_num_topics(
     model_type="tp_lda",
     model_options=None,
     coherence="u_mass",
-    top_n=10,
+    window_size=None,
+    top_n=30,
     start_k=2,
     end_k=10,
     iterations=100,
@@ -111,8 +112,11 @@ def suggest_num_topics(
         model constructor
     coherence: {"u_mass", "c_v", "c_uci", "c_npmi"}
         Coherence measure to calculate
+    window_size: int, optional
+        Window size for "c_v", "c_uci" and "c_npmi" measures; passed to Gensim
     top_n: int
-        Number of top words to extract from each topic when measuring coherence
+        Number of top words to extract from each topic when measuring coherence.
+        The default of 30 matches the number of words shown per topic by pyLDAvis
     start_k: int, optional
         Minimum topic count to consider
     end_k: int, optional
@@ -134,6 +138,9 @@ def suggest_num_topics(
             "Ignis models must be instantiated with Corpus or CorpusSlice instances."
         )
 
+    if model_options is None:
+        model_options = {}
+
     candidate_counts = range(start_k, end_k + 1)
 
     progress_bar = None
@@ -141,8 +148,9 @@ def suggest_num_topics(
         total_models = end_k - start_k + 1
         print(
             f"Training {total_models} mini-models to suggest a suitable number of "
-            f"topics between {start_k} and {end_k}..."
-            f"({len(corpus_slice)} documents, {iterations} iterations each)"
+            f"topics between {start_k} and {end_k}.\n"
+            f"({len(corpus_slice)} documents, {iterations} iterations each, "
+            f"considering top {top_n} terms per topic)"
         )
         progress_bar = tqdm(total=total_models * iterations, miniters=1)
 
@@ -167,6 +175,7 @@ def suggest_num_topics(
                     model.get_coherence(
                         coherence=coherence,
                         top_n=top_n,
+                        window_size=window_size,
                         processes=model.options["workers"],
                     ),
                 )
@@ -181,7 +190,9 @@ def suggest_num_topics(
     if verbose:
         print(
             f"Suggested topic count: {best[0]}\t"
-            f"Coherence: {best[1]} (always negative, closer to 0 is better)"
+            f"Coherence: {best[1]:.5f} (always negative, closer to 0 is better)\n"
+            f"All suggestions: "
+            f"{', '.join([f'[{k}] {coherence:.5f}' for k, coherence in results])}"
         )
         progress_bar.close()
 

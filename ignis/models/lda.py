@@ -19,12 +19,17 @@ default_options = {
     "seed": 11399,
     "workers": 8,
     "parallel_scheme": "default",
-    "iterations": 1000,
+    "iterations": 2000,
     "update_every": 100,
     "until_max_ll": False,
     "until_max_coherence": False,
-    "max_extra_iterations": 2000,
+    "max_extra_iterations": 3000,
     "verbose": False,
+    # Model options
+    # Document-topic
+    "alpha": 0.1,
+    # Topic-word
+    "eta": 0.01,
 }
 
 
@@ -114,7 +119,11 @@ class LDAModel(BaseModel):
 
         # Initialise model
         self.model = tp.LDAModel(
-            tw=self.options["tw"], k=self.options["k"], seed=self.options["seed"]
+            tw=self.options["tw"],
+            k=self.options["k"],
+            seed=self.options["seed"],
+            alpha=self.options["alpha"],
+            eta=self.options["eta"],
         )
 
         # When docs are added to `self.model`, we can only retrieve them from
@@ -131,7 +140,7 @@ class LDAModel(BaseModel):
 
         # Burn-in: Number of iterations before Tomotopy starts optimising
         # hyper-parameters
-        self.model.burn_in = 50
+        self.model.burn_in = 100
 
     @staticmethod
     def load_from_bytes(model_bytes):
@@ -179,15 +188,14 @@ class LDAModel(BaseModel):
                 f"{self.options}\n",
                 flush=True,
             )
-            progress_bar = tqdm(total=iterations)
+            progress_bar = tqdm(total=iterations, miniters=1)
 
         try:
             for i in range(0, iterations, update_every):
                 self.model.train(update_every, workers=workers, parallel=parallel)
                 if verbose:
-                    progress_bar.set_postfix(
-                        {"Log-likelihood": f"{self.model.ll_per_word:.5f}"}
-                    )
+                    current_coherence = self.get_coherence(processes=workers)
+                    progress_bar.set_postfix({"Coherence": f"{current_coherence:.5f}"})
                     progress_bar.update(update_every)
                     # To allow the tqdm bar to update, if in a Jupyter notebook
                     time.sleep(0.01)
@@ -403,7 +411,12 @@ class LDAModel(BaseModel):
 
         return doc_topics
 
-    def get_coherence(self, coherence="u_mass", top_n=30, processes=8):
+    def get_document_top_topic(self, doc_id):
+        return self.get_document_topics(doc_id, 1)[0]
+
+    def get_coherence(
+        self, coherence="u_mass", top_n=30, window_size=None, processes=8
+    ):
         """
         Use Gensim's `models.coherencemodel` to get a coherence score for a trained
         LDAModel.
@@ -414,7 +427,10 @@ class LDAModel(BaseModel):
             Coherence measure to calculate.
             N.B.: Unlike Gensim, the default is "u_mass", which is faster to calculate
         top_n: int, optional
-            Number of top words to extract from each topic
+            Number of top words to extract from each topic. The default of 30 matches
+            the number of words shown per topic by pyLDAvis
+        window_size: int, optional
+            Window size for "c_v", "c_uci", and "c_npmi"
         processes: int, optional
             Number of processes to use for probability estimation phase
 
@@ -451,6 +467,7 @@ class LDAModel(BaseModel):
                 texts=texts,
                 corpus=corpus,
                 dictionary=dictionary,
+                window_size=window_size,
                 coherence=coherence,
                 topn=top_n,
                 processes=processes,
