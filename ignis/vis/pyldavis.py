@@ -4,7 +4,12 @@ import threading
 import time
 import warnings
 
-from IPython.core.display import display, HTML
+try:
+    # Don't depend fully on a Jupyter environment, in case the user wants to create
+    # headless visualisations
+    from IPython.core.display import display, HTML
+except ModuleNotFoundError:
+    pass
 
 # We monkey patch pyLDAvis to optimise various pandas calculations below
 from joblib import Parallel, delayed
