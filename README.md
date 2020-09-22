@@ -1,8 +1,12 @@
 # Ignis: Iterative Topic Modelling Platform
 
-## Dependencies
+Ignis is an extensible platform that provides a common interface for creating and visualising topic models.
 
-The `conda-forge` (https://conda-forge.org/) channel may need to be enabled for some of these dependencies to be installed.
+By default, it supports creating LDA models using Tomotopy (https://bab2min.github.io/tomotopy/) and visualising them using pyLDAvis (https://github.com/bmabey/pyLDAvis), but support for other models and frameworks can be written in as necessary.
+
+## Development Dependencies
+
+If you intend to extend or modify the platform, an Anaconda 3 environment may be used to easily manage the project dependencies.  Note that the `conda-forge` (https://conda-forge.org/) channel may have to be enabled for some of these dependencies to be installed.
 
 General:
 
@@ -44,9 +48,7 @@ sphinx-build -b html . _build
 ```
 
 ## Indeterminacy
-N.B.: Some of the dependencies (e.g., Tomotopy, Gensim) sometimes seem to rely on `PYTHONHASHSEED` being set in order to consistently reproduce results (together with setting the actual random seed), although this behaviour is not always reproducible.  To be safe, `PYTHONHASHSEED` should be explicitly set where necessary.
-
-P.S.: This may have been an artifact of Windows Prefetching; needs further testing.
+N.B.: Some of the dependencies (e.g., Tomotopy, Gensim) sometimes seem to rely on `PYTHONHASHSEED` being set in order to consistently reproduce results (together with setting the actual random seed), although this behaviour is not always reproducible.  This behaviour may have been fixed with the upstream release of Tomotopy v0.9.1., but to be safe, `PYTHONHASHSEED` should be explicitly set where necessary.  
 
 If using a Conda environment, this can be done with:
 ```
@@ -62,19 +64,4 @@ For Jupyter notebooks in a non-Conda environment, edit the Jupyter `kernel.json`
 
 ## pyLDAvis
 
-For zero-indexing support, clone `pyLDAvis` directly from the Github repo, build the wheel, and install it.
-
-```
-conda install numpy scipy pandas=0.23.4 numexpr future funcy
-conda install atomicwrites more-itertools packaging pluggy py pyparsing pytest
-git clone https://github.com/bmabey/pyLDAvis.git
-cd pyLDAvis
-git checkout 2da07084e9df7d51a0daf240db1a64022e3023a5
-python setup.py bdist_wheel
-cd dist
-pip install pyLDAvis-2.1.3-py2.py3-none-any.whl
-```
-
-In particular, the older versions of Pandas (e.g., v0.23.4) seem to generate the visualisation data much more quickly than the latest versions, for the latest version of pyLDAvis.
-
-Ignis also has a built-in monkey-patched version of the pyLDAvis `.prepare()` function that works better with newer versions of Pandas.
+The older versions of Pandas (<0.24.0a) pinned by the default distribution of pyLDAvis generate the visualisation data much more quickly than newer versions of Pandas.  Ignis comes with a built-in monkey-patched version of the pyLDAvis `.prepare()` function that works better with these newer versions, and uses it by default.

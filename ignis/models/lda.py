@@ -20,10 +20,10 @@ default_options = {
     "workers": 8,
     "parallel_scheme": "default",
     "iterations": 2000,
-    "update_every": 100,
+    "update_every": 500,
     "until_max_ll": False,
     "until_max_coherence": False,
-    "max_extra_iterations": 3000,
+    "max_extra_iterations": 2000,
     "verbose": False,
     # Model options
     # Document-topic
@@ -70,6 +70,10 @@ class LDAModel(BaseModel):
         Limit on number of extra iterations to run if `until_max_ll` is True
     verbose: bool
         Whether or not to print diagnostic information after each training batch
+    alpha: float
+        Document-topic hyper-parameter for Dirichlet distribution
+    eta: float
+        Topic-word hyper-parameter for Dirichlet distribution
     """
 
     def __init__(self, corpus_slice, options=None):

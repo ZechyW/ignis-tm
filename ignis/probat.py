@@ -2,6 +2,8 @@
 The methods in this class are used for performing the actual topic modelling to get
 Aurum results.
 """
+import time
+
 from tqdm.auto import tqdm
 
 import ignis
@@ -178,22 +180,30 @@ def suggest_num_topics(
                         window_size=window_size,
                         processes=model.options["workers"],
                     ),
+                    model.model.ll_per_word,
                 )
             )
 
         if verbose:
             progress_bar.update(iterations)
+            # To allow the tqdm bar to update, if in a Jupyter notebook
+            time.sleep(0.01)
 
     results = sorted(results, key=lambda x: x[1], reverse=True)
     best = results[0]
 
     if verbose:
+        # Uncomment below to display the best LL as well, although this may
+        # correspond less to human intuitions than the coherence score
         print(
             f"Suggested topic count: {best[0]}\t"
-            f"Coherence: {best[1]:.5f} (always negative, closer to 0 is better)\n"
-            f"All suggestions: "
-            f"{', '.join([f'[{k}] {coherence:.5f}' for k, coherence in results])}"
+            f"Coherence: {best[1]:.5f}\t"
+            # f"LL per word: {best[2]:.5f}"
         )
+        all_suggestions = ", ".join(
+            [f"[{k}] {coherence:.5f}" for k, coherence, ll in results]
+        )
+        print(f"All suggestions: {all_suggestions}")
         progress_bar.close()
 
     return best[0]
