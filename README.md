@@ -1,0 +1,1 @@
+The project documentation is automatically built and deployed to the `gh-pages` branch via the workflow at `.github/workflows/docs.yml`.
