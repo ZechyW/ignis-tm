@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ignis.probat API documentation</title>
+<meta name="description" content="The methods in this class are used for performing the actual topic modelling to get
+Aurum results." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+</header>
+<section id="section-intro">
+<p>The methods in this class are used for performing the actual topic modelling to get
+Aurum results.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The methods in this class are used for performing the actual topic modelling to get
+Aurum results.
+&#34;&#34;&#34;
+import time
+
+from tqdm.auto import tqdm
+
+import ignis
+import ignis.aurum
+import ignis.corpus
+import ignis.models
+
+
+def train_model(
+    corpus_slice,
+    model_type=&#34;tp_lda&#34;,
+    model_options=None,
+    labeller_type=None,
+    labeller_options=None,
+    vis_type=None,
+    vis_options=None,
+):
+    &#34;&#34;&#34;
+    Top-level helper for training topic models using various algorithms
+
+    Parameters
+    ----------
+    corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
+        The CorpusSlice to perform the topic modelling over.  If a Corpus is passed
+        instead, a CorpusSlice containing all of its Documents will be created.
+    model_type: {&#34;tp_lda&#34;, &#34;tp_hdp&#34;}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class
+    model_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor
+    labeller_type: {&#34;tomotopy&#34;}, optional
+        The type of automated labeller to use, if available
+    labeller_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.labeller`
+        object constructor
+    vis_type: {&#34;pyldavis&#34;}, optional
+        The type of visualisation data to extract, if available
+    vis_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.vis`
+        object constructor
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+        The Aurum results object for the trained model, which can be used for further
+        exploration and iteration
+    &#34;&#34;&#34;
+    if isinstance(corpus_slice, ignis.corpus.Corpus):
+        corpus_slice = corpus_slice.slice_full()
+    if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
+        raise ValueError(
+            &#34;Ignis models must be instantiated with Corpus or CorpusSlice instances.&#34;
+        )
+
+    if model_type == &#34;tp_lda&#34;:
+        model = ignis.models.LDAModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    elif model_type == &#34;tp_hdp&#34;:
+        model = ignis.models.HDPModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    if labeller_type is not None:
+        if labeller_options is None:
+            labeller_options = {}
+
+        aurum.init_labeller(labeller_type, **labeller_options)
+
+    if vis_type is not None:
+        if vis_options is None:
+            vis_options = {}
+
+        aurum.init_vis(vis_type, **vis_options)
+
+    return aurum
+
+
+def suggest_num_topics(
+    corpus_slice,
+    model_type=&#34;tp_lda&#34;,
+    model_options=None,
+    coherence=&#34;u_mass&#34;,
+    window_size=None,
+    top_n=30,
+    start_k=2,
+    end_k=10,
+    iterations=100,
+    verbose=False,
+):
+    &#34;&#34;&#34;
+    Lightly trains models with various topic counts and uses the resultant coherence
+    scores to suggest an optimal number of topics to use for full training.
+
+    Parameters
+    ----------
+    corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
+        The CorpusSlice to perform the topic modelling over.  If a Corpus is passed
+        instead, a CorpusSlice containing all of its Documents will be created.
+    model_type: {&#34;tp_lda&#34;, &#34;tp_hdp&#34;}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class
+    model_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor
+    coherence: {&#34;u_mass&#34;, &#34;c_v&#34;, &#34;c_uci&#34;, &#34;c_npmi&#34;}
+        Coherence measure to calculate
+    window_size: int, optional
+        Window size for &#34;c_v&#34;, &#34;c_uci&#34; and &#34;c_npmi&#34; measures; passed to Gensim
+    top_n: int
+        Number of top words to extract from each topic when measuring coherence.
+        The default of 30 matches the number of words shown per topic by pyLDAvis
+    start_k: int, optional
+        Minimum topic count to consider
+    end_k: int, optional
+        Maximum topic count to consider
+    iterations: int, optional
+        Number of iterations to train each candidate model for
+    verbose: bool, optional
+        Whether or not to show interim training progress
+
+    Returns
+    -------
+    int
+        Suggested topic count
+    &#34;&#34;&#34;
+    if isinstance(corpus_slice, ignis.corpus.Corpus):
+        corpus_slice = corpus_slice.slice_full()
+    if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
+        raise ValueError(
+            &#34;Ignis models must be instantiated with Corpus or CorpusSlice instances.&#34;
+        )
+
+    if model_options is None:
+        model_options = {}
+
+    candidate_counts = range(start_k, end_k + 1)
+
+    progress_bar = None
+    if verbose:
+        total_models = end_k - start_k + 1
+        print(
+            f&#34;Training {total_models} mini-models to suggest a suitable number of &#34;
+            f&#34;topics between {start_k} and {end_k}.\n&#34;
+            f&#34;({len(corpus_slice)} documents, {iterations} iterations each, &#34;
+            f&#34;considering top {top_n} terms per topic)&#34;
+        )
+        progress_bar = tqdm(total=total_models * iterations, miniters=1)
+
+    results = []
+    for k in candidate_counts:
+        this_options = dict(
+            model_options,
+            k=k,
+            iterations=iterations,
+            update_every=iterations,
+            until_max_ll=False,
+            until_max_coherence=False,
+            verbose=False,
+        )
+
+        if model_type == &#34;tp_lda&#34;:
+            model = ignis.models.LDAModel(corpus_slice, this_options)
+            model.train()
+            results.append(
+                (
+                    k,
+                    model.get_coherence(
+                        coherence=coherence,
+                        top_n=top_n,
+                        window_size=window_size,
+                        processes=model.options[&#34;workers&#34;],
+                    ),
+                    model.model.ll_per_word,
+                )
+            )
+
+        if verbose:
+            progress_bar.update(iterations)
+            # To allow the tqdm bar to update, if in a Jupyter notebook
+            time.sleep(0.01)
+
+    results = sorted(results, key=lambda x: x[1], reverse=True)
+    best = results[0]
+
+    if verbose:
+        # Uncomment below to display the best LL as well, although this may
+        # correspond less to human intuitions than the coherence score
+        print(
+            f&#34;Suggested topic count: {best[0]}\t&#34;
+            f&#34;Coherence: {best[1]:.5f}\t&#34;
+            # f&#34;LL per word: {best[2]:.5f}&#34;
+        )
+        all_suggestions = &#34;, &#34;.join(
+            [f&#34;[{k}] {coherence:.5f}&#34; for k, coherence, ll in results]
+        )
+        print(f&#34;All suggestions: {all_suggestions}&#34;)
+        progress_bar.close()
+
+    return best[0]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ignis.probat.suggest_num_topics"><code class="name flex">
+<span>def <span class="ident">suggest_num_topics</span></span>(<span>corpus_slice, model_type='tp_lda', model_options=None, coherence='u_mass', window_size=None, top_n=30, start_k=2, end_k=10, iterations=100, verbose=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Lightly trains models with various topic counts and uses the resultant coherence
+scores to suggest an optimal number of topics to use for full training.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>corpus_slice</code></strong> :&ensp;<code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> or <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>The CorpusSlice to perform the topic modelling over.
+If a Corpus is passed
+instead, a CorpusSlice containing all of its Documents will be created.</dd>
+<dt><strong><code>model_type</code></strong> :&ensp;<code>{"tp_lda", "tp_hdp"}</code></dt>
+<dd>Type of model to train; corresponds to the model type listed in the relevant
+<code><a title="ignis.models" href="models/index.html">ignis.models</a></code> class</dd>
+<dt><strong><code>model_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.models" href="models/index.html">ignis.models</a></code>
+model constructor</dd>
+<dt><strong><code>coherence</code></strong> :&ensp;<code>{"u_mass", "c_v", "c_uci", "c_npmi"}</code></dt>
+<dd>Coherence measure to calculate</dd>
+<dt><strong><code>window_size</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Window size for "c_v", "c_uci" and "c_npmi" measures; passed to Gensim</dd>
+<dt><strong><code>top_n</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of top words to extract from each topic when measuring coherence.
+The default of 30 matches the number of words shown per topic by pyLDAvis</dd>
+<dt><strong><code>start_k</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Minimum topic count to consider</dd>
+<dt><strong><code>end_k</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Maximum topic count to consider</dd>
+<dt><strong><code>iterations</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of iterations to train each candidate model for</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether or not to show interim training progress</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Suggested topic count</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def suggest_num_topics(
+    corpus_slice,
+    model_type=&#34;tp_lda&#34;,
+    model_options=None,
+    coherence=&#34;u_mass&#34;,
+    window_size=None,
+    top_n=30,
+    start_k=2,
+    end_k=10,
+    iterations=100,
+    verbose=False,
+):
+    &#34;&#34;&#34;
+    Lightly trains models with various topic counts and uses the resultant coherence
+    scores to suggest an optimal number of topics to use for full training.
+
+    Parameters
+    ----------
+    corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
+        The CorpusSlice to perform the topic modelling over.  If a Corpus is passed
+        instead, a CorpusSlice containing all of its Documents will be created.
+    model_type: {&#34;tp_lda&#34;, &#34;tp_hdp&#34;}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class
+    model_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor
+    coherence: {&#34;u_mass&#34;, &#34;c_v&#34;, &#34;c_uci&#34;, &#34;c_npmi&#34;}
+        Coherence measure to calculate
+    window_size: int, optional
+        Window size for &#34;c_v&#34;, &#34;c_uci&#34; and &#34;c_npmi&#34; measures; passed to Gensim
+    top_n: int
+        Number of top words to extract from each topic when measuring coherence.
+        The default of 30 matches the number of words shown per topic by pyLDAvis
+    start_k: int, optional
+        Minimum topic count to consider
+    end_k: int, optional
+        Maximum topic count to consider
+    iterations: int, optional
+        Number of iterations to train each candidate model for
+    verbose: bool, optional
+        Whether or not to show interim training progress
+
+    Returns
+    -------
+    int
+        Suggested topic count
+    &#34;&#34;&#34;
+    if isinstance(corpus_slice, ignis.corpus.Corpus):
+        corpus_slice = corpus_slice.slice_full()
+    if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
+        raise ValueError(
+            &#34;Ignis models must be instantiated with Corpus or CorpusSlice instances.&#34;
+        )
+
+    if model_options is None:
+        model_options = {}
+
+    candidate_counts = range(start_k, end_k + 1)
+
+    progress_bar = None
+    if verbose:
+        total_models = end_k - start_k + 1
+        print(
+            f&#34;Training {total_models} mini-models to suggest a suitable number of &#34;
+            f&#34;topics between {start_k} and {end_k}.\n&#34;
+            f&#34;({len(corpus_slice)} documents, {iterations} iterations each, &#34;
+            f&#34;considering top {top_n} terms per topic)&#34;
+        )
+        progress_bar = tqdm(total=total_models * iterations, miniters=1)
+
+    results = []
+    for k in candidate_counts:
+        this_options = dict(
+            model_options,
+            k=k,
+            iterations=iterations,
+            update_every=iterations,
+            until_max_ll=False,
+            until_max_coherence=False,
+            verbose=False,
+        )
+
+        if model_type == &#34;tp_lda&#34;:
+            model = ignis.models.LDAModel(corpus_slice, this_options)
+            model.train()
+            results.append(
+                (
+                    k,
+                    model.get_coherence(
+                        coherence=coherence,
+                        top_n=top_n,
+                        window_size=window_size,
+                        processes=model.options[&#34;workers&#34;],
+                    ),
+                    model.model.ll_per_word,
+                )
+            )
+
+        if verbose:
+            progress_bar.update(iterations)
+            # To allow the tqdm bar to update, if in a Jupyter notebook
+            time.sleep(0.01)
+
+    results = sorted(results, key=lambda x: x[1], reverse=True)
+    best = results[0]
+
+    if verbose:
+        # Uncomment below to display the best LL as well, although this may
+        # correspond less to human intuitions than the coherence score
+        print(
+            f&#34;Suggested topic count: {best[0]}\t&#34;
+            f&#34;Coherence: {best[1]:.5f}\t&#34;
+            # f&#34;LL per word: {best[2]:.5f}&#34;
+        )
+        all_suggestions = &#34;, &#34;.join(
+            [f&#34;[{k}] {coherence:.5f}&#34; for k, coherence, ll in results]
+        )
+        print(f&#34;All suggestions: {all_suggestions}&#34;)
+        progress_bar.close()
+
+    return best[0]</code></pre>
+</details>
+</dd>
+<dt id="ignis.probat.train_model"><code class="name flex">
+<span>def <span class="ident">train_model</span></span>(<span>corpus_slice, model_type='tp_lda', model_options=None, labeller_type=None, labeller_options=None, vis_type=None, vis_options=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Top-level helper for training topic models using various algorithms</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>corpus_slice</code></strong> :&ensp;<code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> or <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>The CorpusSlice to perform the topic modelling over.
+If a Corpus is passed
+instead, a CorpusSlice containing all of its Documents will be created.</dd>
+<dt><strong><code>model_type</code></strong> :&ensp;<code>{"tp_lda", "tp_hdp"}</code></dt>
+<dd>Type of model to train; corresponds to the model type listed in the relevant
+<code><a title="ignis.models" href="models/index.html">ignis.models</a></code> class</dd>
+<dt><strong><code>model_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.models" href="models/index.html">ignis.models</a></code>
+model constructor</dd>
+<dt><strong><code>labeller_type</code></strong> :&ensp;<code>{"tomotopy"}</code>, optional</dt>
+<dd>The type of automated labeller to use, if available</dd>
+<dt><strong><code>labeller_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.labeller" href="labeller/index.html">ignis.labeller</a></code>
+object constructor</dd>
+<dt><strong><code>vis_type</code></strong> :&ensp;<code>{"pyldavis"}</code>, optional</dt>
+<dd>The type of visualisation data to extract, if available</dd>
+<dt><strong><code>vis_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code>
+object constructor</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code></dt>
+<dd>The Aurum results object for the trained model, which can be used for further
+exploration and iteration</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def train_model(
+    corpus_slice,
+    model_type=&#34;tp_lda&#34;,
+    model_options=None,
+    labeller_type=None,
+    labeller_options=None,
+    vis_type=None,
+    vis_options=None,
+):
+    &#34;&#34;&#34;
+    Top-level helper for training topic models using various algorithms
+
+    Parameters
+    ----------
+    corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
+        The CorpusSlice to perform the topic modelling over.  If a Corpus is passed
+        instead, a CorpusSlice containing all of its Documents will be created.
+    model_type: {&#34;tp_lda&#34;, &#34;tp_hdp&#34;}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class
+    model_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor
+    labeller_type: {&#34;tomotopy&#34;}, optional
+        The type of automated labeller to use, if available
+    labeller_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.labeller`
+        object constructor
+    vis_type: {&#34;pyldavis&#34;}, optional
+        The type of visualisation data to extract, if available
+    vis_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.vis`
+        object constructor
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+        The Aurum results object for the trained model, which can be used for further
+        exploration and iteration
+    &#34;&#34;&#34;
+    if isinstance(corpus_slice, ignis.corpus.Corpus):
+        corpus_slice = corpus_slice.slice_full()
+    if not isinstance(corpus_slice, ignis.corpus.CorpusSlice):
+        raise ValueError(
+            &#34;Ignis models must be instantiated with Corpus or CorpusSlice instances.&#34;
+        )
+
+    if model_type == &#34;tp_lda&#34;:
+        model = ignis.models.LDAModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    elif model_type == &#34;tp_hdp&#34;:
+        model = ignis.models.HDPModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    if labeller_type is not None:
+        if labeller_options is None:
+            labeller_options = {}
+
+        aurum.init_labeller(labeller_type, **labeller_options)
+
+    if vis_type is not None:
+        if vis_options is None:
+            vis_options = {}
+
+        aurum.init_vis(vis_type, **vis_options)
+
+    return aurum</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div style="padding: 1em 0.5em">
+<a href="/ignis-tm/ignis">
+<div style="display: flex; align-items: center">
+<img src="/ignis-tm/images/logo.png" alt="Ignis" height="50"/>
+<span style="font-size: 2em; font-weight: 700; margin-left: 0.75em">Ignis</span>
+</div>
+</a>
+</div>
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ignis" href="index.html">ignis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ignis.probat.suggest_num_topics" href="#ignis.probat.suggest_num_topics">suggest_num_topics</a></code></li>
+<li><code><a title="ignis.probat.train_model" href="#ignis.probat.train_model">train_model</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
