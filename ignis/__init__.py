@@ -1,3 +1,7 @@
+"""
+.. include:: ../README.md
+"""
+
 import ignis.aurum
 import ignis.corpus
 import ignis.probat

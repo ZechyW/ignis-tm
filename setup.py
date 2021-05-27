@@ -16,7 +16,6 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
-
 setup(
     # This is the name of your project. The first time you publish this
     # package, this name will be registered for you. It will determine how
@@ -125,13 +124,13 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        "pyldavis>=2.1.2",
-        "tomotopy>=0.8.2",
-        "numpy>=1.17.0",
-        "pandas>=1.0.3",
-        "tqdm>=4.46.0",
         "beautifulsoup4>=4.9.0",
-        "gensim>=3.8.0",
+        "gensim>=4.0.0",
+        "numpy>=1.19.0",
+        "pandas>=1.0.3",
+        "pyldavis>=3.3.1",
+        "tomotopy>=0.10",
+        "tqdm>=4.46.0",
     ],
     # Optional
     # List additional groups of dependencies here (e.g. development

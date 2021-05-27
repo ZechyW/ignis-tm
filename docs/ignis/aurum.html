@@ -1,0 +1,2656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ignis.aurum API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import bz2
+import copy
+import json
+import pathlib
+import pickle
+import pprint
+import tempfile
+
+import ignis.labeller.tomotopy
+import ignis.vis.pyldavis
+
+
+class Aurum:
+    &#34;&#34;&#34;
+    Aurum instances hold the results of performing topic modelling over
+    :class:`~ignis.corpus.Document` instances. They provide methods for easily
+    exploring the results and iterating over the topic modelling process.
+
+    Aurum objects basically bring together the public APIs for Ignis models,
+    automated labellers, and visualisation data providers, while also providing general
+    save/load functionality.
+
+    NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
+    0-indexed. So a model with 5 topics has topic IDs `[1, 2, 3, 4, 5]` and not
+    `[0, 1, 2, 3, 4]`.
+
+    This is for easier matching against pyLDAvis visualisations, and for easier usage
+    by non-technical users.
+
+    Parameters
+    ----------
+    ignis_model: ignis.models.base.BaseModel
+        The specific Ignis topic model used to generate this Aurum object.
+    &#34;&#34;&#34;
+
+    def __init__(self, ignis_model):
+        self.ignis_model = ignis_model
+        self.model_type = ignis_model.model_type
+        self.model_options = ignis_model.options
+
+        # Grab a reference to the CorpusSlice object so that we can use its methods
+        # directly
+        self.corpus_slice = ignis_model.corpus_slice
+
+        # Aurum objects also optionally have cached labeller and visualisation data
+        # objects
+        self.labeller = None
+
+        self.vis_type = None
+        self.vis_options = None
+        self.vis_data = None
+
+    def save(self, filename):
+        &#34;&#34;&#34;
+        Saves the Aurum object, including its associated Ignis model, to the given file.
+        Essentially uses a bz2-compressed Pickle format.
+
+        Also attempts to save any cached visualisation data, but the labeller is
+        probably not pickle-able.
+
+        Parameters
+        ----------
+        filename: str or pathlib.Path
+            File to save the model to
+        &#34;&#34;&#34;
+        filename = pathlib.Path(filename)
+
+        # Copy the Ignis model, separate the external library&#39;s model out, pickle
+        # everything together
+        # (The model objects created by external libraries might not be pickle-able)
+        external_model = self.ignis_model.model
+        self.ignis_model.model = None
+        save_model = copy.deepcopy(self.ignis_model)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_model_file = pathlib.Path(tmpdir) / &#34;save_model.bin&#34;
+            # We assume that the external library&#39;s model object provides a `.save()`
+            # method that takes the filename as a string
+            tmp_model_file = str(tmp_model_file)
+            external_model.save(tmp_model_file)
+            with open(tmp_model_file, &#34;rb&#34;) as fp:
+                external_model_bytes = fp.read()
+
+        save_object = {
+            &#34;save_model&#34;: save_model,
+            &#34;model_type&#34;: save_model.model_type,
+            &#34;external_model_bytes&#34;: external_model_bytes,
+            # We should also be able to save any cached visualisation data, but the
+            # labeller is probably not pickle-able.
+            &#34;vis_type&#34;: self.vis_type,
+            &#34;vis_options&#34;: self.vis_options,
+            &#34;vis_data&#34;: self.vis_data,
+        }
+
+        with bz2.open(filename, &#34;wb&#34;) as fp:
+            pickle.dump(save_object, fp)
+
+        self.ignis_model.model = external_model
+
+    # =================================================================================
+    # Topic Model
+    # (Default arguments are defined by the models themselves, in case different
+    # values work better with different models)
+    def get_num_topics(self):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_num_topics()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_num_topics()
+
+    def get_topic_words(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_topic_words()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_topic_words(*args, **kwargs)
+
+    def get_topic_documents(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_topic_documents()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_topic_documents(*args, **kwargs)
+
+    def get_document_topics(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_document_topics()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_document_topics(*args, **kwargs)
+
+    def get_document_top_topic(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_document_top_topic()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_document_top_topic(*args, **kwargs)
+
+    def get_coherence(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_coherence()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_coherence(*args, **kwargs)
+
+    # =================================================================================
+    # Corpus Slice
+    def get_documents(self):
+        &#34;&#34;&#34;
+        Get the IDs of all the documents that are covered by this Ignis model.
+
+        Returns
+        -------
+        iterable of str
+        &#34;&#34;&#34;
+        return list(self.corpus_slice.documents.keys())
+
+    def get_document(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.get_document()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.get_document(*args, **kwargs)
+
+    def slice_by_ids(self, doc_ids):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_by_ids()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_by_ids(doc_ids)
+
+    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_by_tokens()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_by_tokens(tokens, include_root, human_readable)
+
+    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_without_tokens()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_without_tokens(
+            tokens, include_root, human_readable
+        )
+
+    def slice_filter(self, filter_fn, include_root=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_filter()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_filter(filter_fn, include_root)
+
+    # =================================================================================
+    # Automated Labeller
+    def init_labeller(self, labeller_type, **labeller_options):
+        &#34;&#34;&#34;
+        Trains an automated labeller for this Aurum object
+
+        Parameters
+        ----------
+        labeller_type: {&#34;tomotopy&#34;}
+            String denoting the labeller type.
+        **labeller_options
+            Keyword arguments that are passed to the constructor for the given
+            labeller type.
+        &#34;&#34;&#34;
+        if labeller_type == &#34;tomotopy&#34;:
+            self.labeller = ignis.labeller.tomotopy.TomotopyLabeller(
+                self.ignis_model.model, **labeller_options
+            )
+        else:
+            raise ValueError(f&#34;Unknown labeller type: &#39;{labeller_type}&#39;&#34;)
+
+    def get_topic_labels(self, topic_id, top_n):
+        &#34;&#34;&#34;
+        See `ignis.labeller.tomotopy.get_topic_labels()`
+        &#34;&#34;&#34;
+        if self.labeller is None:
+            raise RuntimeError(
+                &#34;There is no labeller instantiated for this Aurum object. &#34;
+                &#34;Use `.init_labeller()` to prepare one.&#34;
+            )
+        return self.labeller.get_topic_labels(topic_id, top_n)
+
+    # =================================================================================
+    # Visualisation Data
+    # TODO: Move `vis_data` into a full visualisation object, like the labeller/model?
+    def init_vis(self, vis_type, force=False, **vis_options):
+        &#34;&#34;&#34;
+        Prepares a visualisation for this Aurum object in the given format
+
+        Parameters
+        ----------
+        vis_type: {&#34;pyldavis&#34;, &#34;clear&#34;}
+            String denoting the visualisation type.  Setting to &#34;clear&#34; will remove
+            any existing visualisation data.
+        force: bool, optional
+            If `self.vis_data` is already set, it will not be recalculated unless
+            `force` is set.
+        **vis_options
+            Keyword arguments that are passed to the constructor for the given
+            visualisation type.
+        &#34;&#34;&#34;
+        if vis_type == &#34;clear&#34;:
+            self.vis_type = None
+            self.vis_options = None
+            self.vis_data = None
+        elif vis_type == &#34;pyldavis&#34;:
+            if self.vis_data is not None and not force:
+                raise RuntimeError(
+                    f&#34;Visualisation data already exists for this Aurum object &#34;
+                    f&#34;(type: &#39;{self.vis_type}&#39;). &#34;
+                    f&#34;Pass `force=True` to force recalculation.&#34;
+                )
+
+            self.vis_type = vis_type
+            self.vis_options = vis_options
+            self.vis_data = ignis.vis.pyldavis.prepare_data(
+                self.ignis_model.model, **vis_options
+            )
+        else:
+            raise ValueError(f&#34;Unknown visualisation type: &#39;{vis_type}&#39;&#34;)
+
+    def get_vis_data(self):
+        &#34;&#34;&#34;
+        Returns the prepared visualisation data for this model, if any.
+        &#34;&#34;&#34;
+        if self.vis_data is None:
+            raise RuntimeError(
+                &#34;There is no visualisation data instantiated for this Aurum object. &#34;
+                &#34;Use `.init_vis()` to prepare it.&#34;
+            )
+        return self.vis_data
+
+    def show_visualisation(self):
+        &#34;&#34;&#34;
+        Displays the prepared visualisation for this model.
+        (Presumes that the `ignis.vis` class returns a situation-appropriate format,
+        e.g., for display in a Jupyter notebook)
+
+        Returns
+        -------
+        The output of the `show_visualisation` method of the relevant `ignis.vis` class
+        &#34;&#34;&#34;
+        vis_data = self.get_vis_data()
+
+        if self.vis_type == &#34;pyldavis&#34;:
+            return ignis.vis.pyldavis.show_visualisation(vis_data)
+        else:
+            raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)
+
+    def export_visualisation(self, folder):
+        &#34;&#34;&#34;
+        Exports the visualisation prepared for this Aurum object to the given folder.
+
+        Parameters
+        ----------
+        folder
+        &#34;&#34;&#34;
+        vis_data = self.get_vis_data()
+
+        # Assuming the `vis_data` get is successful, we should have a valid record of
+        # the `vis_type` as well.
+        if self.vis_type == &#34;pyldavis&#34;:
+            ignis.vis.pyldavis.export_visualisation(vis_data, folder)
+        else:
+            raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)
+
+    # =================================================================================
+    # Jupyter widgets
+    def nb_explore_topics(
+        self, top_words=30, top_labels=15, doc_sort_key=None, display_fn=None
+    ):
+        &#34;&#34;&#34;
+        Convenience function that creates an interactive Jupyter notebook widget for
+        exploring the topics in this model.
+
+        By default, documents are shown in decreasing order of probability for each
+        specified topic, but a custom sorting function can be passed via `doc_sort_key`
+        as well.
+
+        Parameters
+        ----------
+        top_words: int, optional
+            The top `n` most probable terms for each topic to show
+        top_labels: int, optional
+            The top `n` most probably labels for each topic to show.  Will have no
+            effect if the model does not have a labeller initialised.
+        doc_sort_key: fn, optional
+            If specified, will sort topic documents using this key when displaying them.
+        display_fn: fn, optional
+            Custom display function that receives an individual Document as input and
+            should display the Document in human-readable form as a side effect.
+            If unset, will assume that the human-readable representation of the
+            Document is in HTML format and display it accordingly.
+
+        Returns
+        -------
+        ipywidgets.interact function
+        &#34;&#34;&#34;
+        import ipywidgets
+        from IPython.core.display import display, HTML
+
+        # Per topic info
+        def show_topic(topic_id=1):
+            # Styles
+            # - Limit the height of most output areas for readability
+            # - Prevent vertical scrollbars in nested output subareas
+            jupyter_styles = &#34;&#34;&#34;
+            &lt;style&gt;
+                div.cell &gt; div.output_wrapper &gt; div.output.output_scroll {
+                    height: auto;
+                }
+            
+                .jupyter-widgets-output-area .output_scroll {
+                    height: unset;
+                    border-radius: unset;
+                    -webkit-box-shadow: unset;
+                    box-shadow: unset;
+                }
+            
+                .jupyter-widgets-output-area, .output_stdout, .output_result {
+                    height: auto;
+                    max-height: 50em;
+                    overflow-y: auto;
+                }
+                .jupyter-widgets-output-area .jupyter-widgets-output-area {
+                    max-height: unset;
+                }
+            &lt;/style&gt;
+            &#34;&#34;&#34;
+            # noinspection PyTypeChecker
+            display(HTML(jupyter_styles))
+
+            # Top words
+            words = &#34;, &#34;.join(
+                word
+                for word, probability in self.get_topic_words(topic_id, top_n=top_words)
+            )
+            print(f&#34;Top words:\n{words}&#34;)
+
+            # Labels
+            if self.labeller is not None:
+                labels = &#34;, &#34;.join(
+                    label
+                    for label, score in self.get_topic_labels(
+                        topic_id, top_n=top_labels
+                    )
+                )
+                print(f&#34;\nSuggested labels:\n{labels}&#34;)
+
+            # Topic documents -- `within_top_n`
+            # noinspection PyTypeChecker
+            display(
+                HTML(
+                    f&#34;&lt;h4&gt;Documents with Topic {topic_id} in the top &lt;em&gt;n&lt;/em&gt; &#34;
+                    f&#34;topics&lt;/h4&gt;&#34;
+                )
+            )
+
+            def show_topic_doc(within_top_n=1):
+                # Grab the documents that match the params passed, sorted by topic
+                # probability in descending order
+                topic_probs = self.get_topic_documents(topic_id, within_top_n)
+                topic_probs = sorted(topic_probs, key=lambda x: x[1], reverse=True)
+
+                topic_docs = [doc_id for doc_id, prob in topic_probs]
+
+                if len(topic_docs) == 0:
+                    print(
+                        &#34;No documents matching the given topic parameters. &#34;
+                        &#34;Try increasing `n`, or reducing the number of total topics &#34;
+                        &#34;and retraining the model.&#34;
+                    )
+                    return
+
+                topic_docs = [self.get_document(doc_id) for doc_id in topic_docs]
+
+                if doc_sort_key is not None:
+                    topic_docs = sorted(topic_docs, key=doc_sort_key)
+
+                # Show actual document
+                def show_doc(index=0):
+                    print(f&#34;[Total documents: {len(topic_docs)}]\n&#34;)
+                    doc = topic_docs[index]
+
+                    if display_fn is None:
+                        # Default HTML display
+                        print(f&#34;ID: {doc.id}&#34;)
+                        if &#34;filename&#34; in doc.metadata:
+                            print(f&#34;Filename: {doc.metadata[&#39;filename&#39;]}&#34;)
+                        if &#34;txt_filename&#34; in doc.metadata:
+                            print(f&#34;Processed: {doc.metadata[&#39;txt_filename&#39;]}&#34;)
+
+                        if &#34;sender&#34; in doc.metadata:
+                            print(f&#34;Sender: {doc.metadata[&#39;sender&#39;]}&#34;)
+                        if &#34;recipients&#34; in doc.metadata:
+                            recipients = doc.metadata[&#34;recipients&#34;]
+
+                            # Truncate long recipient lists for display
+                            # (TODO: Make this optional?)
+                            if len(recipients) &gt; 5:
+                                recipients = recipients[:5] + [&#34;...&#34;]
+
+                            print(f&#34;Recipients:\n{json.dumps(recipients, indent=2)}&#34;)
+
+                        # Jupyter notebooks will interpret anything between $ signs
+                        # as LaTeX formulae when rendering HTML output, so we need to
+                        # replace them with escaped $ signs (only in Jupyter
+                        # environments)
+                        display_str = doc.display_str.replace(&#34;$&#34;, r&#34;\$&#34;)
+
+                        # noinspection PyTypeChecker
+                        display(HTML(display_str))
+                    else:
+                        # User-provided display function
+                        display_fn(doc)
+                    print()
+                    print(&#34;Top document topics (in descending order of probability):&#34;)
+                    pprint.pprint(self.get_document_topics(doc.id, 10))
+
+                return ipywidgets.interact(
+                    show_doc,
+                    index=ipywidgets.IntSlider(
+                        description=&#34;Document&#34;, min=0, max=len(topic_docs) - 1
+                    ),
+                )
+
+            return ipywidgets.interact(
+                show_topic_doc,
+                within_top_n=ipywidgets.IntSlider(
+                    description=&#34;n&#34;, min=1, max=self.get_num_topics()
+                ),
+            )
+
+        return ipywidgets.interact(
+            show_topic,
+            topic_id=ipywidgets.IntSlider(
+                description=&#34;Topic&#34;, min=1, max=self.get_num_topics()
+            ),
+        )
+
+    # =================================================================================
+    # Slicing and Iteration
+    # Convenience functions that help with the exploring the Model-Corpus interface
+    def slice_by_topics(self, topic_ids, within_top_n=1, ignore_topics=None):
+        &#34;&#34;&#34;
+        Convenience function to create a new CorpusSlice with Documents that come
+        under all the given topics in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        `within_top_n` parameter.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_ids: iterable of int
+        within_top_n: int, optional
+        ignore_topics: iterable of int, optional
+            Don&#39;t count any of these topics if they are within the top `n` for a
+            document.  E.g., for a document with top topics [5, 1, 3, ...], setting
+            `ignore_topics` to [5] will consider the document&#39;s top topics to be [1,
+            3, ...] instead.
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        &#34;&#34;&#34;
+        if ignore_topics is None:
+            ignore_topics = []
+
+        all_doc_ids = []
+        for doc_id in self.get_documents():
+            # This is a list of (&lt;topic&gt;, &lt;prob&gt;)
+            doc_topics = self.get_document_topics(
+                doc_id, within_top_n + len(ignore_topics)
+            )
+            doc_topics = sorted(doc_topics, key=lambda x: x[1], reverse=True)
+            checked_topics = 0
+            for topic, prob in doc_topics:
+                if topic not in ignore_topics:
+                    # We&#39;ve seen one more topic for this document
+                    checked_topics += 1
+
+                if checked_topics &gt; within_top_n:
+                    # Exceeded the topic check limit for this document
+                    break
+
+                if topic in topic_ids:
+                    # Add it and go to the next document, we&#39;re done here
+                    all_doc_ids.append(doc_id)
+                    break
+
+        return self.slice_by_ids(all_doc_ids)
+
+    def slice_by_topic(self, topic_id, within_top_n=1, ignore_topics=None):
+        &#34;&#34;&#34;
+        Convenience function to create a new CorpusSlice with Documents that come
+        under a given topic in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        `within_top_n` and `ignore_topics` parameters.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_id: int
+        within_top_n: int, optional
+        ignore_topics: iterable of int, optional
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        &#34;&#34;&#34;
+        return self.slice_by_topics([topic_id], within_top_n, ignore_topics)
+
+    def retrain_model(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        labeller_type=None,
+        labeller_options=None,
+        vis_type=None,
+        vis_options=None,
+    ):
+        &#34;&#34;&#34;
+        (Re-)trains a topic model with any number of specified options changed; any
+        parameters that are None will be kept the same as the current model.
+
+        See `ignis.probat.train_model()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        labeller_type
+        labeller_options
+        vis_type
+        vis_options
+
+        Returns
+        -------
+        ignis.aurum.Aurum
+            The Aurum results object for the newly-trained model, which can be used
+            for further exploration and iteration
+        &#34;&#34;&#34;
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+        new_kwargs = {
+            &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+            &#34;model_type&#34;: model_type or self.model_type,
+            &#34;vis_type&#34;: vis_type or self.vis_type,
+        }
+
+        # We can only look up current labeller settings if this object has a labeller
+        # initialised in the first place
+        if self.labeller is not None:
+            if labeller_type is None:
+                new_kwargs[&#34;labeller_type&#34;] = self.labeller.labeller_type
+            if labeller_options is None:
+                new_kwargs[&#34;labeller_options&#34;] = self.labeller.options
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs[&#34;model_options&#34;] = self.model_options
+
+        if labeller_options is not None:
+            if self.labeller is not None:
+                new_kwargs[&#34;labeller_options&#34;] = dict(
+                    self.labeller.options, **labeller_options
+                )
+            else:
+                new_kwargs[&#34;labeller_options&#34;] = labeller_options
+
+        if vis_options is not None:
+            if self.vis_options is not None:
+                new_kwargs[&#34;vis_options&#34;] = dict(self.vis_options, **vis_options)
+            else:
+                new_kwargs[&#34;vis_options&#34;] = vis_options
+        else:
+            new_kwargs[&#34;vis_options&#34;] = self.vis_options
+
+        return ignis.probat.train_model(**new_kwargs)
+
+    def resuggest_num_topics(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        coherence=None,
+        top_n=None,
+        start_k=None,
+        end_k=None,
+        iterations=None,
+        verbose=False,
+    ):
+        &#34;&#34;&#34;
+        (Re-)suggests a possible number of topics for the given corpus slice and
+        model type; any parameters that are None will be kept the same as the
+        current model or set to the Ignis defaults, where appropriate.
+
+        See `ignis.probat.suggest_num_topics()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        coherence
+        top_n
+        start_k
+        end_k
+        iterations
+        verbose
+
+        Returns
+        -------
+        int
+            Suggested topic count
+        &#34;&#34;&#34;
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+        # The only options that are inherited from this Aurum instance are
+        # `corpus_slice`, `model_type`, and `model_options`, where appropriate
+        new_kwargs = {
+            &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+            &#34;model_type&#34;: model_type or self.model_type,
+        }
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs[&#34;model_options&#34;] = self.model_options
+
+        # All other arguments can be passed straight to
+        # `ignis.probat.suggest_num_topics()`, if set
+        if coherence is not None:
+            new_kwargs[&#34;coherence&#34;] = coherence
+        if top_n is not None:
+            new_kwargs[&#34;top_n&#34;] = top_n
+        if start_k is not None:
+            new_kwargs[&#34;start_k&#34;] = start_k
+        if end_k is not None:
+            new_kwargs[&#34;end_k&#34;] = end_k
+        if iterations is not None:
+            new_kwargs[&#34;iterations&#34;] = iterations
+
+        new_kwargs[&#34;verbose&#34;] = verbose
+
+        return ignis.probat.suggest_num_topics(**new_kwargs)
+
+
+def load_results(filename):
+    &#34;&#34;&#34;
+    Loads an Aurum results object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the Aurum object from.
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+    &#34;&#34;&#34;
+    with bz2.open(filename, &#34;rb&#34;) as fp:
+        save_object = pickle.load(fp)
+
+    # Rehydrate the Ignis/external models
+    model_type = save_object[&#34;model_type&#34;]
+    save_model = save_object[&#34;save_model&#34;]
+    external_model_bytes = save_object[&#34;external_model_bytes&#34;]
+
+    if model_type[:3] == &#34;tp_&#34;:
+        # Tomotopy model
+        external_model = _load_tomotopy_model(model_type, external_model_bytes)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    save_model.model = external_model
+
+    # Rehydrate the Aurum object
+    aurum = Aurum(save_model)
+
+    aurum.vis_type = save_object[&#34;vis_type&#34;]
+    aurum.vis_options = save_object[&#34;vis_options&#34;]
+    aurum.vis_data = save_object[&#34;vis_data&#34;]
+
+    return aurum
+
+
+def _load_tomotopy_model(model_type, model_bytes):
+    &#34;&#34;&#34;
+    Loads a Tomotopy model of the specified type from its binary representation.
+
+    (All Tomotopy models are subclasses of tomotopy.LDAModel)
+
+    Parameters
+    ----------
+    model_type: {&#34;tp_lda&#34;}
+        String identifying the type of the saved Tomotopy model
+    model_bytes: bytes
+        The actual saved model
+
+    Returns
+    -------
+    tp.LDAModel
+    &#34;&#34;&#34;
+    import ignis.models
+
+    if model_type == &#34;tp_lda&#34;:
+        return ignis.models.LDAModel.load_from_bytes(model_bytes)
+    elif model_type == &#34;tp_hdp&#34;:
+        return ignis.models.HDPModel.load_from_bytes(model_bytes)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ignis.aurum.load_results"><code class="name flex">
+<span>def <span class="ident">load_results</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads an Aurum results object from the given file.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code> or <code>pathlib.Path</code></dt>
+<dd>The file to load the Aurum object from.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.aurum.Aurum" href="#ignis.aurum.Aurum">Aurum</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_results(filename):
+    &#34;&#34;&#34;
+    Loads an Aurum results object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the Aurum object from.
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+    &#34;&#34;&#34;
+    with bz2.open(filename, &#34;rb&#34;) as fp:
+        save_object = pickle.load(fp)
+
+    # Rehydrate the Ignis/external models
+    model_type = save_object[&#34;model_type&#34;]
+    save_model = save_object[&#34;save_model&#34;]
+    external_model_bytes = save_object[&#34;external_model_bytes&#34;]
+
+    if model_type[:3] == &#34;tp_&#34;:
+        # Tomotopy model
+        external_model = _load_tomotopy_model(model_type, external_model_bytes)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    save_model.model = external_model
+
+    # Rehydrate the Aurum object
+    aurum = Aurum(save_model)
+
+    aurum.vis_type = save_object[&#34;vis_type&#34;]
+    aurum.vis_options = save_object[&#34;vis_options&#34;]
+    aurum.vis_data = save_object[&#34;vis_data&#34;]
+
+    return aurum</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ignis.aurum.Aurum"><code class="flex name class">
+<span>class <span class="ident">Aurum</span></span>
+<span>(</span><span>ignis_model)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Aurum instances hold the results of performing topic modelling over
+:class:<code>~ignis.corpus.Document</code> instances. They provide methods for easily
+exploring the results and iterating over the topic modelling process.</p>
+<p>Aurum objects basically bring together the public APIs for Ignis models,
+automated labellers, and visualisation data providers, while also providing general
+save/load functionality.</p>
+<p>NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
+0-indexed. So a model with 5 topics has topic IDs <code>[1, 2, 3, 4, 5]</code> and not
+<code>[0, 1, 2, 3, 4]</code>.</p>
+<p>This is for easier matching against pyLDAvis visualisations, and for easier usage
+by non-technical users.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ignis_model</code></strong> :&ensp;<code><a title="ignis.models.base.BaseModel" href="models/base.html#ignis.models.base.BaseModel">BaseModel</a></code></dt>
+<dd>The specific Ignis topic model used to generate this Aurum object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Aurum:
+    &#34;&#34;&#34;
+    Aurum instances hold the results of performing topic modelling over
+    :class:`~ignis.corpus.Document` instances. They provide methods for easily
+    exploring the results and iterating over the topic modelling process.
+
+    Aurum objects basically bring together the public APIs for Ignis models,
+    automated labellers, and visualisation data providers, while also providing general
+    save/load functionality.
+
+    NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
+    0-indexed. So a model with 5 topics has topic IDs `[1, 2, 3, 4, 5]` and not
+    `[0, 1, 2, 3, 4]`.
+
+    This is for easier matching against pyLDAvis visualisations, and for easier usage
+    by non-technical users.
+
+    Parameters
+    ----------
+    ignis_model: ignis.models.base.BaseModel
+        The specific Ignis topic model used to generate this Aurum object.
+    &#34;&#34;&#34;
+
+    def __init__(self, ignis_model):
+        self.ignis_model = ignis_model
+        self.model_type = ignis_model.model_type
+        self.model_options = ignis_model.options
+
+        # Grab a reference to the CorpusSlice object so that we can use its methods
+        # directly
+        self.corpus_slice = ignis_model.corpus_slice
+
+        # Aurum objects also optionally have cached labeller and visualisation data
+        # objects
+        self.labeller = None
+
+        self.vis_type = None
+        self.vis_options = None
+        self.vis_data = None
+
+    def save(self, filename):
+        &#34;&#34;&#34;
+        Saves the Aurum object, including its associated Ignis model, to the given file.
+        Essentially uses a bz2-compressed Pickle format.
+
+        Also attempts to save any cached visualisation data, but the labeller is
+        probably not pickle-able.
+
+        Parameters
+        ----------
+        filename: str or pathlib.Path
+            File to save the model to
+        &#34;&#34;&#34;
+        filename = pathlib.Path(filename)
+
+        # Copy the Ignis model, separate the external library&#39;s model out, pickle
+        # everything together
+        # (The model objects created by external libraries might not be pickle-able)
+        external_model = self.ignis_model.model
+        self.ignis_model.model = None
+        save_model = copy.deepcopy(self.ignis_model)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_model_file = pathlib.Path(tmpdir) / &#34;save_model.bin&#34;
+            # We assume that the external library&#39;s model object provides a `.save()`
+            # method that takes the filename as a string
+            tmp_model_file = str(tmp_model_file)
+            external_model.save(tmp_model_file)
+            with open(tmp_model_file, &#34;rb&#34;) as fp:
+                external_model_bytes = fp.read()
+
+        save_object = {
+            &#34;save_model&#34;: save_model,
+            &#34;model_type&#34;: save_model.model_type,
+            &#34;external_model_bytes&#34;: external_model_bytes,
+            # We should also be able to save any cached visualisation data, but the
+            # labeller is probably not pickle-able.
+            &#34;vis_type&#34;: self.vis_type,
+            &#34;vis_options&#34;: self.vis_options,
+            &#34;vis_data&#34;: self.vis_data,
+        }
+
+        with bz2.open(filename, &#34;wb&#34;) as fp:
+            pickle.dump(save_object, fp)
+
+        self.ignis_model.model = external_model
+
+    # =================================================================================
+    # Topic Model
+    # (Default arguments are defined by the models themselves, in case different
+    # values work better with different models)
+    def get_num_topics(self):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_num_topics()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_num_topics()
+
+    def get_topic_words(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_topic_words()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_topic_words(*args, **kwargs)
+
+    def get_topic_documents(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_topic_documents()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_topic_documents(*args, **kwargs)
+
+    def get_document_topics(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_document_topics()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_document_topics(*args, **kwargs)
+
+    def get_document_top_topic(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_document_top_topic()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_document_top_topic(*args, **kwargs)
+
+    def get_coherence(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.models.base.BaseModel.get_coherence()`
+        &#34;&#34;&#34;
+        return self.ignis_model.get_coherence(*args, **kwargs)
+
+    # =================================================================================
+    # Corpus Slice
+    def get_documents(self):
+        &#34;&#34;&#34;
+        Get the IDs of all the documents that are covered by this Ignis model.
+
+        Returns
+        -------
+        iterable of str
+        &#34;&#34;&#34;
+        return list(self.corpus_slice.documents.keys())
+
+    def get_document(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.get_document()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.get_document(*args, **kwargs)
+
+    def slice_by_ids(self, doc_ids):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_by_ids()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_by_ids(doc_ids)
+
+    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_by_tokens()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_by_tokens(tokens, include_root, human_readable)
+
+    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_without_tokens()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_without_tokens(
+            tokens, include_root, human_readable
+        )
+
+    def slice_filter(self, filter_fn, include_root=False):
+        &#34;&#34;&#34;
+        See `ignis.corpus.CorpusSlice.slice_filter()`
+        &#34;&#34;&#34;
+        return self.corpus_slice.slice_filter(filter_fn, include_root)
+
+    # =================================================================================
+    # Automated Labeller
+    def init_labeller(self, labeller_type, **labeller_options):
+        &#34;&#34;&#34;
+        Trains an automated labeller for this Aurum object
+
+        Parameters
+        ----------
+        labeller_type: {&#34;tomotopy&#34;}
+            String denoting the labeller type.
+        **labeller_options
+            Keyword arguments that are passed to the constructor for the given
+            labeller type.
+        &#34;&#34;&#34;
+        if labeller_type == &#34;tomotopy&#34;:
+            self.labeller = ignis.labeller.tomotopy.TomotopyLabeller(
+                self.ignis_model.model, **labeller_options
+            )
+        else:
+            raise ValueError(f&#34;Unknown labeller type: &#39;{labeller_type}&#39;&#34;)
+
+    def get_topic_labels(self, topic_id, top_n):
+        &#34;&#34;&#34;
+        See `ignis.labeller.tomotopy.get_topic_labels()`
+        &#34;&#34;&#34;
+        if self.labeller is None:
+            raise RuntimeError(
+                &#34;There is no labeller instantiated for this Aurum object. &#34;
+                &#34;Use `.init_labeller()` to prepare one.&#34;
+            )
+        return self.labeller.get_topic_labels(topic_id, top_n)
+
+    # =================================================================================
+    # Visualisation Data
+    # TODO: Move `vis_data` into a full visualisation object, like the labeller/model?
+    def init_vis(self, vis_type, force=False, **vis_options):
+        &#34;&#34;&#34;
+        Prepares a visualisation for this Aurum object in the given format
+
+        Parameters
+        ----------
+        vis_type: {&#34;pyldavis&#34;, &#34;clear&#34;}
+            String denoting the visualisation type.  Setting to &#34;clear&#34; will remove
+            any existing visualisation data.
+        force: bool, optional
+            If `self.vis_data` is already set, it will not be recalculated unless
+            `force` is set.
+        **vis_options
+            Keyword arguments that are passed to the constructor for the given
+            visualisation type.
+        &#34;&#34;&#34;
+        if vis_type == &#34;clear&#34;:
+            self.vis_type = None
+            self.vis_options = None
+            self.vis_data = None
+        elif vis_type == &#34;pyldavis&#34;:
+            if self.vis_data is not None and not force:
+                raise RuntimeError(
+                    f&#34;Visualisation data already exists for this Aurum object &#34;
+                    f&#34;(type: &#39;{self.vis_type}&#39;). &#34;
+                    f&#34;Pass `force=True` to force recalculation.&#34;
+                )
+
+            self.vis_type = vis_type
+            self.vis_options = vis_options
+            self.vis_data = ignis.vis.pyldavis.prepare_data(
+                self.ignis_model.model, **vis_options
+            )
+        else:
+            raise ValueError(f&#34;Unknown visualisation type: &#39;{vis_type}&#39;&#34;)
+
+    def get_vis_data(self):
+        &#34;&#34;&#34;
+        Returns the prepared visualisation data for this model, if any.
+        &#34;&#34;&#34;
+        if self.vis_data is None:
+            raise RuntimeError(
+                &#34;There is no visualisation data instantiated for this Aurum object. &#34;
+                &#34;Use `.init_vis()` to prepare it.&#34;
+            )
+        return self.vis_data
+
+    def show_visualisation(self):
+        &#34;&#34;&#34;
+        Displays the prepared visualisation for this model.
+        (Presumes that the `ignis.vis` class returns a situation-appropriate format,
+        e.g., for display in a Jupyter notebook)
+
+        Returns
+        -------
+        The output of the `show_visualisation` method of the relevant `ignis.vis` class
+        &#34;&#34;&#34;
+        vis_data = self.get_vis_data()
+
+        if self.vis_type == &#34;pyldavis&#34;:
+            return ignis.vis.pyldavis.show_visualisation(vis_data)
+        else:
+            raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)
+
+    def export_visualisation(self, folder):
+        &#34;&#34;&#34;
+        Exports the visualisation prepared for this Aurum object to the given folder.
+
+        Parameters
+        ----------
+        folder
+        &#34;&#34;&#34;
+        vis_data = self.get_vis_data()
+
+        # Assuming the `vis_data` get is successful, we should have a valid record of
+        # the `vis_type` as well.
+        if self.vis_type == &#34;pyldavis&#34;:
+            ignis.vis.pyldavis.export_visualisation(vis_data, folder)
+        else:
+            raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)
+
+    # =================================================================================
+    # Jupyter widgets
+    def nb_explore_topics(
+        self, top_words=30, top_labels=15, doc_sort_key=None, display_fn=None
+    ):
+        &#34;&#34;&#34;
+        Convenience function that creates an interactive Jupyter notebook widget for
+        exploring the topics in this model.
+
+        By default, documents are shown in decreasing order of probability for each
+        specified topic, but a custom sorting function can be passed via `doc_sort_key`
+        as well.
+
+        Parameters
+        ----------
+        top_words: int, optional
+            The top `n` most probable terms for each topic to show
+        top_labels: int, optional
+            The top `n` most probably labels for each topic to show.  Will have no
+            effect if the model does not have a labeller initialised.
+        doc_sort_key: fn, optional
+            If specified, will sort topic documents using this key when displaying them.
+        display_fn: fn, optional
+            Custom display function that receives an individual Document as input and
+            should display the Document in human-readable form as a side effect.
+            If unset, will assume that the human-readable representation of the
+            Document is in HTML format and display it accordingly.
+
+        Returns
+        -------
+        ipywidgets.interact function
+        &#34;&#34;&#34;
+        import ipywidgets
+        from IPython.core.display import display, HTML
+
+        # Per topic info
+        def show_topic(topic_id=1):
+            # Styles
+            # - Limit the height of most output areas for readability
+            # - Prevent vertical scrollbars in nested output subareas
+            jupyter_styles = &#34;&#34;&#34;
+            &lt;style&gt;
+                div.cell &gt; div.output_wrapper &gt; div.output.output_scroll {
+                    height: auto;
+                }
+            
+                .jupyter-widgets-output-area .output_scroll {
+                    height: unset;
+                    border-radius: unset;
+                    -webkit-box-shadow: unset;
+                    box-shadow: unset;
+                }
+            
+                .jupyter-widgets-output-area, .output_stdout, .output_result {
+                    height: auto;
+                    max-height: 50em;
+                    overflow-y: auto;
+                }
+                .jupyter-widgets-output-area .jupyter-widgets-output-area {
+                    max-height: unset;
+                }
+            &lt;/style&gt;
+            &#34;&#34;&#34;
+            # noinspection PyTypeChecker
+            display(HTML(jupyter_styles))
+
+            # Top words
+            words = &#34;, &#34;.join(
+                word
+                for word, probability in self.get_topic_words(topic_id, top_n=top_words)
+            )
+            print(f&#34;Top words:\n{words}&#34;)
+
+            # Labels
+            if self.labeller is not None:
+                labels = &#34;, &#34;.join(
+                    label
+                    for label, score in self.get_topic_labels(
+                        topic_id, top_n=top_labels
+                    )
+                )
+                print(f&#34;\nSuggested labels:\n{labels}&#34;)
+
+            # Topic documents -- `within_top_n`
+            # noinspection PyTypeChecker
+            display(
+                HTML(
+                    f&#34;&lt;h4&gt;Documents with Topic {topic_id} in the top &lt;em&gt;n&lt;/em&gt; &#34;
+                    f&#34;topics&lt;/h4&gt;&#34;
+                )
+            )
+
+            def show_topic_doc(within_top_n=1):
+                # Grab the documents that match the params passed, sorted by topic
+                # probability in descending order
+                topic_probs = self.get_topic_documents(topic_id, within_top_n)
+                topic_probs = sorted(topic_probs, key=lambda x: x[1], reverse=True)
+
+                topic_docs = [doc_id for doc_id, prob in topic_probs]
+
+                if len(topic_docs) == 0:
+                    print(
+                        &#34;No documents matching the given topic parameters. &#34;
+                        &#34;Try increasing `n`, or reducing the number of total topics &#34;
+                        &#34;and retraining the model.&#34;
+                    )
+                    return
+
+                topic_docs = [self.get_document(doc_id) for doc_id in topic_docs]
+
+                if doc_sort_key is not None:
+                    topic_docs = sorted(topic_docs, key=doc_sort_key)
+
+                # Show actual document
+                def show_doc(index=0):
+                    print(f&#34;[Total documents: {len(topic_docs)}]\n&#34;)
+                    doc = topic_docs[index]
+
+                    if display_fn is None:
+                        # Default HTML display
+                        print(f&#34;ID: {doc.id}&#34;)
+                        if &#34;filename&#34; in doc.metadata:
+                            print(f&#34;Filename: {doc.metadata[&#39;filename&#39;]}&#34;)
+                        if &#34;txt_filename&#34; in doc.metadata:
+                            print(f&#34;Processed: {doc.metadata[&#39;txt_filename&#39;]}&#34;)
+
+                        if &#34;sender&#34; in doc.metadata:
+                            print(f&#34;Sender: {doc.metadata[&#39;sender&#39;]}&#34;)
+                        if &#34;recipients&#34; in doc.metadata:
+                            recipients = doc.metadata[&#34;recipients&#34;]
+
+                            # Truncate long recipient lists for display
+                            # (TODO: Make this optional?)
+                            if len(recipients) &gt; 5:
+                                recipients = recipients[:5] + [&#34;...&#34;]
+
+                            print(f&#34;Recipients:\n{json.dumps(recipients, indent=2)}&#34;)
+
+                        # Jupyter notebooks will interpret anything between $ signs
+                        # as LaTeX formulae when rendering HTML output, so we need to
+                        # replace them with escaped $ signs (only in Jupyter
+                        # environments)
+                        display_str = doc.display_str.replace(&#34;$&#34;, r&#34;\$&#34;)
+
+                        # noinspection PyTypeChecker
+                        display(HTML(display_str))
+                    else:
+                        # User-provided display function
+                        display_fn(doc)
+                    print()
+                    print(&#34;Top document topics (in descending order of probability):&#34;)
+                    pprint.pprint(self.get_document_topics(doc.id, 10))
+
+                return ipywidgets.interact(
+                    show_doc,
+                    index=ipywidgets.IntSlider(
+                        description=&#34;Document&#34;, min=0, max=len(topic_docs) - 1
+                    ),
+                )
+
+            return ipywidgets.interact(
+                show_topic_doc,
+                within_top_n=ipywidgets.IntSlider(
+                    description=&#34;n&#34;, min=1, max=self.get_num_topics()
+                ),
+            )
+
+        return ipywidgets.interact(
+            show_topic,
+            topic_id=ipywidgets.IntSlider(
+                description=&#34;Topic&#34;, min=1, max=self.get_num_topics()
+            ),
+        )
+
+    # =================================================================================
+    # Slicing and Iteration
+    # Convenience functions that help with the exploring the Model-Corpus interface
+    def slice_by_topics(self, topic_ids, within_top_n=1, ignore_topics=None):
+        &#34;&#34;&#34;
+        Convenience function to create a new CorpusSlice with Documents that come
+        under all the given topics in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        `within_top_n` parameter.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_ids: iterable of int
+        within_top_n: int, optional
+        ignore_topics: iterable of int, optional
+            Don&#39;t count any of these topics if they are within the top `n` for a
+            document.  E.g., for a document with top topics [5, 1, 3, ...], setting
+            `ignore_topics` to [5] will consider the document&#39;s top topics to be [1,
+            3, ...] instead.
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        &#34;&#34;&#34;
+        if ignore_topics is None:
+            ignore_topics = []
+
+        all_doc_ids = []
+        for doc_id in self.get_documents():
+            # This is a list of (&lt;topic&gt;, &lt;prob&gt;)
+            doc_topics = self.get_document_topics(
+                doc_id, within_top_n + len(ignore_topics)
+            )
+            doc_topics = sorted(doc_topics, key=lambda x: x[1], reverse=True)
+            checked_topics = 0
+            for topic, prob in doc_topics:
+                if topic not in ignore_topics:
+                    # We&#39;ve seen one more topic for this document
+                    checked_topics += 1
+
+                if checked_topics &gt; within_top_n:
+                    # Exceeded the topic check limit for this document
+                    break
+
+                if topic in topic_ids:
+                    # Add it and go to the next document, we&#39;re done here
+                    all_doc_ids.append(doc_id)
+                    break
+
+        return self.slice_by_ids(all_doc_ids)
+
+    def slice_by_topic(self, topic_id, within_top_n=1, ignore_topics=None):
+        &#34;&#34;&#34;
+        Convenience function to create a new CorpusSlice with Documents that come
+        under a given topic in the current model.
+
+        See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+        `within_top_n` and `ignore_topics` parameters.
+
+        Note that `topic_id` starts from 1 and not 0.
+
+        Parameters
+        ----------
+        topic_id: int
+        within_top_n: int, optional
+        ignore_topics: iterable of int, optional
+
+        Returns
+        -------
+        ignis.corpus.CorpusSlice
+        &#34;&#34;&#34;
+        return self.slice_by_topics([topic_id], within_top_n, ignore_topics)
+
+    def retrain_model(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        labeller_type=None,
+        labeller_options=None,
+        vis_type=None,
+        vis_options=None,
+    ):
+        &#34;&#34;&#34;
+        (Re-)trains a topic model with any number of specified options changed; any
+        parameters that are None will be kept the same as the current model.
+
+        See `ignis.probat.train_model()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        labeller_type
+        labeller_options
+        vis_type
+        vis_options
+
+        Returns
+        -------
+        ignis.aurum.Aurum
+            The Aurum results object for the newly-trained model, which can be used
+            for further exploration and iteration
+        &#34;&#34;&#34;
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+        new_kwargs = {
+            &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+            &#34;model_type&#34;: model_type or self.model_type,
+            &#34;vis_type&#34;: vis_type or self.vis_type,
+        }
+
+        # We can only look up current labeller settings if this object has a labeller
+        # initialised in the first place
+        if self.labeller is not None:
+            if labeller_type is None:
+                new_kwargs[&#34;labeller_type&#34;] = self.labeller.labeller_type
+            if labeller_options is None:
+                new_kwargs[&#34;labeller_options&#34;] = self.labeller.options
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs[&#34;model_options&#34;] = self.model_options
+
+        if labeller_options is not None:
+            if self.labeller is not None:
+                new_kwargs[&#34;labeller_options&#34;] = dict(
+                    self.labeller.options, **labeller_options
+                )
+            else:
+                new_kwargs[&#34;labeller_options&#34;] = labeller_options
+
+        if vis_options is not None:
+            if self.vis_options is not None:
+                new_kwargs[&#34;vis_options&#34;] = dict(self.vis_options, **vis_options)
+            else:
+                new_kwargs[&#34;vis_options&#34;] = vis_options
+        else:
+            new_kwargs[&#34;vis_options&#34;] = self.vis_options
+
+        return ignis.probat.train_model(**new_kwargs)
+
+    def resuggest_num_topics(
+        self,
+        corpus_slice=None,
+        model_type=None,
+        model_options=None,
+        coherence=None,
+        top_n=None,
+        start_k=None,
+        end_k=None,
+        iterations=None,
+        verbose=False,
+    ):
+        &#34;&#34;&#34;
+        (Re-)suggests a possible number of topics for the given corpus slice and
+        model type; any parameters that are None will be kept the same as the
+        current model or set to the Ignis defaults, where appropriate.
+
+        See `ignis.probat.suggest_num_topics()` for details on the params.
+
+        Parameters
+        ----------
+        corpus_slice
+        model_type
+        model_options
+        coherence
+        top_n
+        start_k
+        end_k
+        iterations
+        verbose
+
+        Returns
+        -------
+        int
+            Suggested topic count
+        &#34;&#34;&#34;
+        if corpus_slice is not None and len(corpus_slice) == 0:
+            raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+        # The only options that are inherited from this Aurum instance are
+        # `corpus_slice`, `model_type`, and `model_options`, where appropriate
+        new_kwargs = {
+            &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+            &#34;model_type&#34;: model_type or self.model_type,
+        }
+
+        # Merge option dictionaries, where available
+        if model_options is not None:
+            new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+        else:
+            new_kwargs[&#34;model_options&#34;] = self.model_options
+
+        # All other arguments can be passed straight to
+        # `ignis.probat.suggest_num_topics()`, if set
+        if coherence is not None:
+            new_kwargs[&#34;coherence&#34;] = coherence
+        if top_n is not None:
+            new_kwargs[&#34;top_n&#34;] = top_n
+        if start_k is not None:
+            new_kwargs[&#34;start_k&#34;] = start_k
+        if end_k is not None:
+            new_kwargs[&#34;end_k&#34;] = end_k
+        if iterations is not None:
+            new_kwargs[&#34;iterations&#34;] = iterations
+
+        new_kwargs[&#34;verbose&#34;] = verbose
+
+        return ignis.probat.suggest_num_topics(**new_kwargs)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ignis.aurum.Aurum.export_visualisation"><code class="name flex">
+<span>def <span class="ident">export_visualisation</span></span>(<span>self, folder)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Exports the visualisation prepared for this Aurum object to the given folder.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>folder</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def export_visualisation(self, folder):
+    &#34;&#34;&#34;
+    Exports the visualisation prepared for this Aurum object to the given folder.
+
+    Parameters
+    ----------
+    folder
+    &#34;&#34;&#34;
+    vis_data = self.get_vis_data()
+
+    # Assuming the `vis_data` get is successful, we should have a valid record of
+    # the `vis_type` as well.
+    if self.vis_type == &#34;pyldavis&#34;:
+        ignis.vis.pyldavis.export_visualisation(vis_data, folder)
+    else:
+        raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_coherence"><code class="name flex">
+<span>def <span class="ident">get_coherence</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_coherence" href="models/base.html#ignis.models.base.BaseModel.get_coherence">BaseModel.get_coherence()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_coherence(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_coherence()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_coherence(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_document"><code class="name flex">
+<span>def <span class="ident">get_document</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.corpus.CorpusSlice.get_document" href="corpus.html#ignis.corpus.CorpusSlice.get_document">CorpusSlice.get_document()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_document(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.corpus.CorpusSlice.get_document()`
+    &#34;&#34;&#34;
+    return self.corpus_slice.get_document(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_document_top_topic"><code class="name flex">
+<span>def <span class="ident">get_document_top_topic</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_document_top_topic" href="models/base.html#ignis.models.base.BaseModel.get_document_top_topic">BaseModel.get_document_top_topic()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_document_top_topic(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_document_top_topic()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_document_top_topic(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_document_topics"><code class="name flex">
+<span>def <span class="ident">get_document_topics</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_document_topics" href="models/base.html#ignis.models.base.BaseModel.get_document_topics">BaseModel.get_document_topics()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_document_topics(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_document_topics()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_document_topics(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_documents"><code class="name flex">
+<span>def <span class="ident">get_documents</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the IDs of all the documents that are covered by this Ignis model.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>iterable</code> of <code>str</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_documents(self):
+    &#34;&#34;&#34;
+    Get the IDs of all the documents that are covered by this Ignis model.
+
+    Returns
+    -------
+    iterable of str
+    &#34;&#34;&#34;
+    return list(self.corpus_slice.documents.keys())</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_num_topics"><code class="name flex">
+<span>def <span class="ident">get_num_topics</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_num_topics" href="models/base.html#ignis.models.base.BaseModel.get_num_topics">BaseModel.get_num_topics()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_num_topics(self):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_num_topics()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_num_topics()</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_topic_documents"><code class="name flex">
+<span>def <span class="ident">get_topic_documents</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_topic_documents" href="models/base.html#ignis.models.base.BaseModel.get_topic_documents">BaseModel.get_topic_documents()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_topic_documents(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_topic_documents()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_topic_documents(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_topic_labels"><code class="name flex">
+<span>def <span class="ident">get_topic_labels</span></span>(<span>self, topic_id, top_n)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code>ignis.labeller.tomotopy.get_topic_labels()</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_topic_labels(self, topic_id, top_n):
+    &#34;&#34;&#34;
+    See `ignis.labeller.tomotopy.get_topic_labels()`
+    &#34;&#34;&#34;
+    if self.labeller is None:
+        raise RuntimeError(
+            &#34;There is no labeller instantiated for this Aurum object. &#34;
+            &#34;Use `.init_labeller()` to prepare one.&#34;
+        )
+    return self.labeller.get_topic_labels(topic_id, top_n)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_topic_words"><code class="name flex">
+<span>def <span class="ident">get_topic_words</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.models.base.BaseModel.get_topic_words" href="models/base.html#ignis.models.base.BaseModel.get_topic_words">BaseModel.get_topic_words()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_topic_words(self, *args, **kwargs):
+    &#34;&#34;&#34;
+    See `ignis.models.base.BaseModel.get_topic_words()`
+    &#34;&#34;&#34;
+    return self.ignis_model.get_topic_words(*args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.get_vis_data"><code class="name flex">
+<span>def <span class="ident">get_vis_data</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the prepared visualisation data for this model, if any.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_vis_data(self):
+    &#34;&#34;&#34;
+    Returns the prepared visualisation data for this model, if any.
+    &#34;&#34;&#34;
+    if self.vis_data is None:
+        raise RuntimeError(
+            &#34;There is no visualisation data instantiated for this Aurum object. &#34;
+            &#34;Use `.init_vis()` to prepare it.&#34;
+        )
+    return self.vis_data</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.init_labeller"><code class="name flex">
+<span>def <span class="ident">init_labeller</span></span>(<span>self, labeller_type, **labeller_options)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Trains an automated labeller for this Aurum object</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>labeller_type</code></strong> :&ensp;<code>{"tomotopy"}</code></dt>
+<dd>String denoting the labeller type.</dd>
+<dt><strong><code>**labeller_options</code></strong></dt>
+<dd>Keyword arguments that are passed to the constructor for the given
+labeller type.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_labeller(self, labeller_type, **labeller_options):
+    &#34;&#34;&#34;
+    Trains an automated labeller for this Aurum object
+
+    Parameters
+    ----------
+    labeller_type: {&#34;tomotopy&#34;}
+        String denoting the labeller type.
+    **labeller_options
+        Keyword arguments that are passed to the constructor for the given
+        labeller type.
+    &#34;&#34;&#34;
+    if labeller_type == &#34;tomotopy&#34;:
+        self.labeller = ignis.labeller.tomotopy.TomotopyLabeller(
+            self.ignis_model.model, **labeller_options
+        )
+    else:
+        raise ValueError(f&#34;Unknown labeller type: &#39;{labeller_type}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.init_vis"><code class="name flex">
+<span>def <span class="ident">init_vis</span></span>(<span>self, vis_type, force=False, **vis_options)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prepares a visualisation for this Aurum object in the given format</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>vis_type</code></strong> :&ensp;<code>{"pyldavis", "clear"}</code></dt>
+<dd>String denoting the visualisation type.
+Setting to "clear" will remove
+any existing visualisation data.</dd>
+<dt><strong><code>force</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>self.vis_data</code> is already set, it will not be recalculated unless
+<code>force</code> is set.</dd>
+<dt><strong><code>**vis_options</code></strong></dt>
+<dd>Keyword arguments that are passed to the constructor for the given
+visualisation type.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_vis(self, vis_type, force=False, **vis_options):
+    &#34;&#34;&#34;
+    Prepares a visualisation for this Aurum object in the given format
+
+    Parameters
+    ----------
+    vis_type: {&#34;pyldavis&#34;, &#34;clear&#34;}
+        String denoting the visualisation type.  Setting to &#34;clear&#34; will remove
+        any existing visualisation data.
+    force: bool, optional
+        If `self.vis_data` is already set, it will not be recalculated unless
+        `force` is set.
+    **vis_options
+        Keyword arguments that are passed to the constructor for the given
+        visualisation type.
+    &#34;&#34;&#34;
+    if vis_type == &#34;clear&#34;:
+        self.vis_type = None
+        self.vis_options = None
+        self.vis_data = None
+    elif vis_type == &#34;pyldavis&#34;:
+        if self.vis_data is not None and not force:
+            raise RuntimeError(
+                f&#34;Visualisation data already exists for this Aurum object &#34;
+                f&#34;(type: &#39;{self.vis_type}&#39;). &#34;
+                f&#34;Pass `force=True` to force recalculation.&#34;
+            )
+
+        self.vis_type = vis_type
+        self.vis_options = vis_options
+        self.vis_data = ignis.vis.pyldavis.prepare_data(
+            self.ignis_model.model, **vis_options
+        )
+    else:
+        raise ValueError(f&#34;Unknown visualisation type: &#39;{vis_type}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.nb_explore_topics"><code class="name flex">
+<span>def <span class="ident">nb_explore_topics</span></span>(<span>self, top_words=30, top_labels=15, doc_sort_key=None, display_fn=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience function that creates an interactive Jupyter notebook widget for
+exploring the topics in this model.</p>
+<p>By default, documents are shown in decreasing order of probability for each
+specified topic, but a custom sorting function can be passed via <code>doc_sort_key</code>
+as well.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>top_words</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The top <code>n</code> most probable terms for each topic to show</dd>
+<dt><strong><code>top_labels</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The top <code>n</code> most probably labels for each topic to show.
+Will have no
+effect if the model does not have a labeller initialised.</dd>
+<dt><strong><code>doc_sort_key</code></strong> :&ensp;<code>fn</code>, optional</dt>
+<dd>If specified, will sort topic documents using this key when displaying them.</dd>
+<dt><strong><code>display_fn</code></strong> :&ensp;<code>fn</code>, optional</dt>
+<dd>Custom display function that receives an individual Document as input and
+should display the Document in human-readable form as a side effect.
+If unset, will assume that the human-readable representation of the
+Document is in HTML format and display it accordingly.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ipywidgets.interact function</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nb_explore_topics(
+    self, top_words=30, top_labels=15, doc_sort_key=None, display_fn=None
+):
+    &#34;&#34;&#34;
+    Convenience function that creates an interactive Jupyter notebook widget for
+    exploring the topics in this model.
+
+    By default, documents are shown in decreasing order of probability for each
+    specified topic, but a custom sorting function can be passed via `doc_sort_key`
+    as well.
+
+    Parameters
+    ----------
+    top_words: int, optional
+        The top `n` most probable terms for each topic to show
+    top_labels: int, optional
+        The top `n` most probably labels for each topic to show.  Will have no
+        effect if the model does not have a labeller initialised.
+    doc_sort_key: fn, optional
+        If specified, will sort topic documents using this key when displaying them.
+    display_fn: fn, optional
+        Custom display function that receives an individual Document as input and
+        should display the Document in human-readable form as a side effect.
+        If unset, will assume that the human-readable representation of the
+        Document is in HTML format and display it accordingly.
+
+    Returns
+    -------
+    ipywidgets.interact function
+    &#34;&#34;&#34;
+    import ipywidgets
+    from IPython.core.display import display, HTML
+
+    # Per topic info
+    def show_topic(topic_id=1):
+        # Styles
+        # - Limit the height of most output areas for readability
+        # - Prevent vertical scrollbars in nested output subareas
+        jupyter_styles = &#34;&#34;&#34;
+        &lt;style&gt;
+            div.cell &gt; div.output_wrapper &gt; div.output.output_scroll {
+                height: auto;
+            }
+        
+            .jupyter-widgets-output-area .output_scroll {
+                height: unset;
+                border-radius: unset;
+                -webkit-box-shadow: unset;
+                box-shadow: unset;
+            }
+        
+            .jupyter-widgets-output-area, .output_stdout, .output_result {
+                height: auto;
+                max-height: 50em;
+                overflow-y: auto;
+            }
+            .jupyter-widgets-output-area .jupyter-widgets-output-area {
+                max-height: unset;
+            }
+        &lt;/style&gt;
+        &#34;&#34;&#34;
+        # noinspection PyTypeChecker
+        display(HTML(jupyter_styles))
+
+        # Top words
+        words = &#34;, &#34;.join(
+            word
+            for word, probability in self.get_topic_words(topic_id, top_n=top_words)
+        )
+        print(f&#34;Top words:\n{words}&#34;)
+
+        # Labels
+        if self.labeller is not None:
+            labels = &#34;, &#34;.join(
+                label
+                for label, score in self.get_topic_labels(
+                    topic_id, top_n=top_labels
+                )
+            )
+            print(f&#34;\nSuggested labels:\n{labels}&#34;)
+
+        # Topic documents -- `within_top_n`
+        # noinspection PyTypeChecker
+        display(
+            HTML(
+                f&#34;&lt;h4&gt;Documents with Topic {topic_id} in the top &lt;em&gt;n&lt;/em&gt; &#34;
+                f&#34;topics&lt;/h4&gt;&#34;
+            )
+        )
+
+        def show_topic_doc(within_top_n=1):
+            # Grab the documents that match the params passed, sorted by topic
+            # probability in descending order
+            topic_probs = self.get_topic_documents(topic_id, within_top_n)
+            topic_probs = sorted(topic_probs, key=lambda x: x[1], reverse=True)
+
+            topic_docs = [doc_id for doc_id, prob in topic_probs]
+
+            if len(topic_docs) == 0:
+                print(
+                    &#34;No documents matching the given topic parameters. &#34;
+                    &#34;Try increasing `n`, or reducing the number of total topics &#34;
+                    &#34;and retraining the model.&#34;
+                )
+                return
+
+            topic_docs = [self.get_document(doc_id) for doc_id in topic_docs]
+
+            if doc_sort_key is not None:
+                topic_docs = sorted(topic_docs, key=doc_sort_key)
+
+            # Show actual document
+            def show_doc(index=0):
+                print(f&#34;[Total documents: {len(topic_docs)}]\n&#34;)
+                doc = topic_docs[index]
+
+                if display_fn is None:
+                    # Default HTML display
+                    print(f&#34;ID: {doc.id}&#34;)
+                    if &#34;filename&#34; in doc.metadata:
+                        print(f&#34;Filename: {doc.metadata[&#39;filename&#39;]}&#34;)
+                    if &#34;txt_filename&#34; in doc.metadata:
+                        print(f&#34;Processed: {doc.metadata[&#39;txt_filename&#39;]}&#34;)
+
+                    if &#34;sender&#34; in doc.metadata:
+                        print(f&#34;Sender: {doc.metadata[&#39;sender&#39;]}&#34;)
+                    if &#34;recipients&#34; in doc.metadata:
+                        recipients = doc.metadata[&#34;recipients&#34;]
+
+                        # Truncate long recipient lists for display
+                        # (TODO: Make this optional?)
+                        if len(recipients) &gt; 5:
+                            recipients = recipients[:5] + [&#34;...&#34;]
+
+                        print(f&#34;Recipients:\n{json.dumps(recipients, indent=2)}&#34;)
+
+                    # Jupyter notebooks will interpret anything between $ signs
+                    # as LaTeX formulae when rendering HTML output, so we need to
+                    # replace them with escaped $ signs (only in Jupyter
+                    # environments)
+                    display_str = doc.display_str.replace(&#34;$&#34;, r&#34;\$&#34;)
+
+                    # noinspection PyTypeChecker
+                    display(HTML(display_str))
+                else:
+                    # User-provided display function
+                    display_fn(doc)
+                print()
+                print(&#34;Top document topics (in descending order of probability):&#34;)
+                pprint.pprint(self.get_document_topics(doc.id, 10))
+
+            return ipywidgets.interact(
+                show_doc,
+                index=ipywidgets.IntSlider(
+                    description=&#34;Document&#34;, min=0, max=len(topic_docs) - 1
+                ),
+            )
+
+        return ipywidgets.interact(
+            show_topic_doc,
+            within_top_n=ipywidgets.IntSlider(
+                description=&#34;n&#34;, min=1, max=self.get_num_topics()
+            ),
+        )
+
+    return ipywidgets.interact(
+        show_topic,
+        topic_id=ipywidgets.IntSlider(
+            description=&#34;Topic&#34;, min=1, max=self.get_num_topics()
+        ),
+    )</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.resuggest_num_topics"><code class="name flex">
+<span>def <span class="ident">resuggest_num_topics</span></span>(<span>self, corpus_slice=None, model_type=None, model_options=None, coherence=None, top_n=None, start_k=None, end_k=None, iterations=None, verbose=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>(Re-)suggests a possible number of topics for the given corpus slice and
+model type; any parameters that are None will be kept the same as the
+current model or set to the Ignis defaults, where appropriate.</p>
+<p>See <code><a title="ignis.probat.suggest_num_topics" href="probat.html#ignis.probat.suggest_num_topics">suggest_num_topics()</a></code> for details on the params.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>corpus_slice</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>model_type</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>model_options</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>coherence</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>top_n</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>start_k</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>end_k</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>iterations</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>verbose</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Suggested topic count</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resuggest_num_topics(
+    self,
+    corpus_slice=None,
+    model_type=None,
+    model_options=None,
+    coherence=None,
+    top_n=None,
+    start_k=None,
+    end_k=None,
+    iterations=None,
+    verbose=False,
+):
+    &#34;&#34;&#34;
+    (Re-)suggests a possible number of topics for the given corpus slice and
+    model type; any parameters that are None will be kept the same as the
+    current model or set to the Ignis defaults, where appropriate.
+
+    See `ignis.probat.suggest_num_topics()` for details on the params.
+
+    Parameters
+    ----------
+    corpus_slice
+    model_type
+    model_options
+    coherence
+    top_n
+    start_k
+    end_k
+    iterations
+    verbose
+
+    Returns
+    -------
+    int
+        Suggested topic count
+    &#34;&#34;&#34;
+    if corpus_slice is not None and len(corpus_slice) == 0:
+        raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+    # The only options that are inherited from this Aurum instance are
+    # `corpus_slice`, `model_type`, and `model_options`, where appropriate
+    new_kwargs = {
+        &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+        &#34;model_type&#34;: model_type or self.model_type,
+    }
+
+    # Merge option dictionaries, where available
+    if model_options is not None:
+        new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+    else:
+        new_kwargs[&#34;model_options&#34;] = self.model_options
+
+    # All other arguments can be passed straight to
+    # `ignis.probat.suggest_num_topics()`, if set
+    if coherence is not None:
+        new_kwargs[&#34;coherence&#34;] = coherence
+    if top_n is not None:
+        new_kwargs[&#34;top_n&#34;] = top_n
+    if start_k is not None:
+        new_kwargs[&#34;start_k&#34;] = start_k
+    if end_k is not None:
+        new_kwargs[&#34;end_k&#34;] = end_k
+    if iterations is not None:
+        new_kwargs[&#34;iterations&#34;] = iterations
+
+    new_kwargs[&#34;verbose&#34;] = verbose
+
+    return ignis.probat.suggest_num_topics(**new_kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.retrain_model"><code class="name flex">
+<span>def <span class="ident">retrain_model</span></span>(<span>self, corpus_slice=None, model_type=None, model_options=None, labeller_type=None, labeller_options=None, vis_type=None, vis_options=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>(Re-)trains a topic model with any number of specified options changed; any
+parameters that are None will be kept the same as the current model.</p>
+<p>See <code><a title="ignis.probat.train_model" href="probat.html#ignis.probat.train_model">train_model()</a></code> for details on the params.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>corpus_slice</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>model_type</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>model_options</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>labeller_type</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>labeller_options</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>vis_type</code></strong></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>vis_options</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.aurum.Aurum" href="#ignis.aurum.Aurum">Aurum</a></code></dt>
+<dd>The Aurum results object for the newly-trained model, which can be used
+for further exploration and iteration</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def retrain_model(
+    self,
+    corpus_slice=None,
+    model_type=None,
+    model_options=None,
+    labeller_type=None,
+    labeller_options=None,
+    vis_type=None,
+    vis_options=None,
+):
+    &#34;&#34;&#34;
+    (Re-)trains a topic model with any number of specified options changed; any
+    parameters that are None will be kept the same as the current model.
+
+    See `ignis.probat.train_model()` for details on the params.
+
+    Parameters
+    ----------
+    corpus_slice
+    model_type
+    model_options
+    labeller_type
+    labeller_options
+    vis_type
+    vis_options
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+        The Aurum results object for the newly-trained model, which can be used
+        for further exploration and iteration
+    &#34;&#34;&#34;
+    if corpus_slice is not None and len(corpus_slice) == 0:
+        raise RuntimeError(&#34;Cannot retrain model on an empty CorpusSlice.&#34;)
+
+    new_kwargs = {
+        &#34;corpus_slice&#34;: corpus_slice or self.corpus_slice,
+        &#34;model_type&#34;: model_type or self.model_type,
+        &#34;vis_type&#34;: vis_type or self.vis_type,
+    }
+
+    # We can only look up current labeller settings if this object has a labeller
+    # initialised in the first place
+    if self.labeller is not None:
+        if labeller_type is None:
+            new_kwargs[&#34;labeller_type&#34;] = self.labeller.labeller_type
+        if labeller_options is None:
+            new_kwargs[&#34;labeller_options&#34;] = self.labeller.options
+
+    # Merge option dictionaries, where available
+    if model_options is not None:
+        new_kwargs[&#34;model_options&#34;] = dict(self.model_options, **model_options)
+    else:
+        new_kwargs[&#34;model_options&#34;] = self.model_options
+
+    if labeller_options is not None:
+        if self.labeller is not None:
+            new_kwargs[&#34;labeller_options&#34;] = dict(
+                self.labeller.options, **labeller_options
+            )
+        else:
+            new_kwargs[&#34;labeller_options&#34;] = labeller_options
+
+    if vis_options is not None:
+        if self.vis_options is not None:
+            new_kwargs[&#34;vis_options&#34;] = dict(self.vis_options, **vis_options)
+        else:
+            new_kwargs[&#34;vis_options&#34;] = vis_options
+    else:
+        new_kwargs[&#34;vis_options&#34;] = self.vis_options
+
+    return ignis.probat.train_model(**new_kwargs)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Saves the Aurum object, including its associated Ignis model, to the given file.
+Essentially uses a bz2-compressed Pickle format.</p>
+<p>Also attempts to save any cached visualisation data, but the labeller is
+probably not pickle-able.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code> or <code>pathlib.Path</code></dt>
+<dd>File to save the model to</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, filename):
+    &#34;&#34;&#34;
+    Saves the Aurum object, including its associated Ignis model, to the given file.
+    Essentially uses a bz2-compressed Pickle format.
+
+    Also attempts to save any cached visualisation data, but the labeller is
+    probably not pickle-able.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        File to save the model to
+    &#34;&#34;&#34;
+    filename = pathlib.Path(filename)
+
+    # Copy the Ignis model, separate the external library&#39;s model out, pickle
+    # everything together
+    # (The model objects created by external libraries might not be pickle-able)
+    external_model = self.ignis_model.model
+    self.ignis_model.model = None
+    save_model = copy.deepcopy(self.ignis_model)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_model_file = pathlib.Path(tmpdir) / &#34;save_model.bin&#34;
+        # We assume that the external library&#39;s model object provides a `.save()`
+        # method that takes the filename as a string
+        tmp_model_file = str(tmp_model_file)
+        external_model.save(tmp_model_file)
+        with open(tmp_model_file, &#34;rb&#34;) as fp:
+            external_model_bytes = fp.read()
+
+    save_object = {
+        &#34;save_model&#34;: save_model,
+        &#34;model_type&#34;: save_model.model_type,
+        &#34;external_model_bytes&#34;: external_model_bytes,
+        # We should also be able to save any cached visualisation data, but the
+        # labeller is probably not pickle-able.
+        &#34;vis_type&#34;: self.vis_type,
+        &#34;vis_options&#34;: self.vis_options,
+        &#34;vis_data&#34;: self.vis_data,
+    }
+
+    with bz2.open(filename, &#34;wb&#34;) as fp:
+        pickle.dump(save_object, fp)
+
+    self.ignis_model.model = external_model</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.show_visualisation"><code class="name flex">
+<span>def <span class="ident">show_visualisation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Displays the prepared visualisation for this model.
+(Presumes that the <code><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code> class returns a situation-appropriate format,
+e.g., for display in a Jupyter notebook)</p>
+<h2 id="returns">Returns</h2>
+<p>The output of the <code>show_visualisation</code> method of the relevant <code><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code> class</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_visualisation(self):
+    &#34;&#34;&#34;
+    Displays the prepared visualisation for this model.
+    (Presumes that the `ignis.vis` class returns a situation-appropriate format,
+    e.g., for display in a Jupyter notebook)
+
+    Returns
+    -------
+    The output of the `show_visualisation` method of the relevant `ignis.vis` class
+    &#34;&#34;&#34;
+    vis_data = self.get_vis_data()
+
+    if self.vis_type == &#34;pyldavis&#34;:
+        return ignis.vis.pyldavis.show_visualisation(vis_data)
+    else:
+        raise RuntimeError(f&#34;Unknown saved visualisation type: &#39;{self.vis_type}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_by_ids"><code class="name flex">
+<span>def <span class="ident">slice_by_ids</span></span>(<span>self, doc_ids)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.corpus.CorpusSlice.slice_by_ids" href="corpus.html#ignis.corpus.CorpusSlice.slice_by_ids">CorpusSlice.slice_by_ids()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_by_ids(self, doc_ids):
+    &#34;&#34;&#34;
+    See `ignis.corpus.CorpusSlice.slice_by_ids()`
+    &#34;&#34;&#34;
+    return self.corpus_slice.slice_by_ids(doc_ids)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_by_tokens"><code class="name flex">
+<span>def <span class="ident">slice_by_tokens</span></span>(<span>self, tokens, include_root=False, human_readable=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.corpus.CorpusSlice.slice_by_tokens" href="corpus.html#ignis.corpus.CorpusSlice.slice_by_tokens">CorpusSlice.slice_by_tokens()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
+    &#34;&#34;&#34;
+    See `ignis.corpus.CorpusSlice.slice_by_tokens()`
+    &#34;&#34;&#34;
+    return self.corpus_slice.slice_by_tokens(tokens, include_root, human_readable)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_by_topic"><code class="name flex">
+<span>def <span class="ident">slice_by_topic</span></span>(<span>self, topic_id, within_top_n=1, ignore_topics=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience function to create a new CorpusSlice with Documents that come
+under a given topic in the current model.</p>
+<p>See <code><a title="ignis.models.base.BaseModel.get_topic_documents" href="models/base.html#ignis.models.base.BaseModel.get_topic_documents">BaseModel.get_topic_documents()</a></code> for details on the
+<code>within_top_n</code> and <code>ignore_topics</code> parameters.</p>
+<p>Note that <code>topic_id</code> starts from 1 and not 0.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>topic_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>within_top_n</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>ignore_topics</code></strong> :&ensp;<code>iterable</code> of <code>int</code>, optional</dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_by_topic(self, topic_id, within_top_n=1, ignore_topics=None):
+    &#34;&#34;&#34;
+    Convenience function to create a new CorpusSlice with Documents that come
+    under a given topic in the current model.
+
+    See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+    `within_top_n` and `ignore_topics` parameters.
+
+    Note that `topic_id` starts from 1 and not 0.
+
+    Parameters
+    ----------
+    topic_id: int
+    within_top_n: int, optional
+    ignore_topics: iterable of int, optional
+
+    Returns
+    -------
+    ignis.corpus.CorpusSlice
+    &#34;&#34;&#34;
+    return self.slice_by_topics([topic_id], within_top_n, ignore_topics)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_by_topics"><code class="name flex">
+<span>def <span class="ident">slice_by_topics</span></span>(<span>self, topic_ids, within_top_n=1, ignore_topics=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience function to create a new CorpusSlice with Documents that come
+under all the given topics in the current model.</p>
+<p>See <code><a title="ignis.models.base.BaseModel.get_topic_documents" href="models/base.html#ignis.models.base.BaseModel.get_topic_documents">BaseModel.get_topic_documents()</a></code> for details on the
+<code>within_top_n</code> parameter.</p>
+<p>Note that <code>topic_id</code> starts from 1 and not 0.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>topic_ids</code></strong> :&ensp;<code>iterable</code> of <code>int</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>within_top_n</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>ignore_topics</code></strong> :&ensp;<code>iterable</code> of <code>int</code>, optional</dt>
+<dd>Don't count any of these topics if they are within the top <code>n</code> for a
+document.
+E.g., for a document with top topics [5, 1, 3, &hellip;], setting
+<code>ignore_topics</code> to [5] will consider the document's top topics to be [1,
+3, &hellip;] instead.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_by_topics(self, topic_ids, within_top_n=1, ignore_topics=None):
+    &#34;&#34;&#34;
+    Convenience function to create a new CorpusSlice with Documents that come
+    under all the given topics in the current model.
+
+    See `ignis.models.base.BaseModel.get_topic_documents()` for details on the
+    `within_top_n` parameter.
+
+    Note that `topic_id` starts from 1 and not 0.
+
+    Parameters
+    ----------
+    topic_ids: iterable of int
+    within_top_n: int, optional
+    ignore_topics: iterable of int, optional
+        Don&#39;t count any of these topics if they are within the top `n` for a
+        document.  E.g., for a document with top topics [5, 1, 3, ...], setting
+        `ignore_topics` to [5] will consider the document&#39;s top topics to be [1,
+        3, ...] instead.
+
+    Returns
+    -------
+    ignis.corpus.CorpusSlice
+    &#34;&#34;&#34;
+    if ignore_topics is None:
+        ignore_topics = []
+
+    all_doc_ids = []
+    for doc_id in self.get_documents():
+        # This is a list of (&lt;topic&gt;, &lt;prob&gt;)
+        doc_topics = self.get_document_topics(
+            doc_id, within_top_n + len(ignore_topics)
+        )
+        doc_topics = sorted(doc_topics, key=lambda x: x[1], reverse=True)
+        checked_topics = 0
+        for topic, prob in doc_topics:
+            if topic not in ignore_topics:
+                # We&#39;ve seen one more topic for this document
+                checked_topics += 1
+
+            if checked_topics &gt; within_top_n:
+                # Exceeded the topic check limit for this document
+                break
+
+            if topic in topic_ids:
+                # Add it and go to the next document, we&#39;re done here
+                all_doc_ids.append(doc_id)
+                break
+
+    return self.slice_by_ids(all_doc_ids)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_filter"><code class="name flex">
+<span>def <span class="ident">slice_filter</span></span>(<span>self, filter_fn, include_root=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.corpus.CorpusSlice.slice_filter" href="corpus.html#ignis.corpus.CorpusSlice.slice_filter">CorpusSlice.slice_filter()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_filter(self, filter_fn, include_root=False):
+    &#34;&#34;&#34;
+    See `ignis.corpus.CorpusSlice.slice_filter()`
+    &#34;&#34;&#34;
+    return self.corpus_slice.slice_filter(filter_fn, include_root)</code></pre>
+</details>
+</dd>
+<dt id="ignis.aurum.Aurum.slice_without_tokens"><code class="name flex">
+<span>def <span class="ident">slice_without_tokens</span></span>(<span>self, tokens, include_root=False, human_readable=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>See <code><a title="ignis.corpus.CorpusSlice.slice_without_tokens" href="corpus.html#ignis.corpus.CorpusSlice.slice_without_tokens">CorpusSlice.slice_without_tokens()</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+    &#34;&#34;&#34;
+    See `ignis.corpus.CorpusSlice.slice_without_tokens()`
+    &#34;&#34;&#34;
+    return self.corpus_slice.slice_without_tokens(
+        tokens, include_root, human_readable
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div style="padding: 1em 0.5em">
+<a href="/ignis">
+<div style="display: flex; align-items: center">
+<img src="logo.png" alt="Ignis" height="50"/>
+<span style="font-size: 2em; font-weight: 700; margin-left: 0.75em">Ignis</span>
+</div>
+</a>
+</div>
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ignis" href="index.html">ignis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ignis.aurum.load_results" href="#ignis.aurum.load_results">load_results</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ignis.aurum.Aurum" href="#ignis.aurum.Aurum">Aurum</a></code></h4>
+<ul class="">
+<li><code><a title="ignis.aurum.Aurum.export_visualisation" href="#ignis.aurum.Aurum.export_visualisation">export_visualisation</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_coherence" href="#ignis.aurum.Aurum.get_coherence">get_coherence</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_document" href="#ignis.aurum.Aurum.get_document">get_document</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_document_top_topic" href="#ignis.aurum.Aurum.get_document_top_topic">get_document_top_topic</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_document_topics" href="#ignis.aurum.Aurum.get_document_topics">get_document_topics</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_documents" href="#ignis.aurum.Aurum.get_documents">get_documents</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_num_topics" href="#ignis.aurum.Aurum.get_num_topics">get_num_topics</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_topic_documents" href="#ignis.aurum.Aurum.get_topic_documents">get_topic_documents</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_topic_labels" href="#ignis.aurum.Aurum.get_topic_labels">get_topic_labels</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_topic_words" href="#ignis.aurum.Aurum.get_topic_words">get_topic_words</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.get_vis_data" href="#ignis.aurum.Aurum.get_vis_data">get_vis_data</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.init_labeller" href="#ignis.aurum.Aurum.init_labeller">init_labeller</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.init_vis" href="#ignis.aurum.Aurum.init_vis">init_vis</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.nb_explore_topics" href="#ignis.aurum.Aurum.nb_explore_topics">nb_explore_topics</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.resuggest_num_topics" href="#ignis.aurum.Aurum.resuggest_num_topics">resuggest_num_topics</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.retrain_model" href="#ignis.aurum.Aurum.retrain_model">retrain_model</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.save" href="#ignis.aurum.Aurum.save">save</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.show_visualisation" href="#ignis.aurum.Aurum.show_visualisation">show_visualisation</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_by_ids" href="#ignis.aurum.Aurum.slice_by_ids">slice_by_ids</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_by_tokens" href="#ignis.aurum.Aurum.slice_by_tokens">slice_by_tokens</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_by_topic" href="#ignis.aurum.Aurum.slice_by_topic">slice_by_topic</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_by_topics" href="#ignis.aurum.Aurum.slice_by_topics">slice_by_topics</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_filter" href="#ignis.aurum.Aurum.slice_filter">slice_filter</a></code></li>
+<li><code><a title="ignis.aurum.Aurum.slice_without_tokens" href="#ignis.aurum.Aurum.slice_without_tokens">slice_without_tokens</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
