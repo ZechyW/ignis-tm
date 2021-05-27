@@ -16,3 +16,13 @@ train_model = ignis.probat.train_model
 suggest_num_topics = ignis.probat.suggest_num_topics
 
 load_results = ignis.aurum.load_results
+
+# Documentation
+__pdoc__ = {"tests": False}
+__all__ = [
+    "load_corpus",
+    "load_slice",
+    "train_model",
+    "suggest_num_topics",
+    "load_results",
+]

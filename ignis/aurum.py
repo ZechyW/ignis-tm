@@ -1,3 +1,8 @@
+"""
+`ignis.aurum.Aurum` instances manage the results of topic modelling runs, and provide
+methods for exploring and iterating over them.
+"""
+
 import bz2
 import copy
 import json
@@ -12,15 +17,11 @@ import ignis.vis.pyldavis
 
 class Aurum:
     """
-    Aurum instances hold the results of performing topic modelling over
-    :class:`~ignis.corpus.Document` instances. They provide methods for easily
-    exploring the results and iterating over the topic modelling process.
-
-    Aurum objects basically bring together the public APIs for Ignis models,
-    automated labellers, and visualisation data providers, while also providing general
+    `Aurum` objects bring together the public APIs for `ignis` models, automated
+    labellers, and visualisation data providers, while also providing general
     save/load functionality.
 
-    NOTE: All topic IDs retrieved from Aurum instances are 1-indexed rather than
+    **NOTE**: All topic IDs retrieved from `Aurum` instances are 1-indexed rather than
     0-indexed. So a model with 5 topics has topic IDs `[1, 2, 3, 4, 5]` and not
     `[0, 1, 2, 3, 4]`.
 
@@ -30,7 +31,7 @@ class Aurum:
     Parameters
     ----------
     ignis_model: ignis.models.base.BaseModel
-        The specific Ignis topic model used to generate this Aurum object.
+        The specific `ignis` model used to generate this `Aurum` object.
     """
 
     def __init__(self, ignis_model):
@@ -52,16 +53,20 @@ class Aurum:
 
     def save(self, filename):
         """
-        Saves the Aurum object, including its associated Ignis model, to the given file.
+        Saves the `Aurum` object, including its associated `ignis.models` model,
+        to the given file.
         Essentially uses a bz2-compressed Pickle format.
 
-        Also attempts to save any cached visualisation data, but the labeller is
-        probably not pickle-able.
+        Also attempts to save any cached visualisation data, but will omit any
+        initialised automated labeller (since labellers are probably not pickle-able).
+
+        We recommend using _.aurum_ as the canonical file extension, but this is not
+        strictly enforced by the library.
 
         Parameters
         ----------
         filename: str or pathlib.Path
-            File to save the model to
+            File to save the model to.
         """
         filename = pathlib.Path(filename)
 
@@ -103,89 +108,219 @@ class Aurum:
     # values work better with different models)
     def get_num_topics(self):
         """
-        See `ignis.models.base.BaseModel.get_num_topics()`
+        See `ignis.models.base.BaseModel.get_num_topics()`.
         """
         return self.ignis_model.get_num_topics()
 
     def get_topic_words(self, *args, **kwargs):
         """
-        See `ignis.models.base.BaseModel.get_topic_words()`
+        See `ignis.models.base.BaseModel.get_topic_words()`.
         """
         return self.ignis_model.get_topic_words(*args, **kwargs)
 
     def get_topic_documents(self, *args, **kwargs):
         """
-        See `ignis.models.base.BaseModel.get_topic_documents()`
+        See `ignis.models.base.BaseModel.get_topic_documents()`.
         """
         return self.ignis_model.get_topic_documents(*args, **kwargs)
 
     def get_document_topics(self, *args, **kwargs):
         """
-        See `ignis.models.base.BaseModel.get_document_topics()`
+        See `ignis.models.base.BaseModel.get_document_topics()`.
         """
         return self.ignis_model.get_document_topics(*args, **kwargs)
 
     def get_document_top_topic(self, *args, **kwargs):
         """
-        See `ignis.models.base.BaseModel.get_document_top_topic()`
+        See `ignis.models.base.BaseModel.get_document_top_topic()`.
         """
         return self.ignis_model.get_document_top_topic(*args, **kwargs)
 
     def get_coherence(self, *args, **kwargs):
         """
-        See `ignis.models.base.BaseModel.get_coherence()`
+        See `ignis.models.base.BaseModel.get_coherence()`.
         """
         return self.ignis_model.get_coherence(*args, **kwargs)
 
     # =================================================================================
     # Corpus Slice
-    def get_documents(self):
+    @property
+    def document_ids(self):
         """
-        Get the IDs of all the documents that are covered by this Ignis model.
+        Get the IDs of all the `ignis.corpus.Document` objects that are covered by this
+        `ignis` model.
 
         Returns
         -------
-        iterable of str
+        iterable of uuid.UUID
         """
-        return list(self.corpus_slice.documents.keys())
+        return list(self.corpus_slice.document_ids)
 
     def get_document(self, *args, **kwargs):
         """
-        See `ignis.corpus.CorpusSlice.get_document()`
+        See `ignis.corpus.CorpusSlice.get_document()`.
         """
         return self.corpus_slice.get_document(*args, **kwargs)
 
-    def slice_by_ids(self, doc_ids):
+    def slice_by_ids(self, doc_ids, include_root=False):
         """
-        See `ignis.corpus.CorpusSlice.slice_by_ids()`
-        """
-        return self.corpus_slice.slice_by_ids(doc_ids)
+        Slice the model's input dataset by the given `ignis.corpus.Document` IDs.
 
-    def slice_by_tokens(self, tokens, include_root=False, human_readable=False):
-        """
-        See `ignis.corpus.CorpusSlice.slice_by_tokens()`
-        """
-        return self.corpus_slice.slice_by_tokens(tokens, include_root, human_readable)
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
 
-    def slice_without_tokens(self, tokens, include_root=False, human_readable=False):
+        See `ignis.corpus.CorpusSlice.slice_by_ids()` for more details.
         """
-        See `ignis.corpus.CorpusSlice.slice_without_tokens()`
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_by_ids(doc_ids)
+
+    def slice_by_token(self, token, include_root=False):
         """
-        return self.corpus_slice.slice_without_tokens(
-            tokens, include_root, human_readable
-        )
+        Slice the model's input dataset by the given token.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_by_token()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_by_token(token)
+
+    def slice_by_tokens(self, tokens, include_root=False):
+        """
+        Slice the model's input dataset by tokens.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_by_tokens()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_by_tokens(tokens)
+
+    def slice_without_token(self, token, include_root=False):
+        """
+        Slice the model's input dataset by removing `ignis.corpus.Document` objects
+        that contain the given token.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_without_token()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_without_token(token)
+
+    def slice_without_tokens(self, tokens, include_root=False):
+        """
+        Slice the model's input dataset by removing `ignis.corpus.Document` objects
+        that contain any of the given tokens.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_without_tokens()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_without_tokens(tokens)
+
+    def slice_by_text_string(self, text_string, include_root=False):
+        """
+        Slice the model's input dataset by the given text string.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_by_text_string()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_by_text_string(text_string)
+
+    def slice_by_text_strings(self, text_strings, include_root=False):
+        """
+        Slice the model's input dataset by the given text strings.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_by_text_strings()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_by_text_strings(text_strings)
+
+    def slice_without_text_string(self, text_string, include_root=False):
+        """
+        Slice the model's input dataset by removing `ignis.corpus.Document` objects
+        that contain the given text string.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_without_token()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_without_text_string(text_string)
+
+    def slice_without_text_strings(self, text_strings, include_root=False):
+        """
+        Slice the model's input dataset by removing `ignis.corpus.Document` objects
+        that contain any of the given text strings.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_without_tokens()` for more details.
+        """
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_without_text_strings(text_strings)
 
     def slice_filter(self, filter_fn, include_root=False):
         """
-        See `ignis.corpus.CorpusSlice.slice_filter()`
+        Slice the model's input dataset using some custom `filter_fn`.
+
+        If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
+        instead of just the model's current `ignis.corpus.CorpusSlice`.
+
+        See `ignis.corpus.CorpusSlice.slice_filter()` for more details.
         """
-        return self.corpus_slice.slice_filter(filter_fn, include_root)
+        base_slice = self.corpus_slice
+        if include_root:
+            base_slice = base_slice.root
+
+        return base_slice.slice_filter(filter_fn)
 
     # =================================================================================
     # Automated Labeller
     def init_labeller(self, labeller_type, **labeller_options):
         """
-        Trains an automated labeller for this Aurum object
+        Trains an automated `ignis.labeller` for this `Aurum` object.
 
         Parameters
         ----------
@@ -204,7 +339,7 @@ class Aurum:
 
     def get_topic_labels(self, topic_id, top_n):
         """
-        See `ignis.labeller.tomotopy.get_topic_labels()`
+        See `ignis.labeller.tomotopy.get_topic_labels()`.
         """
         if self.labeller is None:
             raise RuntimeError(
@@ -218,16 +353,16 @@ class Aurum:
     # TODO: Move `vis_data` into a full visualisation object, like the labeller/model?
     def init_vis(self, vis_type, force=False, **vis_options):
         """
-        Prepares a visualisation for this Aurum object in the given format
+        Prepares the visualisation data for this `Aurum` object in the specified
+        format.
 
         Parameters
         ----------
         vis_type: {"pyldavis", "clear"}
-            String denoting the visualisation type.  Setting to "clear" will remove
+            String denoting the visualisation type.  Passing `"clear"` will remove
             any existing visualisation data.
         force: bool, optional
-            If `self.vis_data` is already set, it will not be recalculated unless
-            `force` is set.
+            Forces recalculation of `self.vis_data`, if it already exists.
         **vis_options
             Keyword arguments that are passed to the constructor for the given
             visualisation type.
@@ -255,6 +390,9 @@ class Aurum:
     def get_vis_data(self):
         """
         Returns the prepared visualisation data for this model, if any.
+
+        Different visualisation classes may have different ways of storing and
+        representing this data.
         """
         if self.vis_data is None:
             raise RuntimeError(
