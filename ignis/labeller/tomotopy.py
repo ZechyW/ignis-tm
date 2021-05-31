@@ -1,3 +1,10 @@
+"""
+Topic labelling using `tomotopy`.
+
+These functions should be called by `ignis.aurum.Aurum` methods; end-users should not
+need to invoke them directly.
+"""
+
 import ignis.util
 
 tp = ignis.util.LazyLoader("tomotopy")
@@ -5,23 +12,23 @@ tp = ignis.util.LazyLoader("tomotopy")
 
 class TomotopyLabeller:
     """
-    Provides an interface to the Tomotopy First-order relevance labeller
+    Provides an interface to the `tomotopy` First-order Relevance labeller.
 
     Parameters
     ----------
-    model: tp.LDAModel
+    model: tomotopy.LDAModel
         A trained Tomotopy model
     verbose: bool, optional
         Whether or not to print verbose progress messages
     workers: int, optional
         Number of worker processes to use for the labeller -- Note that this *might*
         affect other random processes (e.g., the topic modelling proper) because it
-        affects the parallelisation operations
+        affects the order of concurrent/parallel operations
 
     Other Parameters
     ----------------
-    The other keyword arguments are labeller-specific options (See Tomotopy docs for
-    details)
+    The other keyword arguments are labeller-specific options.
+    (See the `tomotopy` docs for details.)
     """
 
     def __init__(
@@ -75,23 +82,23 @@ class TomotopyLabeller:
 
     def get_topic_labels(self, topic_id, top_n=10):
         """
-        Gets the `top_n` labels from the saved Tomotopy FoRelevance labeller for the
-        given `topic_id`.
+        Gets the `top_n` labels from the saved `tomotopy.label.FoRelevance` labeller
+        for the given `topic_id`.
 
-        NOTE: `topic_id` should start from 1 and not 0;
-        i.e., it should be in `range(1, len(topics) + 1)`
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`.
 
         Parameters
         ----------
         topic_id: int
-            Topic ID to label
+            ID of the topic to label.
         top_n: int
-            Number of labels to generate
+            Number of highest-scoring labels to generate.
 
         Returns
         -------
-        tuple of [str, float]
-            Returns (<label>, <score>) for each of the `top_n` labels for the topic.
+        tuple of (str, float)
+            Returns (`label`, `score`) for each of the `top_n` labels for the topic.
         """
         # Tomotopy topics are 0-indexed
         tp_topic_id = topic_id - 1

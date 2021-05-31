@@ -1,3 +1,7 @@
+"""
+An improved automated n-gram detection mechanism built on top of the `gensim` Phraser.
+"""
+
 import math
 import time
 import uuid
@@ -10,35 +14,39 @@ from ignis.util.lazy_loader import LazyLoader
 class ImprovedPhraser:
     """
     A slightly different implementation of automated n-gram detection derived from
-    Gensim's Phraser
+    the `gensim` Phraser:
 
-    - Applies to highest-scoring and longest n-grams in a document first
-    - Chained n-grams that have the same score are combined into a single n-gram
-      (e.g., if "quick brown" and "brown fox" have the same score, a new n-gram
-      "quick brown fox" is created with that score)
-
-    Assumes that its input is an iterable of strings (Gensim's phraser model works
-    with bytes by default)
+    - Applies to highest-scoring and longest n-grams in a document first.
+    - Chained n-grams that have the same score are combined into a single n-gram.
+      (E.g., if "quick brown" and "brown fox" have the same score, a new n-gram
+      "quick brown fox" is created with that score.)
 
     Parameters
     ----------
     sentences: iterable of iterable of str
-        Required argument that will be passed to `gensim.models.Phrases` to generate
-        the base n-gram model
+        Passed to `gensim.models.Phrases` to generate the base n-gram model.
     min_count, threshold, max_vocab_size, scoring, common_terms: optional
         Optional arguments that will be passed directly to `gensim.models.Phrases` to
-        generate the base n-gram model
+        generate the base n-gram model.
     delimiter: str, optional
-        Delimiter to join detected phrases with. Will not actually be passed to the
-        underlying Gensim model (which expects bytes and not a string anyway).
+        Delimiter to join detected phrases with.
+
+        This will not actually be passed to the underlying `gensim` model, and will
+        only be used at the output stage.
     drop_non_alpha: bool, optional
         Whether or not to include phrases that consist entirely of non-alphabetic
         strings. Will drop them by default.
     verbose: bool, optional
+        Whether or not to print verbose progress messages.
     """
 
     def __init__(
-        self, sentences, delimiter=" ", drop_non_alpha=True, verbose=False, **kwargs,
+        self,
+        sentences,
+        delimiter=" ",
+        drop_non_alpha=True,
+        verbose=False,
+        **kwargs,
     ):
         start_time = time.perf_counter()
 
@@ -46,12 +54,13 @@ class ImprovedPhraser:
 
         gensim = LazyLoader("gensim")
 
+        # Keyword arguments taken by `gensim`
         gensim_kwarg_names = [
             "min_count",
             "threshold",
             "max_vocab_size",
             "scoring",
-            "common_terms",
+            "connector_words",
         ]
         gensim_kwargs = {
             key: value
@@ -59,23 +68,27 @@ class ImprovedPhraser:
             if key in gensim_kwarg_names and value is not None
         }
 
-        # Pass a bogus delimiter to gensim -- The default of b"_" will throw off the
+        # Pass a bogus delimiter to gensim -- The default of "_" will throw off the
         # phrase scores if any terms already have underscores in them
-        gensim_kwargs["delimiter"] = b"<*ignis*>"
+        gensim_kwargs["delimiter"] = "<*ignis*>"
 
         model = gensim.models.Phrases(sentences=sentences, **gensim_kwargs)
-        model = gensim.models.phrases.Phraser(model)
+        model = model.freeze()
         model = model.phrasegrams.items()
 
         elapsed = time.perf_counter() - start_time
         start_time = time.perf_counter()
         if verbose:
-            print(f"Gensim Phraser initialised. {elapsed:.3f}s", flush=True)
+            print(f"Gensim Phraser initialised. {elapsed:.2f}s", flush=True)
 
         # model is a list of tuples(<n-gram>, <score>), where <n-gram> is a
         # tuple (<token 1>, <token 2>, ...).
         # N.B.: Gensim treats all the tokens as bytes, so we will need to .decode()
         # to strings when using them below.
+        # ---------------------------------------------------
+        # P.S.: The above is no longer true with Gensim >= 4.
+        # model is a list of tuples (<n-gram>, <score>), where <n-gram> is a string
+        # "<token 1><delimiter><token 2>"
 
         # The final list of sorted phrases
         self.phrases = []
@@ -87,9 +100,9 @@ class ImprovedPhraser:
             score_phrases = set(
                 phrase for phrase, score in model if score == score_tier
             )
-            # Decode the byte tokens in the phrase tuple
             score_phrases = set(
-                tuple(token.decode() for token in phrase) for phrase in score_phrases
+                tuple(phrase.split(gensim_kwargs["delimiter"]))
+                for phrase in score_phrases
             )
 
             # Recursively expanded phrase list (including "chained" phrases),
@@ -142,7 +155,14 @@ class ImprovedPhraser:
                         if phrase[-1] == other[0]:
                             new_phrase = phrase + other[1:]
 
-                        if new_phrase and new_phrase not in merged:
+                        # We also want to put in a hard limit on merged token length,
+                        # in case we get phrases like (a, b), (b, c), (c, a), (a, c),
+                        # etc. with many combinations.
+                        if (
+                            new_phrase
+                            and new_phrase not in merged
+                            and len(new_phrase) <= 5
+                        ):
                             merged.add(new_phrase)
                             done = False
 
@@ -158,7 +178,7 @@ class ImprovedPhraser:
         # And done -- Ready to phrase.
         elapsed = time.perf_counter() - start_time
         if verbose:
-            print(f"Improved Phraser initialised. {elapsed:.3f}s", flush=True)
+            print(f"Improved Phraser initialised. {elapsed:.2f}s", flush=True)
 
     def _map_by_first_token(self):
         """
@@ -173,6 +193,84 @@ class ImprovedPhraser:
                 self.by_first[head] = []
             self.by_first[head].append((phrase, score))
 
+    def find_ngram_single(self, doc, threshold=-math.inf):
+        """
+        Perform n-gram replacement for a single document using the phrase model
+        trained for this instance.
+
+        Parameters
+        ----------
+        doc: iterable of str
+            The document to phrase, as an iterable of string tokens.
+        threshold: float, optional
+            Optionally set a new phrasing threshold; if not set, will apply all the
+            available phrases (which are determined by the value of `threshold` passed
+            to the base `gensim` model on init)
+
+        Returns
+        -------
+        iterable of str
+            The document after it has undergone phrasing.
+        """
+        # Find all candidate phrase chains originating from each token,
+        # then merge the highest-scoring one.
+        new_doc = doc[:]
+        index = 0
+
+        while index < len(new_doc):
+            token = new_doc[index]
+
+            # Short-circuit here if there are no phrases that start with this token
+            # (i.e., there aren't even any candidate phrases)
+            if token not in self.by_first:
+                index += 1
+                continue
+
+            best_candidate = self._find_best_candidate(token, index, new_doc, threshold)
+
+            if best_candidate is None:
+                # We checked the candidate phrases, and none of them fit
+                index += 1
+                continue
+
+            # Preemptively merge any candidates found in the chain starting from
+            # this token
+            exhausted_chain = False
+            while best_candidate["start_index"] > index:
+                # Merge
+                new_doc[
+                    best_candidate["start_index"] : best_candidate["start_index"]
+                    + len(best_candidate["phrase"])
+                ] = [self.delimiter.join(best_candidate["phrase"])]
+
+                # Get the next highest scoring candidate in the chain
+                best_candidate = self._find_best_candidate(
+                    token, index, new_doc, threshold
+                )
+
+                if best_candidate is None:
+                    # There is no candidate for merging anywhere in the chain,
+                    # including directly from the current token...
+                    exhausted_chain = True
+                    break
+
+            if exhausted_chain:
+                # ... so continue with the next token in the document
+                # (Can't break out of the inner loop and continue the outer one in
+                # one command)
+                index += 1
+                continue
+
+            # Still here? Then there is a best candidate phrase for merging,
+            # and it starts on this token
+            assert best_candidate["start_index"] == index
+            new_doc[index : index + len(best_candidate["phrase"])] = [
+                self.delimiter.join(best_candidate["phrase"])
+            ]
+            index += 1
+
+        return new_doc
+
     def find_ngrams(self, docs, threshold=-math.inf, verbose=False):
         """
         Perform n-gram replacement on the given documents using the phrase model
@@ -183,23 +281,25 @@ class ImprovedPhraser:
         documentation).
 
         To detect the next higher order of n-grams (viz., trigrams and above),
-        you will need to create a new ImprovedPhraser instance, passing the results
+        you will need to create a new `ImprovedPhraser` instance, passing the results
         of this function as the new set of base sentences to use.
 
         Parameters
         ----------
         docs: iterable of iterable of str
-            Each doc in docs should be an iterable of strings -- Substring matching
-            will be used in the replacement process
+            Each doc in docs should be an iterable of string tokens.
         threshold: float, optional
             Optionally set a new phrasing threshold; if not set, will apply all the
             available phrases (which are determined by the value of `threshold`
-            passed to the base gensim model on init)
+            passed to the base `gensim` model on init).
         verbose: bool, optional
+            Whether or not to show the phrasing progress.
 
         Returns
         -------
         iterable of iterable of str
+            The documents, each an iterable of strings, after they have undergone
+            phrasing.
         """
         new_docs = []
 
@@ -207,60 +307,14 @@ class ImprovedPhraser:
             docs = tqdm(docs)
 
         for doc in docs:
-            # Find all candidate phrase chains originating from each token,
-            # then merge the highest-scoring one.
-            new_doc = doc[:]
-            index = 0
-            while index < len(new_doc):
-                token = new_doc[index]
-                best_candidate = self._find_best_candidate(
-                    token, index, new_doc, threshold
-                )
-
-                # No phrases starting on this token
-                if best_candidate is None:
-                    index += 1
-                    continue
-
-                # Preemptively merge any candidates found in the chain starting from
-                # this token
-                exhausted_chain = False
-                while best_candidate["start_index"] > index:
-                    # Merge
-                    new_doc[
-                        best_candidate["start_index"] : best_candidate["start_index"]
-                        + len(best_candidate["phrase"])
-                    ] = [self.delimiter.join(best_candidate["phrase"])]
-
-                    # Get the next highest scoring candidate in the chain
-                    best_candidate = self._find_best_candidate(
-                        token, index, new_doc, threshold
-                    )
-
-                    if best_candidate is None:
-                        # There is no candidate for merging anywhere in the chain,
-                        # including directly from the current token...
-                        exhausted_chain = True
-                        break
-
-                if exhausted_chain:
-                    # ... so continue with the next token in the document
-                    index += 1
-                    continue
-
-                # Still here? Then there is a best candidate phrase for merging,
-                # and it starts on this token
-                assert best_candidate["start_index"] == index
-                new_doc[index : index + len(best_candidate["phrase"])] = [
-                    self.delimiter.join(best_candidate["phrase"])
-                ]
-                index += 1
-
+            new_doc = self.find_ngram_single(doc, threshold)
             new_docs.append(new_doc)
 
         return new_docs
 
-    def _find_best_candidate(self, start_token, start_index, document, threshold):
+    def _find_best_candidate(
+        self, start_token, start_index, document, threshold, nesting_level=0
+    ):
         """
         Examines all the candidate phrase chains originating from the given token in
         this Phraser model and returns the highest-scoring one.
@@ -276,6 +330,9 @@ class ImprovedPhraser:
         start_index
         document
         threshold
+        nesting_level: int
+            How many times we have recursively checked for best candidates within
+            best candidates -- We set a sane hard limit on this.
 
         Returns
         -------
@@ -283,6 +340,11 @@ class ImprovedPhraser:
         None if `start_token` is not in the model's phrases
         """
         if start_token not in self.by_first:
+            return None
+
+        if nesting_level >= 10:
+            # Short-circuit, we don't need to go so deep looking for candidates,
+            # especially since our max candidate length is also hard-limited
             return None
 
         # Maps next `start_token` -> `start_index` entries for recursion
@@ -295,7 +357,9 @@ class ImprovedPhraser:
             if score < threshold:
                 continue
 
-            if document[start_index : start_index + len(phrase)] == phrase:
+            doc_tokens = document[start_index : start_index + len(phrase)]
+
+            if tuple(doc_tokens) == tuple(phrase):
                 # Found a candidate chain
                 this_candidate = dict(
                     start_index=start_index, phrase=phrase, score=score
@@ -327,7 +391,11 @@ class ImprovedPhraser:
         # Cash out the chains in `next_starts`
         for next_start, next_index in next_starts.items():
             next_candidate = self._find_best_candidate(
-                next_start, next_index, document, threshold
+                next_start,
+                next_index,
+                tuple(document),
+                threshold,
+                nesting_level=nesting_level + 1,
             )
             if next_candidate is None:
                 continue
@@ -339,67 +407,3 @@ class ImprovedPhraser:
                 best_candidate = next_candidate
 
         return best_candidate
-
-    def find_ngrams_str(self, docs, threshold=-math.inf):
-        """
-        Perform n-gram replacement on the given documents using the phrase model
-        trained for this instance.
-
-        Version that uses string replacement: Much slower and slightly divergent from
-        the default algorithm, which always ensures that the right-most relevant
-        n-gram is merged first.
-
-        Parameters
-        ----------
-        docs: iterable of iterable of str
-            Each doc in docs should be an iterable of strings -- Substring matching
-            will be used in the replacement process
-        threshold: float, optional
-            Optionally set a new phrasing threshold; if not set, will apply all the
-            available phrases (which are determined by the value of `threshold`
-            passed to the base gensim model on init)
-
-        Returns
-        -------
-        iterable of iterable of str
-        """
-        # A "safe" delimiter that will be used for the intermediate string joins;
-        # should be guaranteed to be different from `self.delimiter` so that we can
-        # perform recursive phrasing without inadvertently re-splitting previously
-        # joined tokens
-        search_delimiter = f"<*>"
-
-        new_docs = []
-        for doc in docs:
-            # In case we really need a new delimiter: Use part of a UUID (not the
-            # whole, to conserve memory)
-            while search_delimiter in doc or search_delimiter == self.delimiter:
-                search_delimiter = f"<{str(uuid.uuid4())[:3]}>"
-
-            str_doc = search_delimiter.join(doc)
-
-            for phrase, score in self.phrases:
-                if score < threshold or phrase[0] not in doc:
-                    continue
-
-                search_phrase = search_delimiter.join(phrase)
-                replace_phrase = self.delimiter.join(phrase)
-
-                str_phrase = f"{search_delimiter}{search_phrase}{search_delimiter}"
-                str_replace = f"{search_delimiter}{replace_phrase}{search_delimiter}"
-                str_doc = str_doc.replace(str_phrase, str_replace)
-
-                # Handle matches at start/end of lines
-                start_phrase = f"{search_phrase}{search_delimiter}"
-                start_replace = f"{replace_phrase}{search_delimiter}"
-                end_phrase = f"{search_delimiter}{search_phrase}"
-                end_replace = f"{search_delimiter}{replace_phrase}"
-
-                if str_doc.startswith(start_phrase):
-                    str_doc = start_replace + str_doc[len(start_phrase) :]
-                if str_doc.endswith(end_phrase):
-                    str_doc = str_doc[0 : -len(end_phrase)] + end_replace
-
-            new_docs.append(str_doc.split(search_delimiter))
-
-        return new_docs
