@@ -1,25 +1,30 @@
+"""
+Base class for all `ignis` models.
+Should never be instantiated directly.
+"""
+
 import ignis.corpus
 
 
 class BaseModel:
     """
-    The base class for all Ignis models.
+    The base class for all `ignis` models.
 
     Implemented child classes have the freedom to define their own default values for
     each method.
 
-    NOTE: All Ignis models should have topic IDs that start from 1 and not 0;
-    i.e., they should be in range(1, num_topics + 1)
+    **NOTE**: All `ignis` models should have topic IDs that are 1-indexed,
+    not 0-indexed (i.e., they should be in `range(1, len(topics) + 1)`).
 
     Parameters
     ----------
     corpus_slice: ignis.corpus.CorpusSlice
-        The CorpusSlice to train the model on
+        The `ignis.corpus.CorpusSlice` to train the model on.
     options: dict, optional
-        Model-specific options
+        Model-specific options.
     """
 
-    def __init__(self, corpus_slice, options=None):
+    def __init__(self, corpus_slice, *args, options=None, **kwargs):
         # Save a reference to the CorpusSlice we are modelling over
         self.corpus_slice = corpus_slice
 
@@ -34,36 +39,48 @@ class BaseModel:
         # The actual model, as created by the external topic modelling library
         self.model = None
 
+    def train(self):
+        """
+        Trains the topic model with its configured options on its configured
+        `ignis.corpus.CorpusSlice`.
+        """
+        raise NotImplementedError()
+
     def get_num_topics(self):
         """
+        Get the number of topics in a trained topic model.
+
         Returns
         -------
         int
-            The number of topics in the trained model
         """
-        pass
+        raise NotImplementedError()
 
     def get_topic_words(self, topic_id, top_n):
         """
-        NOTE: `topic_id` should start from 1 and not 0;
-        i.e., it should be in `range(1, len(topics) + 1)`
+        Get the `n` most probable words for a given topic.
+
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`).
 
         Parameters
         ----------
-        topic_id
-        top_n
+        topic_id: int
+            The 1-indexed ID of the topic to consider.
+        top_n: int
+            The number of most probable words to return for the topic.
 
         Returns
         -------
-        iterable
-            The `top_n` words in the topic `topic_id`, as a list of (<word:str>,
-            <probability:float>)
+        iterable of tuple
+            A list of tuples of (`word`, `probability`).
         """
-        pass
+        raise NotImplementedError()
 
     def get_topic_documents(self, topic_id, within_top_n):
         """
-        Find Documents that have Topic `topic_id` within its `n` most probable topics.
+        Find `ignis.corpus.Document` objects that have the topic with the given
+        `topic_id` within their `n` most probable topics.
 
         Because topics are distributions over terms and documents are distributions
         over topics, documents don't belong to individual topics per se -- As such,
@@ -75,74 +92,77 @@ class BaseModel:
         gathered into one or two topics, and we don't want to rule out a document if
         its single most probable topic is the stopword topic.
 
-        NOTE: `topic_id` should start from 1 and not 0;
-        i.e., it should be in `range(1, len(topics) + 1)`
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`).
 
         Parameters
         ----------
-        topic_id
-        within_top_n
+        topic_id: int
+            The 1-indexed ID of the topic to consider.
+        within_top_n: int
+            The top `n` topics per `ignis.corpus.Document` to look for `topic_id` in.
 
         Returns
         -------
-        iterable of tuples
-            A list of tuples (<Document ID>, <topic_id probability>)
+        iterable of tuple
+            A list of tuples of (`Document ID`, `topic_id probability`)
         """
-        pass
+        raise NotImplementedError()
 
     def get_document_topics(self, doc_id, top_n):
         """
-        Get the top `n` most probable topics for the Document with the given ID.
+        Get the top `n` most probable topics for the `ignis.corpus.Document` with the
+        given ID.
 
         Children must accept either a string or UUID for `doc_id`.
 
-        NOTE: The topic IDs in the results start from 1 and not 0.
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`).
 
         Parameters
         ----------
         doc_id: str or uuid.UUID
-        top_n
+            The ID for the `ignis.corpus.Document`.
+        top_n: int
+            The number of top topics to return.
 
         Returns
         -------
-        iterable of tuples
-            A list of tuples (<topic ID>, <probability>)
+        iterable of tuple
+            A list of tuples of (`topic ID`, `probability`)
         """
-        pass
+        raise NotImplementedError()
 
     def get_document_top_topic(self, doc_id):
         """
-        Get the topic with the highest probability for the given document
+        Get the most probable topic for a given `ignis.corpus.Document`.
+
+        Children must accept either a string or UUID for `doc_id`.
 
         Parameters
         ----------
-        doc_id
+        doc_id: str or uuid.UUID
+            ID for some `ignis.corpus.Document`.
 
         Returns
         -------
-        tuple
-            A single tuple (<topic ID>, <probability>)
+        int
+            The 1-indexed ID for the given `ignis.corpus.Document` object's top topic.
         """
-        pass
+        raise NotImplementedError()
 
-    def get_coherence(self, coherence, top_n, window_size, processes):
+    def get_coherence(self, **kwargs):
         """
-        Use Gensim's `models.coherencemodel` to get a coherence score for a trained
-        model.
+        Gets the current coherence score for a trained model.
 
         Parameters
         ----------
-        coherence: {"u_mass", "c_v", "c_uci", "c_npmi"}
-            Coherence measure to calculate
-        top_n: int
-            Number of top words to extract from each topic
-        window_size: int
-            Window size for "c_v", "c_uci", and "c_npmi"
-        processes: int
-            Number of worker processes
+        **kwargs
+            Children are free to define their own coherence calculation pipelines.
 
         Returns
         -------
         float
+            The current coherence score for the model.
         """
-        pass
+        raise NotImplementedError()

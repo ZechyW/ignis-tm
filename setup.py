@@ -14,6 +14,14 @@ here = pathlib.Path(__file__).parent.resolve()
 # Get the long description from the README file
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
+# Get the version from the package sources
+# (Following the recommendation at packaging.python.org)
+with open(here / "ignis" / "__version__.py") as fp:
+    for line in fp:
+        if line.startswith("__version__"):
+            delimiter = '"' if '"' in line else "'"
+            version = line.split(delimiter)[1]
+
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
 setup(
@@ -35,7 +43,7 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.1.9",  # Required
+    version=version,  # Required
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary

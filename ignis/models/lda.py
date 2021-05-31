@@ -1,9 +1,12 @@
-import collections
+"""
+Topic modelling using a `tomotopy` LDA model.
+"""
+
+import os
 import pathlib
 import tempfile
 import time
 import uuid
-import warnings
 
 from tqdm.auto import tqdm
 
@@ -11,69 +14,92 @@ import ignis.util
 from .base import BaseModel
 
 tp = ignis.util.LazyLoader("tomotopy")
-gensim = ignis.util.LazyLoader("gensim")
 
 default_options = {
-    "term_weighting": "one",
+    "term_weighting": "pmi",
     "k": 10,
     "seed": 11399,
-    "workers": 8,
+    # If "auto", will attempt to detect the number of available CPU cores and use
+    # half that as the number of workers.
+    "workers": "auto",
     "parallel_scheme": "default",
     "iterations": 2000,
     "update_every": 500,
     "until_max_ll": False,
     "until_max_coherence": False,
     "max_extra_iterations": 2000,
-    "verbose": False,
+    "verbose": True,
+    # --------------------------------------
     # Model options
     # Document-topic
+    # N.B.: If hyper-parameter optimisation is on, setting this parameter manually
+    # will not have much effect.
     "alpha": 0.1,
     # Topic-word
-    "eta": 0.01,
+    # N.B.: This parameter can significantly affect the modelling results even if
+    # optimisation is on.
+    # Tomotopy's default is 0.01
+    # If "auto", will use 1 / k
+    "eta": "auto",
+    # --------------------------------------
+    # Automatic hyper-parameter optimisation
+    # Number of burn-in iterations (Tomotopy's default is 0)
+    "burn_in": 100,
+    # Optimisation interval (set to 0 to turn off)
+    "optim_interval": 10,
 }
 
 
 class LDAModel(BaseModel):
     """
-    An Ignis model that wraps a Tomotopy LDA model.
+    An Ignis model that wraps a `tomotopy` LDA model.
+
+    The configurable keys for the `options` dictionary are described in the "Other
+    Parameters" section.
 
     Parameters
     ----------
     corpus_slice: ignis.corpus.CorpusSlice
-        The CorpusSlice to train the model on
+        The `ignis.corpus.CorpusSlice` to train the model on.
     options: dict, optional
-        Model-specific options
+        Model-specific options.
 
-    Notes
-    -----
-    `options` can contain any of the following key-value pairs:
-
+    Other Parameters
+    ----------------
     term_weighting: {"idf", "pmi", "one"}
-        Tomotopy term weighting scheme
+        Tomotopy term weighting scheme.
     k: int
-        Number of topics to infer
+        Number of topics to infer.
     seed: int
-        Model random seed
-    workers: int
-        Number of worker processes to use
+        Model random seed.
+    workers: int or "auto"
+        Number of worker processes to use.  If "auto", will use half the number of
+        available CPU cores.
     parallel_scheme: {"partition", "copy_merge", "default", "none"}
-        Tomotopy parallelism scheme
+        Tomotopy parallelism scheme.
     iterations: int
-        Number of base sampling iterations to run
+        Number of base sampling iterations to run.
     update_every: int
-        How many iterations to run in a batch -- If `verbose` is True, will print
-        diagnostic information after each batch
+        How many iterations to run in a batch.
+
+        If `verbose` is True, will print diagnostic information after each batch.
     until_max_ll: bool
         Whether or not to continue training until an approximate maximum per-word
-        LL is reached
+        Log-Likelihood is reached.
     max_extra_iterations: int
-        Limit on number of extra iterations to run if `until_max_ll` is True
+        Limit on number of extra iterations to run if `until_max_ll` is True.
     verbose: bool
-        Whether or not to print diagnostic information after each training batch
+        Whether or not to print diagnostic information after each training batch.
     alpha: float
-        Document-topic hyper-parameter for Dirichlet distribution
-    eta: float
-        Topic-word hyper-parameter for Dirichlet distribution
+        Document-topic hyper-parameter for the Dirichlet distribution.
+    eta: float or "auto"
+        Topic-word hyper-parameter for the Dirichlet distribution.
+        If "auto", will use `1 / k`.
+    burn_in: int
+        Burn-in iterations for hyper-parameter optimisation (The upstream default for
+        `tomotopy` is 0)
+    optim_interval: int
+        Interval for automatic hyper-parameter optimisation (set to 0 to turn off)
     """
 
     def __init__(self, corpus_slice, options=None):
@@ -92,6 +118,8 @@ class LDAModel(BaseModel):
         self.options = dict(default_options, **options)
 
         # Normalise options
+        # -----------------
+        # Term weighting
         term_weighting = self.options["term_weighting"]
         if term_weighting == "idf":
             tw = tp.TermWeight.IDF
@@ -105,6 +133,13 @@ class LDAModel(BaseModel):
             )
         self.options["tw"] = tw
 
+        # Worker count
+        if self.options["workers"] == "auto":
+            worker_count = int(os.cpu_count() / 2)
+            # We need at least 1 worker
+            self.options["workers"] = max(1, worker_count)
+
+        # Parallel scheme
         parallel_scheme = self.options["parallel_scheme"]
         if parallel_scheme == "default":
             parallel = tp.ParallelScheme.DEFAULT
@@ -121,13 +156,19 @@ class LDAModel(BaseModel):
             )
         self.options["parallel"] = parallel
 
+        # Eta
+        if self.options["eta"] == "auto":
+            eta = 1 / self.options["k"]
+        else:
+            eta = self.options["eta"]
+
         # Initialise model
         self.model = tp.LDAModel(
             tw=self.options["tw"],
             k=self.options["k"],
             seed=self.options["seed"],
             alpha=self.options["alpha"],
-            eta=self.options["eta"],
+            eta=eta,
         )
 
         # When docs are added to `self.model`, we can only retrieve them from
@@ -136,28 +177,29 @@ class LDAModel(BaseModel):
         self.doc_id_to_model_index = {}
         index = 0
 
-        for doc_id in self.corpus_slice.document_ids():
+        for doc_id in self.corpus_slice.document_ids:
             doc = self.corpus_slice.get_document(doc_id)
             self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
 
-        # Burn-in: Number of iterations before Tomotopy starts optimising
-        # hyper-parameters
-        self.model.burn_in = 100
+        # Hyper-parameter optimisation
+        self.model.burn_in = self.options["burn_in"]
+        self.model.optim_interval = self.options["optim_interval"]
 
     @staticmethod
     def load_from_bytes(model_bytes):
         """
-        Loads a Tomotopy LDAModel from its binary representation
+        Loads a `tomotopy.LDAModel` from its binary representation.
 
         Parameters
         ----------
         model_bytes: bytes
+            The binary representation of the `tomotopy.LDAModel`.
 
         Returns
         -------
-        tp.LDAModel
+        tomotopy.LDAModel
         """
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_model_file = pathlib.Path(tmpdir) / "load_model.bin"
@@ -172,9 +214,6 @@ class LDAModel(BaseModel):
         return tp_model
 
     def train(self):
-        """
-        Runs the modelling algorithm with the saved options and CorpusSlice.
-        """
         parallel = self.options["parallel"]
         workers = self.options["workers"]
         iterations = self.options["iterations"]
@@ -187,21 +226,21 @@ class LDAModel(BaseModel):
 
         progress_bar = None
         if verbose:
-            print(
-                f"Training model on {len(self.corpus_slice)} documents:\n"
-                f"{self.options}\n",
-                flush=True,
-            )
+            # print(
+            #     f"Training model on {len(self.corpus_slice)} documents:\n"
+            #     f"{self.options}\n",
+            #     flush=True,
+            # )
             progress_bar = tqdm(total=iterations, miniters=1)
 
         try:
             for i in range(0, iterations, update_every):
                 self.model.train(update_every, workers=workers, parallel=parallel)
                 if verbose:
-                    current_coherence = self.get_coherence(processes=workers)
+                    current_coherence = self.get_coherence()
                     progress_bar.set_postfix({"Coherence": f"{current_coherence:.5f}"})
                     progress_bar.update(update_every)
-                    # To allow the tqdm bar to update, if in a Jupyter notebook
+                    # Let the progress bar update
                     time.sleep(0.01)
         except KeyboardInterrupt:
             print("Stopping train sequence.")
@@ -218,16 +257,19 @@ class LDAModel(BaseModel):
         elapsed = time.perf_counter() - origin_time
         if verbose:
             print(
-                f"Docs: {len(self.model.docs)}, "
-                f"Vocab size: {len(self.model.used_vocabs)}, "
-                f"Total Words: {self.model.num_words}"
+                f"Model training complete. ({elapsed:.3f}s)\n"
+                f"\n"
+                f"<Ignis Options>\n"
+                f"| Workers: {workers}\n"
+                f"| ParallelScheme: {repr(parallel)}\n"
+                f"|"
             )
-            print(f"Model training complete. ({elapsed:.3f}s)", flush=True)
+            self.model.summary(topic_word_top_n=10, flush=True)
 
     def _train_until_max_ll(self):
         """
         Extended training until an approximate maximum per-word LL is reached.
-        
+
         Saves a temporary copy of the model before every iteration batch, and loads
         the last best model once LL stops increasing.
         """
@@ -267,7 +309,7 @@ class LDAModel(BaseModel):
                             {"Log-likelihood": f"{current_ll:.5f}"}
                         )
                         progress_bar.update(update_every)
-                        # To allow the tqdm bar to update, if in a Jupyter notebook
+                        # Let the progress bar update
                         time.sleep(0.01)
 
                     if current_ll < best_ll:
@@ -315,11 +357,11 @@ class LDAModel(BaseModel):
 
             if verbose:
                 print(
-                    "\n" "Continuing to train until maximum coherence.\n", flush=True,
+                    "\nContinuing to train until maximum coherence.\n", flush=True,
                 )
                 progress_bar = tqdm(miniters=1)
 
-            best_coherence = self.get_coherence(processes=workers)
+            best_coherence = self.get_coherence()
             start_coherence = best_coherence
             i = 0
             batches_since_best = 0
@@ -329,13 +371,13 @@ class LDAModel(BaseModel):
                     self.model.train(update_every, workers=workers, parallel=parallel)
                     i += update_every
 
-                    current_coherence = self.get_coherence(processes=workers)
+                    current_coherence = self.get_coherence()
                     if verbose:
                         progress_bar.set_postfix(
                             {"Coherence": f"{current_coherence:.5f}"}
                         )
                         progress_bar.update(update_every)
-                        # To allow the tqdm bar to update, if in a Jupyter notebook
+                        # Let the progress bar update
                         time.sleep(0.01)
 
                     if current_coherence < best_coherence:
@@ -371,25 +413,15 @@ class LDAModel(BaseModel):
         return self.model.get_topic_words(tp_topic_id, top_n)
 
     def get_topic_documents(self, topic_id, within_top_n):
-        """
-        If calling consecutively for multiple topic IDs, this is less efficient than
-        iterating over the documents directly and calling `.get_document_topics()`
-        instead.
+        # N.B.: If calling consecutively for multiple topic IDs, this may be less
+        # efficient than iterating over the documents directly and calling
+        # `.get_document_topics()` instead.
 
-        Parameters
-        ----------
-        topic_id
-        within_top_n
-
-        Returns
-        -------
-
-        """
         # Tomotopy topics are 0-indexed
         tp_topic_id = topic_id - 1
 
         topic_documents = []
-        for doc_id in self.corpus_slice.document_ids():
+        for doc_id in self.corpus_slice.document_ids:
             model_index = self.doc_id_to_model_index[doc_id]
             model_doc = self.model.docs[model_index]
             doc_topics = model_doc.get_topics(top_n=within_top_n)
@@ -418,72 +450,66 @@ class LDAModel(BaseModel):
     def get_document_top_topic(self, doc_id):
         return self.get_document_topics(doc_id, 1)[0]
 
-    def get_coherence(
-        self, coherence="u_mass", top_n=30, window_size=None, processes=8
-    ):
+    def get_coherence(self, coherence="c_npmi", top_n=30, **kwargs):
         """
-        Use Gensim's `models.coherencemodel` to get a coherence score for a trained
-        LDAModel.
+        Use the `tomotopy.coherence` pipeline to get a coherence score for this
+        trained model.
 
         Parameters
         ----------
-        coherence: {"u_mass", "c_v", "c_uci", "c_npmi"}, optional
+        coherence: {"c_npmi", "c_v", "u_mass", "c_uci"}, optional
             Coherence measure to calculate.
+            The four shorthand strings above can be used, or a custom combination of
+            `tomotopy.coherence` classes can be used.
             N.B.: Unlike Gensim, the default is "u_mass", which is faster to calculate
         top_n: int, optional
-            Number of top words to extract from each topic. The default of 30 matches
-            the number of words shown per topic by pyLDAvis
-        window_size: int, optional
-            Window size for "c_v", "c_uci", and "c_npmi"
-        processes: int, optional
-            Number of processes to use for probability estimation phase
+            Number of top tokens to extract from each topic. The default of 30 matches
+            the number of tokens shown per topic by `pyLDAvis`.
 
         Returns
         -------
         float
         """
-        with warnings.catch_warnings():
-            # At time of coding, Gensim 3.8.0 is the latest version available on the
-            # main Anaconda repo, and it triggers DeprecationWarnings when the
-            # CoherenceModel is used in this way
-            warnings.simplefilter("ignore", category=DeprecationWarning)
+        coherence_model = tp.coherence.Coherence(
+            self.model, coherence=coherence, top_n=top_n, **kwargs
+        )
+        return coherence_model.get_score()
 
-            topics = []
-            for k in range(self.model.k):
-                word_probs = self.model.get_topic_words(k, top_n)
-                topics.append([word for word, prob in word_probs])
+    def set_word_prior(self, word, prior_list):
+        """
+        This function sets the prior weight for the given word across each topic in
+        the model.
+        (contrib.: C. Ow)
 
-            texts = []
-            corpus = []
-            for doc in self.model.docs:
-                words = [self.model.vocabs[token_id] for token_id in doc.words]
-                texts.append(words)
-                freqs = list(collections.Counter(doc.words).items())
-                corpus.append(freqs)
-
-            id2word = dict(enumerate(self.model.vocabs))
-            dictionary = gensim.corpora.dictionary.Dictionary.from_corpus(
-                corpus, id2word
+        Parameters
+        ----------
+        word: str
+            The word to set the word prior for.
+        prior_list: iterable of float
+            List of priors with length `k` (the number of topics).
+        """
+        k = self.get_num_topics()
+        if len(prior_list) != k:
+            raise ValueError(
+                "Length mismatch between given word prior distribution and number of "
+                "model topics."
             )
+        else:
+            self.model.set_word_prior(word, prior_list)
 
-            cm = gensim.models.coherencemodel.CoherenceModel(
-                topics=topics,
-                texts=texts,
-                corpus=corpus,
-                dictionary=dictionary,
-                window_size=window_size,
-                coherence=coherence,
-                topn=top_n,
-                processes=processes,
-            )
+    def get_word_prior(self, word):
+        """
+        Gets the per-topic priors for the given word in the model.
+        (contrib.: C. Ow)
 
-            # For debugging the interface between Tomotopy and Gensim
-            # coherence = cm.get_coherence()
-            # return {
-            #     "coherence": coherence,
-            #     "topics": topics,
-            #     "texts": texts,
-            #     "corpus": corpus,
-            #     "dictionary": dictionary,
-            # }
-            return cm.get_coherence()
+        Parameters
+        ----------
+        word: str
+            The word to get the word prior for.
+
+        Returns
+        -------
+        iterable of float
+            List of per-topic priors for the given word.
+        """
+        return self.model.get_word_prior(word)
