@@ -101,3 +101,9 @@ For Jupyter notebooks in a non-Conda environment, edit the Jupyter `kernel.json`
 ### Miscellaneous notes on dependencies
 
 The `ipython` and `jedi` packages are pinned to specific versions in the demo `pipenv` environment to ensure their compatibility with extensions and code completion within Jupyter notebooks; unfortunately, they break with later versions due to a lack of upstream updates.
+
+## Changes
+
+- 1.5.0 (1 June 2021)
+  - General functionality update to match development version; enhancements and improvements across the board.
+  - Updated demo walkthrough notebooks.

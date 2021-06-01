@@ -9,10 +9,8 @@ ipython = "==7.16.1"
 jedi = "==0.17.2"
 jupyter = "*"
 jupyter-contrib-nbextensions = "*"
-notebook = "<5.6.0"
 pdoc3 = "*"
 setuptools-git = "*"
-tornado = "<6"
 
 [packages]
 beautifulsoup4 = ">=4.9.0"
