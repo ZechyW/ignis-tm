@@ -1,0 +1,31 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "*"
+ipython = "==7.16.1"
+jedi = "==0.17.2"
+jupyter = "*"
+jupyter-contrib-nbextensions = "*"
+notebook = "<5.6.0"
+pdoc3 = "*"
+setuptools-git = "*"
+tornado = "<6"
+
+[packages]
+beautifulsoup4 = ">=4.9.0"
+gensim = ">=4.0.0"
+numpy = ">=1.19.0"
+pandas = ">=1.0.3"
+pyldavis = ">=3.3.1"
+spacy = "<3"
+tomotopy = ">=0.10"
+tqdm = ">=4.46.0"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
