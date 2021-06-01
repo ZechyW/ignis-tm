@@ -86,7 +86,7 @@ class TomotopyLabeller:
         for the given `topic_id`.
 
         **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
-        len(topics) + 1)`.
+        len(topics) + 1)`).
 
         Parameters
         ----------

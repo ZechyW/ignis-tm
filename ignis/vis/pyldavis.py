@@ -8,7 +8,6 @@ import pathlib
 import shutil
 import threading
 import time
-import warnings
 
 try:
     # Don't depend fully on a Jupyter environment, in case the user wants to create
@@ -45,7 +44,7 @@ def show_visualisation(vis_data, **kwargs):
 
     Returns
     -------
-    IPython.display.HTML
+    IPython.core.display.HTML
     """
     # noinspection PyTypeChecker
     return display(HTML(get_visualisation_html(vis_data, **kwargs)))
@@ -81,7 +80,7 @@ def get_visualisation_html(vis_data, **kwargs):
     <style>
         /* These have to be marked important to override pyLDAvis default styles */
         #notebook-container {
-            /* The pyLDAvis default is 1370, but we leave a bit of leeway here
+            /* The pyLDAvis default width is 1370, but we leave a bit of leeway here
                to account for spacing offsets in various situations. */
             width: 1380px !important;
         }

@@ -16,14 +16,14 @@ jupyter_output_style = """
     div.cell > div.output_wrapper > div.output.output_scroll {
         height: auto;
     }
-    
+
     .jupyter-widgets-output-area .output_scroll {
         height: unset;
         border-radius: unset;
         -webkit-box-shadow: unset;
         box-shadow: unset;
     }
-    
+
     .jupyter-widgets-output-area, .output_stdout, .output_result {
         height: auto;
         max-height: 65em;
@@ -32,7 +32,7 @@ jupyter_output_style = """
     .jupyter-widgets-output-area .jupyter-widgets-output-area {
         max-height: unset;
     }
-    
+
     .jupyter-widgets-view.output_subarea {
         padding: 0.4em 0;
     }

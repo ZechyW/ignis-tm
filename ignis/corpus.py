@@ -28,7 +28,7 @@ class Corpus:
 
     Note: `Document` objects in a `Corpus` are loosely kept in insertion order,
     but they are shuffled when sliced into `CorpusSlice` objects (viz., they are
-    sorted by the randomly-generated IDs).
+    sorted by their randomly-generated IDs).
 
     Stop words are also managed at the (root) `Corpus` level -- Whenever `Document`
     objects are retrieved via `Corpus.get_document()`, stop words are removed from
@@ -139,7 +139,7 @@ class Corpus:
 
     def concat(self, *other_corpora):
         """
-        Consolidates to or more separate `Corpus` objects into a single `Corpus`.
+        Consolidates two or more separate `Corpus` objects into a single `Corpus`.
 
         Functionally different from the `CorpusSlice.concat()` method, which
         consolidates two slices that necessarily come from the same single `Corpus`.
@@ -236,7 +236,7 @@ class Corpus:
 
     def remove_stop_words(self, stop_words):
         """
-        Remove the given stop words to the root `Corpus` object's stop word list.
+        Remove the given stop words from the root `Corpus` object's stop word list.
 
         Parameters
         ----------
@@ -348,8 +348,8 @@ class Corpus:
         Create a new `CorpusSlice` with `Document` objects that contain the given
         token.
 
-        This method searches the `.tokens` property of each `Document` (
-        case-insensitive). These are the words and phrases that appear as labels in
+        This method searches the `.tokens` property of each `Document`
+        (case-insensitive). These are the words and phrases that appear as labels in
         the main graphical visualisation via `ignis.aurum.Aurum.show_visualisation()`.
 
         Note that each label is a single token even if it contains spaces/multiple
@@ -483,7 +483,7 @@ class Corpus:
         # Sanity check
         if isinstance(text_strings, str):
             raise RuntimeWarning(
-                "Use `.slice_by_text_string()` to slice by a single token."
+                "Use `.slice_by_text_string()` to slice by a single text string."
             )
 
         # Plain-text search performs a regex text search, looking for `text_string`
@@ -514,8 +514,8 @@ class Corpus:
         Create a new `CorpusSlice` by removing `Document` objects that contain the given
         token.
 
-        This method searches the `.tokens` property of each `Document` (
-        case-insensitive). These are the words and phrases that appear as labels in
+        This method searches the `.tokens` property of each `Document`
+        (case-insensitive). These are the words and phrases that appear as labels in
         the main graphical visualisation via `ignis.aurum.Aurum.show_visualisation()`.
 
         Note that each label is a single token even if it contains spaces/multiple
@@ -532,7 +532,7 @@ class Corpus:
         """
         if not isinstance(token, str):
             raise RuntimeWarning(
-                "Use `.slice_without_tokens()` to slice by multiple tokens at once."
+                "Use `.slice_without_tokens()` to slice using multiple tokens at once."
             )
 
         return self.slice_without_tokens([token])
@@ -566,7 +566,7 @@ class Corpus:
         # Sanity check
         if isinstance(tokens, str):
             raise RuntimeWarning(
-                "Use `.slice_without_token()` to slice by a single token."
+                "Use `.slice_without_token()` to slice using a single token."
             )
 
         # By-token search matches tokens directly, ignoring case
@@ -631,7 +631,7 @@ class Corpus:
         `Document` as shown in the `ignis.aurum.Aurum.nb_explore_topics()` or
         `Corpus.nb_explore()` widgets.
 
-        Non-word characters at the boundaries of the text string are ignored.
+        Non-word characters at the boundaries of each text string are ignored.
 
         To slice out `Document` objects that contain multiple specific text strings
         (an "AND" search), you can chain multiple invocations of the single text string
@@ -657,7 +657,7 @@ class Corpus:
             )
 
         # Plain-text search performs a regex text search, looking for `text_string`
-        # matches that start/end on word boundaries.
+        # matches that start/end on word boundaries or whitespace.
         search_patterns = [
             re.compile(fr"(\b|\s|^){re.escape(text_string)}(\b|\s|$)", re.IGNORECASE)
             for text_string in text_strings
@@ -828,7 +828,7 @@ class Corpus:
 
 class CorpusSlice(Corpus):
     """
-    Contains some subset of the `Document` objects in a Corpus, and keeps a reference
+    Contains some subset of the `Document` objects in a `Corpus`, and keeps a reference
     to the root `Corpus` for bookkeeping and iteration.
 
     All the `ignis` topic models take `CorpusSlice` objects as input.
@@ -876,8 +876,8 @@ class CorpusSlice(Corpus):
 
     def concat(self, *other_slices):
         """
-        Returns a new `CorpusSlice` that has the `Document` objects from this
-        instance and all the other specified `CorpusSlice` objects combined.
+        Returns a new `CorpusSlice` that has the `Document` objects from this instance
+        and all the other specified `CorpusSlice` objects combined.
 
         Only `CorpusSlice` objects with the same root `Corpus` can be concatenated.
 
