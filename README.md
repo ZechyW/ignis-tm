@@ -61,6 +61,12 @@ jupyter nbextensions_configurator enable --user
 
 You can then configure the Jupyter notebook extensions directly from the web-based Jupyter UI.  In particular, see https://neuralcoder.science/Black-Jupyter/ for a guide to setting up the Code Prettify extension using `black`.  The ExecuteTime extension is also useful for tracking cell execution times.
 
+You will also need to download the Spacy `en_core_web_sm` package if you intend to perform lemmatisation on your data:
+
+```shell
+python -m spacy download en_core_web_sm
+```
+
 ### Run the sample notebooks
 
 Once the installation is complete, you can spin up a jupyter notebook instance (be sure to activate the `pipenv` environment if necessary):
