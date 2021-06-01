@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>ignis.labeller.tomotopy API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Topic labelling using `tomotopy` …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -21,34 +21,44 @@
 <header>
 </header>
 <section id="section-intro">
+<p>Topic labelling using <code>tomotopy</code>.</p>
+<p>These functions should be called by <code><a title="ignis.aurum.Aurum" href="../aurum.html#ignis.aurum.Aurum">Aurum</a></code> methods; end-users should not
+need to invoke them directly.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import ignis.util
+<pre><code class="python">&#34;&#34;&#34;
+Topic labelling using `tomotopy`.
+
+These functions should be called by `ignis.aurum.Aurum` methods; end-users should not
+need to invoke them directly.
+&#34;&#34;&#34;
+
+import ignis.util
 
 tp = ignis.util.LazyLoader(&#34;tomotopy&#34;)
 
 
 class TomotopyLabeller:
     &#34;&#34;&#34;
-    Provides an interface to the Tomotopy First-order relevance labeller
+    Provides an interface to the `tomotopy` First-order Relevance labeller.
 
     Parameters
     ----------
-    model: tp.LDAModel
+    model: tomotopy.LDAModel
         A trained Tomotopy model
     verbose: bool, optional
         Whether or not to print verbose progress messages
     workers: int, optional
         Number of worker processes to use for the labeller -- Note that this *might*
         affect other random processes (e.g., the topic modelling proper) because it
-        affects the parallelisation operations
+        affects the order of concurrent/parallel operations
 
     Other Parameters
     ----------------
-    The other keyword arguments are labeller-specific options (See Tomotopy docs for
-    details)
+    The other keyword arguments are labeller-specific options.
+    (See the `tomotopy` docs for details.)
     &#34;&#34;&#34;
 
     def __init__(
@@ -102,23 +112,23 @@ class TomotopyLabeller:
 
     def get_topic_labels(self, topic_id, top_n=10):
         &#34;&#34;&#34;
-        Gets the `top_n` labels from the saved Tomotopy FoRelevance labeller for the
-        given `topic_id`.
+        Gets the `top_n` labels from the saved `tomotopy.label.FoRelevance` labeller
+        for the given `topic_id`.
 
-        NOTE: `topic_id` should start from 1 and not 0;
-        i.e., it should be in `range(1, len(topics) + 1)`
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`).
 
         Parameters
         ----------
         topic_id: int
-            Topic ID to label
+            ID of the topic to label.
         top_n: int
-            Number of labels to generate
+            Number of highest-scoring labels to generate.
 
         Returns
         -------
-        tuple of [str, float]
-            Returns (&lt;label&gt;, &lt;score&gt;) for each of the `top_n` labels for the topic.
+        tuple of (str, float)
+            Returns (`label`, `score`) for each of the `top_n` labels for the topic.
         &#34;&#34;&#34;
         # Tomotopy topics are 0-indexed
         tp_topic_id = topic_id - 1
@@ -140,44 +150,44 @@ class TomotopyLabeller:
 <span>(</span><span>model, min_cf=10, min_df=5, max_len=5, max_cand=10000, smoothing=0.01, mu=0.25, workers=8, verbose=False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Provides an interface to the Tomotopy First-order relevance labeller</p>
+<div class="desc"><p>Provides an interface to the <code>tomotopy</code> First-order Relevance labeller.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>model</code></strong> :&ensp;<code>tp.LDAModel</code></dt>
+<dt><strong><code>model</code></strong> :&ensp;<code>tomotopy.LDAModel</code></dt>
 <dd>A trained Tomotopy model</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Whether or not to print verbose progress messages</dd>
 <dt><strong><code>workers</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Number of worker processes to use for the labeller &ndash; Note that this <em>might</em>
 affect other random processes (e.g., the topic modelling proper) because it
-affects the parallelisation operations</dd>
+affects the order of concurrent/parallel operations</dd>
 </dl>
 <h2 id="other-parameters">Other Parameters</h2>
-<p>The other keyword arguments are labeller-specific options (See Tomotopy docs for
-details)</p></div>
+<p>The other keyword arguments are labeller-specific options.
+(See the <code>tomotopy</code> docs for details.)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TomotopyLabeller:
     &#34;&#34;&#34;
-    Provides an interface to the Tomotopy First-order relevance labeller
+    Provides an interface to the `tomotopy` First-order Relevance labeller.
 
     Parameters
     ----------
-    model: tp.LDAModel
+    model: tomotopy.LDAModel
         A trained Tomotopy model
     verbose: bool, optional
         Whether or not to print verbose progress messages
     workers: int, optional
         Number of worker processes to use for the labeller -- Note that this *might*
         affect other random processes (e.g., the topic modelling proper) because it
-        affects the parallelisation operations
+        affects the order of concurrent/parallel operations
 
     Other Parameters
     ----------------
-    The other keyword arguments are labeller-specific options (See Tomotopy docs for
-    details)
+    The other keyword arguments are labeller-specific options.
+    (See the `tomotopy` docs for details.)
     &#34;&#34;&#34;
 
     def __init__(
@@ -231,23 +241,23 @@ details)</p></div>
 
     def get_topic_labels(self, topic_id, top_n=10):
         &#34;&#34;&#34;
-        Gets the `top_n` labels from the saved Tomotopy FoRelevance labeller for the
-        given `topic_id`.
+        Gets the `top_n` labels from the saved `tomotopy.label.FoRelevance` labeller
+        for the given `topic_id`.
 
-        NOTE: `topic_id` should start from 1 and not 0;
-        i.e., it should be in `range(1, len(topics) + 1)`
+        **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+        len(topics) + 1)`).
 
         Parameters
         ----------
         topic_id: int
-            Topic ID to label
+            ID of the topic to label.
         top_n: int
-            Number of labels to generate
+            Number of highest-scoring labels to generate.
 
         Returns
         -------
-        tuple of [str, float]
-            Returns (&lt;label&gt;, &lt;score&gt;) for each of the `top_n` labels for the topic.
+        tuple of (str, float)
+            Returns (`label`, `score`) for each of the `top_n` labels for the topic.
         &#34;&#34;&#34;
         # Tomotopy topics are 0-indexed
         tp_topic_id = topic_id - 1
@@ -260,21 +270,21 @@ details)</p></div>
 <span>def <span class="ident">get_topic_labels</span></span>(<span>self, topic_id, top_n=10)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Gets the <code>top_n</code> labels from the saved Tomotopy FoRelevance labeller for the
-given <code>topic_id</code>.</p>
-<p>NOTE: <code>topic_id</code> should start from 1 and not 0;
-i.e., it should be in <code>range(1, len(topics) + 1)</code></p>
+<div class="desc"><p>Gets the <code>top_n</code> labels from the saved <code>tomotopy.label.FoRelevance</code> labeller
+for the given <code>topic_id</code>.</p>
+<p><strong>NOTE</strong>: <code>topic_id</code> is 1-indexed, not 0-indexed (i.e., it is in <code>range(1,
+len(topics) + 1)</code>).</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>topic_id</code></strong> :&ensp;<code>int</code></dt>
-<dd>Topic ID to label</dd>
+<dd>ID of the topic to label.</dd>
 <dt><strong><code>top_n</code></strong> :&ensp;<code>int</code></dt>
-<dd>Number of labels to generate</dd>
+<dd>Number of highest-scoring labels to generate.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code>tuple</code> of <code>[str, float]</code></dt>
-<dd>Returns (<label>, <score>) for each of the <code>top_n</code> labels for the topic.</dd>
+<dt><code>tuple</code> of <code>(str, float)</code></dt>
+<dd>Returns (<code>label</code>, <code>score</code>) for each of the <code>top_n</code> labels for the topic.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -282,23 +292,23 @@ i.e., it should be in <code>range(1, len(topics) + 1)</code></p>
 </summary>
 <pre><code class="python">def get_topic_labels(self, topic_id, top_n=10):
     &#34;&#34;&#34;
-    Gets the `top_n` labels from the saved Tomotopy FoRelevance labeller for the
-    given `topic_id`.
+    Gets the `top_n` labels from the saved `tomotopy.label.FoRelevance` labeller
+    for the given `topic_id`.
 
-    NOTE: `topic_id` should start from 1 and not 0;
-    i.e., it should be in `range(1, len(topics) + 1)`
+    **NOTE**: `topic_id` is 1-indexed, not 0-indexed (i.e., it is in `range(1,
+    len(topics) + 1)`).
 
     Parameters
     ----------
     topic_id: int
-        Topic ID to label
+        ID of the topic to label.
     top_n: int
-        Number of labels to generate
+        Number of highest-scoring labels to generate.
 
     Returns
     -------
-    tuple of [str, float]
-        Returns (&lt;label&gt;, &lt;score&gt;) for each of the `top_n` labels for the topic.
+    tuple of (str, float)
+        Returns (`label`, `score`) for each of the `top_n` labels for the topic.
     &#34;&#34;&#34;
     # Tomotopy topics are 0-indexed
     tp_topic_id = topic_id - 1

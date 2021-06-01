@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>ignis.models API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Classes for working with topic modelling algorithms.
+End-users should not need to use these classes directly." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -21,12 +22,21 @@
 <header>
 </header>
 <section id="section-intro">
+<p>Classes for working with topic modelling algorithms.
+End-users should not need to use these classes directly.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .lda import LDAModel
-from .hdp import HDPModel</code></pre>
+<pre><code class="python">&#34;&#34;&#34;
+Classes for working with topic modelling algorithms.
+End-users should not need to use these classes directly.
+&#34;&#34;&#34;
+
+from .lda import LDAModel
+from .hdp import HDPModel
+
+# TODO: Keep a central registry of model types</code></pre>
 </details>
 </section>
 <section>
@@ -34,7 +44,8 @@ from .hdp import HDPModel</code></pre>
 <dl>
 <dt><code class="name"><a title="ignis.models.base" href="base.html">ignis.models.base</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Base class for all <code><a title="ignis" href="../index.html">ignis</a></code> models.
+Should never be instantiated directly.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.models.hdp" href="hdp.html">ignis.models.hdp</a></code></dt>
 <dd>
@@ -42,7 +53,7 @@ from .hdp import HDPModel</code></pre>
 </dd>
 <dt><code class="name"><a title="ignis.models.lda" href="lda.html">ignis.models.lda</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Topic modelling using a <code>tomotopy</code> LDA model.</p></div>
 </dd>
 </dl>
 </section>

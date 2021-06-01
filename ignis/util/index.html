@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>ignis.util API documentation</title>
-<meta name="description" content="General utility classes that are not technically a part of Ignis functionality" />
+<meta name="description" content="General utility classes that are not directly part of the topic modelling
+functionality provided by `ignis`." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -21,16 +22,21 @@
 <header>
 </header>
 <section id="section-intro">
-<p>General utility classes that are not technically a part of Ignis functionality</p>
+<p>General utility classes that are not directly part of the topic modelling
+functionality provided by <code><a title="ignis" href="../index.html">ignis</a></code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-General utility classes that are not technically a part of Ignis functionality
+General utility classes that are not directly part of the topic modelling
+functionality provided by `ignis`.
 &#34;&#34;&#34;
 from ignis.util.improved_phraser import ImprovedPhraser
-from ignis.util.lazy_loader import LazyLoader</code></pre>
+from ignis.util.lazy_loader import LazyLoader
+
+# Documentation
+__pdoc__ = {&#34;jupyter_styles&#34;: False}</code></pre>
 </details>
 </section>
 <section>
@@ -38,11 +44,11 @@ from ignis.util.lazy_loader import LazyLoader</code></pre>
 <dl>
 <dt><code class="name"><a title="ignis.util.improved_phraser" href="improved_phraser.html">ignis.util.improved_phraser</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>An improved automated n-gram detection mechanism built on top of the <code>gensim</code> Phraser.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.util.lazy_loader" href="lazy_loader.html">ignis.util.lazy_loader</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>A general class for lazy loading expensive modules.</p></div>
 </dd>
 </dl>
 </section>

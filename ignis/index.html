@@ -56,6 +56,14 @@ jupyter nbextensions_configurator enable --user
 <p>You can then configure the Jupyter notebook extensions directly from the web-based Jupyter UI.
 In particular, see <a href="https://neuralcoder.science/Black-Jupyter/">https://neuralcoder.science/Black-Jupyter/</a> for a guide to setting up the Code Prettify extension using <code>black</code>.
 The ExecuteTime extension is also useful for tracking cell execution times.</p>
+<p>You will also need to download the Spacy <code>en_core_web_sm</code> package if you intend to perform lemmatisation on your data:</p>
+<pre><code class="language-shell">python -m spacy download en_core_web_sm
+</code></pre>
+<h3 id="run-the-sample-notebooks">Run the sample notebooks</h3>
+<p>Once the installation is complete, you can spin up a jupyter notebook instance (be sure to activate the <code>pipenv</code> environment if necessary):</p>
+<pre><code class="language-shell">jupyter notebook
+</code></pre>
+<p>Then go through the self-documented <code>Ignis Corpus</code> and <code>Ignis LDA</code> notebooks to explore the BBC news dataset.</p>
 <h2 id="other-notes">Other Notes</h2>
 <h3 id="random-seeds-and-indeterminacy">Random seeds and indeterminacy</h3>
 <pre><code class="language-text">N.B.: The behaviour described below should be fixed in Tomotopy &gt;= 0.9.1, which uses a different random number generation scheme.  Note that models created with Tomotopy &lt; 0.9.1 might therefore differ from newer models even if the same seed is set.
@@ -93,7 +101,17 @@ load_slice = ignis.corpus.load_slice
 train_model = ignis.probat.train_model
 suggest_num_topics = ignis.probat.suggest_num_topics
 
-load_results = ignis.aurum.load_results</code></pre>
+load_results = ignis.aurum.load_results
+
+# Documentation
+__pdoc__ = {&#34;tests&#34;: False}
+__all__ = [
+    &#34;load_corpus&#34;,
+    &#34;load_slice&#34;,
+    &#34;train_model&#34;,
+    &#34;suggest_num_topics&#34;,
+    &#34;load_results&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -101,42 +119,385 @@ load_results = ignis.aurum.load_results</code></pre>
 <dl>
 <dt><code class="name"><a title="ignis.aurum" href="aurum.html">ignis.aurum</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p><code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code> instances manage the results of topic modelling runs, and provide
+methods for exploring and iterating over them.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.corpus" href="corpus.html">ignis.corpus</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p><code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> and <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code> instances are containers for
+tracking the <code><a title="ignis.corpus.Document" href="corpus.html#ignis.corpus.Document">Document</a></code> objects in a dataset.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.labeller" href="labeller/index.html">ignis.labeller</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Classes for working with automated topic labellers.
+End-users should not need to use these classes directly.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.models" href="models/index.html">ignis.models</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Classes for working with topic modelling algorithms.
+End-users should not need to use these classes directly.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.probat" href="probat.html">ignis.probat</a></code></dt>
 <dd>
-<div class="desc"><p>The methods in this class are used for performing the actual topic modelling to get
-Aurum results.</p></div>
-</dd>
-<dt><code class="name"><a title="ignis.tests" href="tests/index.html">ignis.tests</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Functions for performing topic modelling to get <code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code> results.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.util" href="util/index.html">ignis.util</a></code></dt>
 <dd>
-<div class="desc"><p>General utility classes that are not technically a part of Ignis functionality</p></div>
+<div class="desc"><p>General utility classes that are not directly part of the topic modelling
+functionality provided by <code><a title="ignis" href="#ignis">ignis</a></code>.</p></div>
 </dd>
 <dt><code class="name"><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Classes for working with topic modelling result visualisations.
+End-users should not need to use these classes directly.</p></div>
 </dd>
 </dl>
 </section>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ignis.load_corpus"><code class="name flex">
+<span>def <span class="ident">load_corpus</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads a <code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> object from the given file.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code> or <code>pathlib.Path</code></dt>
+<dd>The file to load the <code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> object from.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_corpus(filename):
+    &#34;&#34;&#34;
+    Loads a `ignis.corpus.Corpus` object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the `ignis.corpus.Corpus` object from.
+
+    Returns
+    -------
+    ignis.corpus.Corpus
+    &#34;&#34;&#34;
+    with bz2.open(filename, &#34;rb&#34;) as fp:
+        loaded = pickle.load(fp)
+
+    if not type(loaded) is Corpus:
+        raise ValueError(f&#34;File does not contain a `Corpus` object: &#39;{filename}&#39;&#34;)
+
+    # Re-initialise the `Corpus` with all `Documents` and the dynamic stop word list.
+    new_corpus = Corpus()
+    if hasattr(loaded, &#34;_stop_words&#34;):
+        # Copy stop words, if they are set
+        new_corpus._stop_words = set(loaded._stop_words)
+    if hasattr(loaded, &#34;documents&#34;):
+        # Old version - `.documents` was directly accessible.
+        docs = loaded.documents.values()
+    else:
+        # New version - documents can only be retrieved via `get_document()`
+        docs = loaded._documents.values()
+    for doc in docs:
+        # `Document` objects are un-pickled separately; `Document.__setstate__()`
+        # ensures that the `raw_tokens` attribute is set appropriately.
+        new_corpus.add_doc(
+            doc.raw_tokens, doc.metadata, doc.display_str, doc.plain_text
+        )
+
+    return new_corpus</code></pre>
+</details>
+</dd>
+<dt id="ignis.load_results"><code class="name flex">
+<span>def <span class="ident">load_results</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads an <code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code> results object from the given file.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code> or <code>pathlib.Path</code></dt>
+<dd>The file to load the <code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code> object from.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_results(filename):
+    &#34;&#34;&#34;
+    Loads an `ignis.aurum.Aurum` results object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the `ignis.aurum.Aurum` object from.
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+    &#34;&#34;&#34;
+    with bz2.open(filename, &#34;rb&#34;) as fp:
+        save_object = pickle.load(fp)
+
+    # Rehydrate the Ignis/external models
+    model_type = save_object[&#34;model_type&#34;]
+    save_model = save_object[&#34;save_model&#34;]
+    external_model_bytes = save_object[&#34;external_model_bytes&#34;]
+
+    if model_type[:3] == &#34;tp_&#34;:
+        # Tomotopy model
+        external_model = _load_tomotopy_model(model_type, external_model_bytes)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    save_model.model = external_model
+
+    # Rehydrate the Aurum object
+    aurum = Aurum(save_model)
+
+    aurum.vis_type = save_object[&#34;vis_type&#34;]
+    aurum.vis_options = save_object[&#34;vis_options&#34;]
+    aurum.vis_data = save_object[&#34;vis_data&#34;]
+
+    return aurum</code></pre>
+</details>
+</dd>
+<dt id="ignis.load_slice"><code class="name flex">
+<span>def <span class="ident">load_slice</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads a <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code> object from the given file.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code> or <code>pathlib.Path</code></dt>
+<dd>The file to load the <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code> object from.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_slice(filename):
+    &#34;&#34;&#34;
+    Loads a `ignis.corpus.CorpusSlice` object from the given file.
+
+    Parameters
+    ----------
+    filename: str or pathlib.Path
+        The file to load the `ignis.corpus.CorpusSlice` object from.
+
+    Returns
+    -------
+    ignis.corpus.CorpusSlice
+    &#34;&#34;&#34;
+    with bz2.open(filename, &#34;rb&#34;) as fp:
+        loaded = pickle.load(fp)
+
+    if not type(loaded) is CorpusSlice:
+        raise ValueError(f&#34;File does not contain a `CorpusSlice` object: &#39;{filename}&#39;&#34;)
+
+    return loaded</code></pre>
+</details>
+</dd>
+<dt id="ignis.suggest_num_topics"><code class="name flex">
+<span>def <span class="ident">suggest_num_topics</span></span>(<span>*args, verbose=True, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience function for running <code>compare_topic_count_coherence()</code> and directly
+reporting the topic count with the highest coherence found.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether or not to print the details of the best topic count.</dd>
+<dt><strong><code>*args</code></strong>, <strong><code>**kwargs</code></strong></dt>
+<dd>Passed on to <code>compare_topic_count_coherence()</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>The suggested topic count.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def suggest_num_topics(*args, verbose=True, **kwargs):
+    &#34;&#34;&#34;
+    Convenience function for running `compare_topic_count_coherence()` and directly
+    reporting the topic count with the highest coherence found.
+
+    Parameters
+    ----------
+    verbose: bool, optional
+        Whether or not to print the details of the best topic count.
+    *args, **kwargs
+        Passed on to `compare_topic_count_coherence()`.
+
+    Returns
+    -------
+    int
+        The suggested topic count.
+    &#34;&#34;&#34;
+    results = compare_topic_count_coherence(*args, verbose=verbose, **kwargs)
+    results = sorted(results, key=lambda x: x[1], reverse=True)
+    best = results[0]
+
+    if verbose:
+        print(f&#34;Suggested topic count: {best[0]}\t&#34; f&#34;Coherence: {best[1]}&#34;)
+
+    return best[0]</code></pre>
+</details>
+</dd>
+<dt id="ignis.train_model"><code class="name flex">
+<span>def <span class="ident">train_model</span></span>(<span>corpus_slice, pre_model=None, model_type='tp_lda', model_options=None, labeller_type=None, labeller_options=None, vis_type='pyldavis', vis_options=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Top-level helper for training topic models using the various algorithms available.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>corpus_slice</code></strong> :&ensp;<code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> or <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code></dt>
+<dd>The <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code> to perform the topic modelling over.
+If a
+<code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> is passed instead, a <code><a title="ignis.corpus.CorpusSlice" href="corpus.html#ignis.corpus.CorpusSlice">CorpusSlice</a></code>
+containing all of its <code><a title="ignis.corpus.Document" href="corpus.html#ignis.corpus.Document">Document</a></code> objects will be created.</dd>
+<dt><strong><code>pre_model</code></strong> :&ensp;<code><a title="ignis.models.lda.LDAModel" href="models/lda.html#ignis.models.lda.LDAModel">LDAModel</a></code>, optional</dt>
+<dd>This is needed when you want to train a <code>tomotopy</code> LDA model with word priors.
+Default is <code>None</code>.</dd>
+<dt><strong><code>model_type</code></strong> :&ensp;<code>{"tp_lda", "tp_hdp", "tp_lda_wp"}</code></dt>
+<dd>Type of model to train; corresponds to the model type listed in the relevant
+<code><a title="ignis.models" href="models/index.html">ignis.models</a></code> class.</dd>
+<dt><strong><code>model_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.models" href="models/index.html">ignis.models</a></code>
+model constructor.</dd>
+<dt><strong><code>labeller_type</code></strong> :&ensp;<code>{"tomotopy"}</code>, optional</dt>
+<dd>The type of automated labeller to use, if available.</dd>
+<dt><strong><code>labeller_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.labeller" href="labeller/index.html">ignis.labeller</a></code>
+object constructor.</dd>
+<dt><strong><code>vis_type</code></strong> :&ensp;<code>{"pyldavis"}</code>, optional</dt>
+<dd>The type of visualisation data to extract, if available.</dd>
+<dt><strong><code>vis_options</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Dictionary of options that will be passed to the relevant <code><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code>
+object constructor.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code></dt>
+<dd>The <code><a title="ignis.aurum.Aurum" href="aurum.html#ignis.aurum.Aurum">Aurum</a></code> results object for the trained model, which can be used
+for further exploration and iteration.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def train_model(
+    corpus_slice,
+    pre_model=None,
+    model_type=&#34;tp_lda&#34;,
+    model_options=None,
+    labeller_type=None,
+    labeller_options=None,
+    vis_type=&#34;pyldavis&#34;,
+    vis_options=None,
+):
+    &#34;&#34;&#34;
+    Top-level helper for training topic models using the various algorithms available.
+
+    Parameters
+    ----------
+    corpus_slice: ignis.corpus.Corpus or ignis.corpus.CorpusSlice
+        The `ignis.corpus.CorpusSlice` to perform the topic modelling over.  If a
+        `ignis.corpus.Corpus` is passed instead, a `ignis.corpus.CorpusSlice`
+        containing all of its `ignis.corpus.Document` objects will be created.
+    pre_model: ignis.models.lda.LDAModel, optional
+        This is needed when you want to train a `tomotopy` LDA model with word priors.
+        Default is `None`.
+    model_type: {&#34;tp_lda&#34;, &#34;tp_hdp&#34;, &#34;tp_lda_wp&#34;}
+        Type of model to train; corresponds to the model type listed in the relevant
+        `ignis.models` class.
+    model_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.models`
+        model constructor.
+    labeller_type: {&#34;tomotopy&#34;}, optional
+        The type of automated labeller to use, if available.
+    labeller_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.labeller`
+        object constructor.
+    vis_type: {&#34;pyldavis&#34;}, optional
+        The type of visualisation data to extract, if available.
+    vis_options: dict, optional
+        Dictionary of options that will be passed to the relevant `ignis.vis`
+        object constructor.
+
+    Returns
+    -------
+    ignis.aurum.Aurum
+        The `ignis.aurum.Aurum` results object for the trained model, which can be used
+        for further exploration and iteration.
+    &#34;&#34;&#34;
+    if type(corpus_slice) is ignis.corpus.Corpus:
+        corpus_slice = corpus_slice.slice_full()
+    if not type(corpus_slice) is ignis.corpus.CorpusSlice:
+        raise ValueError(
+            &#34;Ignis models must be instantiated with Corpus or CorpusSlice instances.&#34;
+        )
+
+    if model_type == &#34;tp_lda&#34;:
+        model = ignis.models.LDAModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    elif model_type == &#34;tp_lda_wp&#34;:
+        # Tomotopy LDA model with word priors
+        # (contrib.: C. Ow)
+        if isinstance(pre_model, ignis.models.lda.LDAModel):
+            model = pre_model
+        else:
+            raise ValueError(
+                &#34;Ignis models with word priors must be pre-instantiated &#34;
+                &#34;`ignis.models.lda.LDAModel` instances.&#34;
+            )
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    elif model_type == &#34;tp_hdp&#34;:
+        model = ignis.models.HDPModel(corpus_slice, model_options)
+        model.train()
+        aurum = ignis.aurum.Aurum(model)
+    else:
+        raise ValueError(f&#34;Unknown model type: &#39;{model_type}&#39;&#34;)
+
+    if labeller_type is not None:
+        if labeller_options is None:
+            labeller_options = {}
+
+        aurum.init_labeller(labeller_type, **labeller_options)
+
+    if vis_type is not None:
+        if vis_options is None:
+            vis_options = {}
+
+        aurum.init_vis(vis_type, **vis_options)
+
+    return aurum</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -159,6 +520,7 @@ Aurum results.</p></div>
 <li><a href="#clone-the-repository">Clone the repository</a></li>
 <li><a href="#install-the-project-dependencies">Install the project dependencies</a></li>
 <li><a href="#perform-post-installation-steps">Perform post-installation steps</a></li>
+<li><a href="#run-the-sample-notebooks">Run the sample notebooks</a></li>
 </ul>
 </li>
 <li><a href="#other-notes">Other Notes</a><ul>
@@ -178,9 +540,17 @@ Aurum results.</p></div>
 <li><code><a title="ignis.labeller" href="labeller/index.html">ignis.labeller</a></code></li>
 <li><code><a title="ignis.models" href="models/index.html">ignis.models</a></code></li>
 <li><code><a title="ignis.probat" href="probat.html">ignis.probat</a></code></li>
-<li><code><a title="ignis.tests" href="tests/index.html">ignis.tests</a></code></li>
 <li><code><a title="ignis.util" href="util/index.html">ignis.util</a></code></li>
 <li><code><a title="ignis.vis" href="vis/index.html">ignis.vis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ignis.load_corpus" href="#ignis.load_corpus">load_corpus</a></code></li>
+<li><code><a title="ignis.load_results" href="#ignis.load_results">load_results</a></code></li>
+<li><code><a title="ignis.load_slice" href="#ignis.load_slice">load_slice</a></code></li>
+<li><code><a title="ignis.suggest_num_topics" href="#ignis.suggest_num_topics">suggest_num_topics</a></code></li>
+<li><code><a title="ignis.train_model" href="#ignis.train_model">train_model</a></code></li>
 </ul>
 </li>
 </ul>
