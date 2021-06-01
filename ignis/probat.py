@@ -11,7 +11,7 @@ import ignis.corpus
 import ignis.models
 
 
-def initi_lda_model_wp(corpus_slice, model_options=None):
+def init_lda_model_wp(corpus_slice, model_options=None):
     """
     Prepare an `ignis.models.lda.LDAModel` for use with word priors.
     (contrib.: C. Ow)
@@ -159,7 +159,7 @@ def compare_topic_count_coherence(
         model constructor.
     coherence: {"c_npmi", "c_v", "u_mass", "c_uci"}, optional
         Coherence measure to calculate. `"c_npmi"` by default.
-    top_n: int
+    top_n: int, optional
         Number of top tokens to extract from each topic when measuring coherence.
         The default of 30 matches the number of tokens shown per topic by pyLDAvis.
     start_k: int, optional
@@ -243,7 +243,7 @@ def suggest_num_topics(*args, verbose=True, **kwargs):
     ----------
     verbose: bool, optional
         Whether or not to print the details of the best topic count.
-    *args, **kwargs:
+    *args, **kwargs
         Passed on to `compare_topic_count_coherence()`.
 
     Returns

@@ -4,7 +4,6 @@ An improved automated n-gram detection mechanism built on top of the `gensim` Ph
 
 import math
 import time
-import uuid
 
 from tqdm.auto import tqdm
 
@@ -193,7 +192,7 @@ class ImprovedPhraser:
                 self.by_first[head] = []
             self.by_first[head].append((phrase, score))
 
-    def find_ngram_single(self, doc, threshold=-math.inf):
+    def find_ngrams_single(self, doc, threshold=-math.inf):
         """
         Perform n-gram replacement for a single document using the phrase model
         trained for this instance.
@@ -307,7 +306,7 @@ class ImprovedPhraser:
             docs = tqdm(docs)
 
         for doc in docs:
-            new_doc = self.find_ngram_single(doc, threshold)
+            new_doc = self.find_ngrams_single(doc, threshold)
             new_docs.append(new_doc)
 
         return new_docs

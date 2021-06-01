@@ -277,7 +277,7 @@ class Aurum:
         If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
         instead of just the model's current `ignis.corpus.CorpusSlice`.
 
-        See `ignis.corpus.Corpus.slice_without_token()` for more details.
+        See `ignis.corpus.Corpus.slice_without_text_string()` for more details.
         """
         base_slice = self.corpus_slice
         if include_root:
@@ -293,7 +293,7 @@ class Aurum:
         If `include_root` is True, will slice the full base `ignis.corpus.Corpus`
         instead of just the model's current `ignis.corpus.CorpusSlice`.
 
-        See `ignis.corpus.Corpus.slice_without_tokens()` for more details.
+        See `ignis.corpus.Corpus.slice_without_text_strings()` for more details.
         """
         base_slice = self.corpus_slice
         if include_root:
@@ -416,7 +416,7 @@ class Aurum:
         Parameters
         ----------
         **kwargs
-            Passed through to the visualisation module
+            Passed through to the visualisation module.
 
         Returns
         -------
@@ -830,7 +830,7 @@ class Aurum:
         are passed, they are _merged_ with the ones from this current `Aurum` object
         instead of replacing them outright.
 
-        See `ignis.probat.train_model()` for details on the various parameters.
+        See `ignis.probat.train_model()` for more details on the various parameters.
 
         Parameters
         ----------
@@ -1064,7 +1064,7 @@ def show_visualisations(aurum_objects):
     display(ui, out)
 
     # Show the initial output (i.e., with index == 1).  We need to call it manually
-    # here because some visualisations (e.g., pyLDAvis) will ony be drawn if `out`
+    # here because some visualisations (e.g., pyLDAvis) will only be drawn if `out`
     # has already been made visible via `display()`.
     with out:
         out.clear_output(wait=True)
