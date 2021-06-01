@@ -1,0 +1,7 @@
+recursive-include data *
+include *.ipynb
+include Pipfile
+include Pipfile.lock
+prune .github
+prune .idea
+prune docs
