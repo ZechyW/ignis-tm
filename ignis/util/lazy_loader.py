@@ -1,3 +1,7 @@
+"""
+A general class for lazy loading expensive modules.
+"""
+
 import importlib
 
 
@@ -5,14 +9,22 @@ class LazyLoader:
     """
     A general class for lazy loading expensive modules.
 
+    Modules will only be fully loaded when any of their members are first accessed.
+
     Parameters
     ----------
     module_name: str
-        Module name to lazy load
+        Name of the module to lazy load
 
     Examples
     --------
-    tp = LazyLoader("tomotopy")
+    >>> tp = LazyLoader("tomotopy")
+    >>> vars(tp)
+    {'module_name': 'tomotopy', '_module': None}
+    >>> tp.__version__
+    '0.10.1'
+    >>> tp._module is None
+    False
     """
 
     def __init__(self, module_name):
