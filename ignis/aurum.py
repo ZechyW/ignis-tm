@@ -408,11 +408,6 @@ class Aurum:
         Presumes that the `ignis.vis` class returns a situation-appropriate format
         (e.g., for display in a Jupyter notebook)
 
-        _Sample (using `pyLDAvis`):_
-
-        .. image:: /ignis-tm/images/show_visualisation_pyldavis.png
-           `show_visualisation()` widget screenshot (pyLDAvis)
-
         Parameters
         ----------
         **kwargs
@@ -500,11 +495,6 @@ class Aurum:
         passed via `doc_sort_key` as well.
 
         Suggested topic labels will be shown if the model has a labeller initialised.
-
-        _Sample:_
-
-        .. image:: /ignis-tm/images/nb_explore_topics.png
-           `nb_explore_topics()` widget screenshot
 
         Parameters
         ----------
@@ -1015,11 +1005,6 @@ def show_visualisations(aurum_objects):
     """
     Given some list of multiple `ignis.aurum.Aurum` objects that have initialised
     visualisation data, show them sequentially with a Jupyter notebook slider widget.
-
-    _Sample (using `pyLDAvis` visualisations):_
-
-    .. image:: /ignis-tm/images/show_visualisations_pyldavis.png
-       `show_visualisations()` widget screenshot (pyLDAvis)
 
     Parameters
     ----------

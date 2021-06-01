@@ -719,11 +719,6 @@ class Corpus:
         `Document` objects do not have any sort order imposed on them by default,
         but a custom sorting function can be passed via `doc_sort_key` if necessary.
 
-        _Sample:_
-
-        .. image:: /ignis-tm/images/nb_explore.png
-           `nb_explore()` widget screenshot
-
         Parameters
         ----------
         doc_sort_key: fn, optional
