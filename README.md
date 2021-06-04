@@ -4,6 +4,8 @@
 
 By default, it supports creating LDA models using Tomotopy (https://bab2min.github.io/tomotopy/) and visualising them using pyLDAvis (https://github.com/bmabey/pyLDAvis), but support for other models and frameworks can be written in as necessary.
 
+API documentation is available at [https://zechyw.github.io/ignis-tm/ignis/](https://zechyw.github.io/ignis-tm/ignis/).
+
 ## Installation
 
 The library package is named `ignis-tm` on PyPI, so to use it in a project, first install the `ignis-tm` package:
@@ -105,5 +107,5 @@ The `ipython` and `jedi` packages are pinned to specific versions in the demo `p
 ## Changes
 
 - 1.5.0 (1 June 2021)
-  - General functionality update to match development version; enhancements and improvements across the board.
-  - Updated demo walkthrough notebooks.
+    - General functionality update to match development version; enhancements and improvements across the board.
+    - Updated demo walkthrough notebooks.
