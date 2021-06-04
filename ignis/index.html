@@ -24,6 +24,7 @@
 <h1 id="ignis-iterative-topic-modelling-platform">Ignis: Iterative Topic Modelling Platform</h1>
 <p><code><a title="ignis" href="#ignis">ignis</a></code> is an extensible platform that provides a common interface for creating and visualising topic models.</p>
 <p>By default, it supports creating LDA models using Tomotopy (<a href="https://bab2min.github.io/tomotopy/">https://bab2min.github.io/tomotopy/</a>) and visualising them using pyLDAvis (<a href="https://github.com/bmabey/pyLDAvis">https://github.com/bmabey/pyLDAvis</a>), but support for other models and frameworks can be written in as necessary.</p>
+<p>API documentation is available at <a href="https://zechyw.github.io/ignis-tm/ignis/">https://zechyw.github.io/ignis-tm/ignis/</a>.</p>
 <h2 id="installation">Installation</h2>
 <p>The library package is named <code>ignis-tm</code> on PyPI, so to use it in a project, first install the <code>ignis-tm</code> package:</p>
 <pre><code class="language-shell">pip install ignis-tm
@@ -82,9 +83,11 @@ To be safe, <code>PYTHONHASHSEED</code> should be explicitly set where necessary
 <p>The <code>ipython</code> and <code>jedi</code> packages are pinned to specific versions in the demo <code>pipenv</code> environment to ensure their compatibility with extensions and code completion within Jupyter notebooks; unfortunately, they break with later versions due to a lack of upstream updates.</p>
 <h2 id="changes">Changes</h2>
 <ul>
-<li>1.5.0 (1 June 2021)</li>
+<li>1.5.0 (1 June 2021)<ul>
 <li>General functionality update to match development version; enhancements and improvements across the board.</li>
 <li>Updated demo walkthrough notebooks.</li>
+</ul>
+</li>
 </ul>
 <details class="source">
 <summary>
