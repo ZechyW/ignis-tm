@@ -107,7 +107,7 @@ The `ipython` and `jedi` packages are pinned to specific versions in the demo `p
 ## Changes
 - 1.6.5 (18 June 2021)
     - Made `ignis.corpus.Corpus` objects iterable.  `ignis.corpus.Document` objects are also now accessible by index.
-    - Fixed `ignis.models.LDAModel` to handle documents with empty token lists.  These documents come about when all their tokens are removed by the root stop word list at run-time.
+    - Fixed `ignis.models.lda.LDAModel` to handle documents with empty token lists.  These documents come about when all their tokens are removed by the root stop word list at run-time.
 
 - 1.5.0 (1 June 2021)
     - General functionality update to match development version; enhancements and improvements across the board.
