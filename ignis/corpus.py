@@ -296,6 +296,25 @@ class Corpus:
         return self._documents[doc_id]
 
     # --------------------
+    # Indexing and iteration
+    def __getitem__(self, doc_id):
+        if isinstance(doc_id, int):
+            # Pick out the n-th Document in the Corpus
+            return self.get_document(self.document_ids[doc_id])
+        elif isinstance(doc_id, slice):
+            # Pick out a slice of Documents from the Corpus
+            return [
+                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
+            ]
+        else:
+            # Pick out the Document by ID
+            return self.get_document(doc_id)
+
+    def __iter__(self):
+        for doc_id in self.document_ids:
+            yield self.get_document(doc_id)
+
+    # --------------------
     # Slicing functions
     def slice_full(self):
         """
@@ -754,11 +773,11 @@ class Corpus:
         # noinspection PyTypeChecker
         display(HTML(ignis.util.jupyter_styles.jupyter_output_style))
 
-        docs = [self.get_document(doc_id) for doc_id in self.document_ids]
-
-        if len(docs) == 0:
+        if len(self) == 0:
             print("This Corpus or CorpusSlice contains no documents.")
             return
+
+        docs = list(self)
 
         if doc_sort_key is not None:
             docs = sorted(docs, key=doc_sort_key, reverse=reverse)
@@ -1012,6 +1031,9 @@ class Document(object):
             self.plain_text = " ".join(soup.get_text().split())
             return self.plain_text
         return object.__getattribute__(self, item)
+
+    def __repr__(self):
+        return str(self)
 
 
 # noinspection PyProtectedMember
