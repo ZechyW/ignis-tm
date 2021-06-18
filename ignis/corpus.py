@@ -30,9 +30,8 @@ class Corpus:
     but they are shuffled when sliced into `CorpusSlice` objects (viz., they are
     sorted by their randomly-generated IDs).
 
-    Stop words are also managed at the (root) `Corpus` level -- Whenever `Document`
-    objects are retrieved via `Corpus.get_document()`, stop words are removed from
-    their tokens at run-time.
+    Stop words are also managed at the (root) `Corpus` level -- Stop words are
+    removed at run-time whenever the `token` attribute of a `Document` is accessed.
 
     Parameters
     ----------
@@ -303,9 +302,10 @@ class Corpus:
             return self.get_document(self.document_ids[doc_id])
         elif isinstance(doc_id, slice):
             # Pick out a slice of Documents from the Corpus
-            return [
-                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
-            ]
+            # (presented as a CorpusSlice rather than a simple list)
+            return CorpusSlice(
+                self, [slice_doc for slice_doc in self.document_ids[doc_id]]
+            )
         else:
             # Pick out the Document by ID
             return self.get_document(doc_id)
