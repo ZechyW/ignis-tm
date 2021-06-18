@@ -83,7 +83,18 @@ To be safe, <code>PYTHONHASHSEED</code> should be explicitly set where necessary
 <p>The <code>ipython</code> and <code>jedi</code> packages are pinned to specific versions in the demo <code>pipenv</code> environment to ensure their compatibility with extensions and code completion within Jupyter notebooks; unfortunately, they break with later versions due to a lack of upstream updates.</p>
 <h2 id="changes">Changes</h2>
 <ul>
-<li>1.5.0 (1 June 2021)<ul>
+<li>
+<p>1.6.5 (18 June 2021)</p>
+<ul>
+<li>Made <code><a title="ignis.corpus.Corpus" href="corpus.html#ignis.corpus.Corpus">Corpus</a></code> objects iterable.
+<code><a title="ignis.corpus.Document" href="corpus.html#ignis.corpus.Document">Document</a></code> objects are also now accessible by index.</li>
+<li>Fixed <code>ignis.model.LDAModel</code> to handle documents with empty token lists.
+These documents come about when all their tokens are removed by the root stop word list at run-time.</li>
+</ul>
+</li>
+<li>
+<p>1.5.0 (1 June 2021)</p>
+<ul>
 <li>General functionality update to match development version; enhancements and improvements across the board.</li>
 <li>Updated demo walkthrough notebooks.</li>
 </ul>
