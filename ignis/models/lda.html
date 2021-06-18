@@ -35,6 +35,7 @@ import pathlib
 import tempfile
 import time
 import uuid
+import warnings
 
 from tqdm.auto import tqdm
 
@@ -205,11 +206,25 @@ class LDAModel(BaseModel):
         self.doc_id_to_model_index = {}
         index = 0
 
+        empty_docs = 0
         for doc_id in self.corpus_slice.document_ids:
             doc = self.corpus_slice.get_document(doc_id)
+
+            # Because the Corpus stop list is dynamically applied, documents may have
+            # empty token lists at this point
+            if len(doc.tokens) == 0:
+                empty_docs += 1
+                continue
+
             self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
+
+        if empty_docs &gt; 0:
+            warnings.warn(
+                f&#34;{empty_docs} document(s) skipped because they contain no tokens. &#34;
+                f&#34;(The document(s) may have contained only stop words as tokens.)&#34;
+            )
 
         # Hyper-parameter optimisation
         self.model.burn_in = self.options[&#34;burn_in&#34;]
@@ -385,7 +400,8 @@ class LDAModel(BaseModel):
 
             if verbose:
                 print(
-                    &#34;\nContinuing to train until maximum coherence.\n&#34;, flush=True,
+                    &#34;\nContinuing to train until maximum coherence.\n&#34;,
+                    flush=True,
                 )
                 progress_bar = tqdm(miniters=1)
 
@@ -737,11 +753,25 @@ If "auto", will use <code>1 / k</code>.</dd>
         self.doc_id_to_model_index = {}
         index = 0
 
+        empty_docs = 0
         for doc_id in self.corpus_slice.document_ids:
             doc = self.corpus_slice.get_document(doc_id)
+
+            # Because the Corpus stop list is dynamically applied, documents may have
+            # empty token lists at this point
+            if len(doc.tokens) == 0:
+                empty_docs += 1
+                continue
+
             self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
+
+        if empty_docs &gt; 0:
+            warnings.warn(
+                f&#34;{empty_docs} document(s) skipped because they contain no tokens. &#34;
+                f&#34;(The document(s) may have contained only stop words as tokens.)&#34;
+            )
 
         # Hyper-parameter optimisation
         self.model.burn_in = self.options[&#34;burn_in&#34;]
@@ -917,7 +947,8 @@ If "auto", will use <code>1 / k</code>.</dd>
 
             if verbose:
                 print(
-                    &#34;\nContinuing to train until maximum coherence.\n&#34;, flush=True,
+                    &#34;\nContinuing to train until maximum coherence.\n&#34;,
+                    flush=True,
                 )
                 progress_bar = tqdm(miniters=1)
 

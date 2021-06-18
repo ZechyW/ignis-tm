@@ -60,9 +60,8 @@ class Corpus:
     but they are shuffled when sliced into `CorpusSlice` objects (viz., they are
     sorted by their randomly-generated IDs).
 
-    Stop words are also managed at the (root) `Corpus` level -- Whenever `Document`
-    objects are retrieved via `Corpus.get_document()`, stop words are removed from
-    their tokens at run-time.
+    Stop words are also managed at the (root) `Corpus` level -- Stop words are
+    removed at run-time whenever the `token` attribute of a `Document` is accessed.
 
     Parameters
     ----------
@@ -333,9 +332,10 @@ class Corpus:
             return self.get_document(self.document_ids[doc_id])
         elif isinstance(doc_id, slice):
             # Pick out a slice of Documents from the Corpus
-            return [
-                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
-            ]
+            # (presented as a CorpusSlice rather than a simple list)
+            return CorpusSlice(
+                self, [slice_doc for slice_doc in self.document_ids[doc_id]]
+            )
         else:
             # Pick out the Document by ID
             return self.get_document(doc_id)
@@ -1256,9 +1256,8 @@ modelling &ndash; Smaller sets of <code><a title="ignis.corpus.Document" href="#
 <p>Note: <code><a title="ignis.corpus.Document" href="#ignis.corpus.Document">Document</a></code> objects in a <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpus</a></code> are loosely kept in insertion order,
 but they are shuffled when sliced into <code><a title="ignis.corpus.CorpusSlice" href="#ignis.corpus.CorpusSlice">CorpusSlice</a></code> objects (viz., they are
 sorted by their randomly-generated IDs).</p>
-<p>Stop words are also managed at the (root) <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpus</a></code> level &ndash; Whenever <code><a title="ignis.corpus.Document" href="#ignis.corpus.Document">Document</a></code>
-objects are retrieved via <code><a title="ignis.corpus.Corpus.get_document" href="#ignis.corpus.Corpus.get_document">Corpus.get_document()</a></code>, stop words are removed from
-their tokens at run-time.</p>
+<p>Stop words are also managed at the (root) <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpus</a></code> level &ndash; Stop words are
+removed at run-time whenever the <code>token</code> attribute of a <code><a title="ignis.corpus.Document" href="#ignis.corpus.Document">Document</a></code> is accessed.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>stop_words</code></strong> :&ensp;<code>set</code> of <code>str</code>, optional</dt>
@@ -1290,9 +1289,8 @@ with both <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpu
     but they are shuffled when sliced into `CorpusSlice` objects (viz., they are
     sorted by their randomly-generated IDs).
 
-    Stop words are also managed at the (root) `Corpus` level -- Whenever `Document`
-    objects are retrieved via `Corpus.get_document()`, stop words are removed from
-    their tokens at run-time.
+    Stop words are also managed at the (root) `Corpus` level -- Stop words are
+    removed at run-time whenever the `token` attribute of a `Document` is accessed.
 
     Parameters
     ----------
@@ -1563,9 +1561,10 @@ with both <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpu
             return self.get_document(self.document_ids[doc_id])
         elif isinstance(doc_id, slice):
             # Pick out a slice of Documents from the Corpus
-            return [
-                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
-            ]
+            # (presented as a CorpusSlice rather than a simple list)
+            return CorpusSlice(
+                self, [slice_doc for slice_doc in self.document_ids[doc_id]]
+            )
         else:
             # Pick out the Document by ID
             return self.get_document(doc_id)
