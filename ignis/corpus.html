@@ -326,6 +326,25 @@ class Corpus:
         return self._documents[doc_id]
 
     # --------------------
+    # Indexing and iteration
+    def __getitem__(self, doc_id):
+        if isinstance(doc_id, int):
+            # Pick out the n-th Document in the Corpus
+            return self.get_document(self.document_ids[doc_id])
+        elif isinstance(doc_id, slice):
+            # Pick out a slice of Documents from the Corpus
+            return [
+                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
+            ]
+        else:
+            # Pick out the Document by ID
+            return self.get_document(doc_id)
+
+    def __iter__(self):
+        for doc_id in self.document_ids:
+            yield self.get_document(doc_id)
+
+    # --------------------
     # Slicing functions
     def slice_full(self):
         &#34;&#34;&#34;
@@ -784,11 +803,11 @@ class Corpus:
         # noinspection PyTypeChecker
         display(HTML(ignis.util.jupyter_styles.jupyter_output_style))
 
-        docs = [self.get_document(doc_id) for doc_id in self.document_ids]
-
-        if len(docs) == 0:
+        if len(self) == 0:
             print(&#34;This Corpus or CorpusSlice contains no documents.&#34;)
             return
+
+        docs = list(self)
 
         if doc_sort_key is not None:
             docs = sorted(docs, key=doc_sort_key, reverse=reverse)
@@ -1042,6 +1061,9 @@ class Document(object):
             self.plain_text = &#34; &#34;.join(soup.get_text().split())
             return self.plain_text
         return object.__getattribute__(self, item)
+
+    def __repr__(self):
+        return str(self)
 
 
 # noinspection PyProtectedMember
@@ -1534,6 +1556,25 @@ with both <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpu
         return self._documents[doc_id]
 
     # --------------------
+    # Indexing and iteration
+    def __getitem__(self, doc_id):
+        if isinstance(doc_id, int):
+            # Pick out the n-th Document in the Corpus
+            return self.get_document(self.document_ids[doc_id])
+        elif isinstance(doc_id, slice):
+            # Pick out a slice of Documents from the Corpus
+            return [
+                self.get_document(slice_doc) for slice_doc in self.document_ids[doc_id]
+            ]
+        else:
+            # Pick out the Document by ID
+            return self.get_document(doc_id)
+
+    def __iter__(self):
+        for doc_id in self.document_ids:
+            yield self.get_document(doc_id)
+
+    # --------------------
     # Slicing functions
     def slice_full(self):
         &#34;&#34;&#34;
@@ -1992,11 +2033,11 @@ with both <code><a title="ignis.corpus.Corpus" href="#ignis.corpus.Corpus">Corpu
         # noinspection PyTypeChecker
         display(HTML(ignis.util.jupyter_styles.jupyter_output_style))
 
-        docs = [self.get_document(doc_id) for doc_id in self.document_ids]
-
-        if len(docs) == 0:
+        if len(self) == 0:
             print(&#34;This Corpus or CorpusSlice contains no documents.&#34;)
             return
+
+        docs = list(self)
 
         if doc_sort_key is not None:
             docs = sorted(docs, key=doc_sort_key, reverse=reverse)
@@ -2492,11 +2533,11 @@ metadata dictionary.</p>
     # noinspection PyTypeChecker
     display(HTML(ignis.util.jupyter_styles.jupyter_output_style))
 
-    docs = [self.get_document(doc_id) for doc_id in self.document_ids]
-
-    if len(docs) == 0:
+    if len(self) == 0:
         print(&#34;This Corpus or CorpusSlice contains no documents.&#34;)
         return
+
+    docs = list(self)
 
     if doc_sort_key is not None:
         docs = sorted(docs, key=doc_sort_key, reverse=reverse)
@@ -3739,7 +3780,10 @@ object's <code>tokens</code> property is accessed.</dd>
             # Concatenate, split, and concatenate again to normalise the spacing
             self.plain_text = &#34; &#34;.join(soup.get_text().split())
             return self.plain_text
-        return object.__getattribute__(self, item)</code></pre>
+        return object.__getattribute__(self, item)
+
+    def __repr__(self):
+        return str(self)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
