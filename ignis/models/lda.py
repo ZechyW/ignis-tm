@@ -7,6 +7,7 @@ import pathlib
 import tempfile
 import time
 import uuid
+import warnings
 
 from tqdm.auto import tqdm
 
@@ -177,11 +178,25 @@ class LDAModel(BaseModel):
         self.doc_id_to_model_index = {}
         index = 0
 
+        empty_docs = 0
         for doc_id in self.corpus_slice.document_ids:
             doc = self.corpus_slice.get_document(doc_id)
+
+            # Because the Corpus stop list is dynamically applied, documents may have
+            # empty token lists at this point
+            if len(doc.tokens) == 0:
+                empty_docs += 1
+                continue
+
             self.model.add_doc(doc.tokens)
             self.doc_id_to_model_index[doc_id] = index
             index += 1
+
+        if empty_docs > 0:
+            warnings.warn(
+                f"{empty_docs} document(s) skipped because they contain no tokens. "
+                f"(The document(s) may have contained only stop words as tokens.)"
+            )
 
         # Hyper-parameter optimisation
         self.model.burn_in = self.options["burn_in"]
@@ -357,7 +372,8 @@ class LDAModel(BaseModel):
 
             if verbose:
                 print(
-                    "\nContinuing to train until maximum coherence.\n", flush=True,
+                    "\nContinuing to train until maximum coherence.\n",
+                    flush=True,
                 )
                 progress_bar = tqdm(miniters=1)
 
