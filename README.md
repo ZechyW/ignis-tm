@@ -105,6 +105,9 @@ For Jupyter notebooks in a non-Conda environment, edit the Jupyter `kernel.json`
 The `ipython` and `jedi` packages are pinned to specific versions in the demo `pipenv` environment to ensure their compatibility with extensions and code completion within Jupyter notebooks; unfortunately, they break with later versions due to a lack of upstream updates.
 
 ## Changes
+- 1.6.5 (18 June 2021)
+    - Made `ignis.corpus.Corpus` objects iterable.  `ignis.corpus.Document` objects are also now accessible by index.
+    - Fixed `ignis.model.LDAModel` to handle documents with empty token lists.  These documents come about when all their tokens are removed by the root stop word list at run-time.
 
 - 1.5.0 (1 June 2021)
     - General functionality update to match development version; enhancements and improvements across the board.
