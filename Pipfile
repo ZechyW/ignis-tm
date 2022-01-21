@@ -5,7 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 black = "*"
-ipython = "==7.16.1"
+ipython = "==7.16.3"
 jedi = "==0.17.2"
 jupyter = "*"
 jupyter-contrib-nbextensions = "*"
